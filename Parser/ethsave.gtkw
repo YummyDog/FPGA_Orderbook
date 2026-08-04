@@ -1,0 +1,29 @@
+[*]
+[*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
+[*] Tue Aug 04 11:58:00 2026
+[*]
+[dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\eth_parser.fst"
+[dumpfile_mtime] "Tue Aug 04 10:30:29 2026"
+[dumpfile_size] 2450
+[savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\ethsave.gtkw"
+[timestart] 0
+[size] 1920 1017
+[pos] -87 -87
+*-30.000000 1844000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 409
+[signals_width] 174
+[sst_expanded] 1
+[sst_vpaned_height] 589
+@28
+eth_parser.clk
+@22
+eth_parser.s_axis_tdata[63:0]
+eth_parser.tpid_c[15:0]
+@28
+eth_parser.vlan_present_r
+@22
+eth_parser.m_fields[129:0]
+@29
+eth_parser.m_axis_tvalid
+[pattern_trace] 1
+[pattern_trace] 0

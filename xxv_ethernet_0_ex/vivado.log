@@ -1,0 +1,1113 @@
+#-----------------------------------------------------------
+# Vivado v2025.2 (64-bit)
+# SW Build 6299465 on Fri Nov 14 19:35:11 GMT 2025
+# IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+# SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+# Start of session at: Mon Aug  3 18:24:28 2026
+# Process ID         : 15936
+# Current directory  : c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex
+# Command line       : vivado.exe -notrace -source c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_0_ex.tcl
+# Log file           : c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/vivado.log
+# Journal file       : c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex\vivado.jou
+# Running On         : DESKTOP-MB4FOM3
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 19045
+# Processor Detail   : Intel(R) Core(TM) i5-8600 CPU @ 3.10GHz
+# CPU Frequency      : 3096 MHz
+# CPU Physical cores : 6
+# CPU Logical cores  : 6
+# Host memory        : 17119 MB
+# Swap memory        : 9299 MB
+# Total Virtual      : 26419 MB
+# Available Virtual  : 10249 MB
+#-----------------------------------------------------------
+start_gui
+source c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_0_ex.tcl -notrace
+INFO: [open_example_project] Creating new example project...
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:ac701:part0:1.4 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\ac701\1.4\board.xml as part xc7a200tfbg676-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:emb-plus-vpr-4616:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\emb-plus-vpr-4616\1.0\board.xml as part xcve2302-sfva784-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:emb-plus-vpr-4616:part0:1.1 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\emb-plus-vpr-4616\1.1\board.xml as part xcve2302-sfva784-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:k24c:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\k24c\1.0\board.xml as part xck24-ubva530-2lv-c specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:k24c:part0:1.1 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\k24c\1.1\board.xml as part xck24-ubva530-2lv-c specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:k24i:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\k24i\1.0\board.xml as part xck24-ubva530-2lvi-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:k26c:part0:1.2 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\k26c\1.2\board.xml as part xck26-sfvc784-2lv-c specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:k26c:part0:1.3 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\k26c\1.3\board.xml as part xck26-sfvc784-2lv-c specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:k26c:part0:1.4 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\k26c\1.4\board.xml as part xck26-sfvc784-2lv-c specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:k26i:part0:1.2 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\k26i\1.2\board.xml as part xck26-sfvc784-2lvi-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:k26i:part0:1.3 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\k26i\1.3\board.xml as part xck26-sfvc784-2lvi-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:k26i:part0:1.4 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\k26i\1.4\board.xml as part xck26-sfvc784-2lvi-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kc705:part0:1.6 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\kc705\1.6\board.xml as part xc7k325tffg900-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kc705:part0:1.7 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\kc705\1.7\board.xml as part xc7k325tffg900-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kcu105:part0:1.6 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\kcu105\1.6\board.xml as part xcku040-ffva1156-2-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kcu105:part0:1.7 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\kcu105\1.7\board.xml as part xcku040-ffva1156-2-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kd240_som:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\kd240_som\1.0\board.xml as part xck24-ubva530-2lv-c specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kd240_som:part0:1.1 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\kd240_som\1.1\board.xml as part xck24-ubva530-2lv-c specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kr260_som:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\kr260_som\1.0\board.xml as part xck26-sfvc784-2lv-c specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kr260_som:part0:1.1 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\kr260_som\1.1\board.xml as part xck26-sfvc784-2lv-c specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kv260_som:part0:1.2 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\kv260_som\1.2\board.xml as part xck26-sfvc784-2lv-c specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kv260_som:part0:1.3 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\kv260_som\1.3\board.xml as part xck26-sfvc784-2lv-c specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kv260_som:part0:1.4 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\kv260_som\1.4\board.xml as part xck26-sfvc784-2lv-c specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:sp701:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\sp701\1.0\board.xml as part xc7s100fgga676-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:sp701:part0:1.1 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\sp701\1.1\board.xml as part xc7s100fgga676-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vc707:part0:1.4 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vc707\1.4\board.xml as part xc7vx485tffg1761-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vc707:part0:1.5 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vc707\1.5\board.xml as part xc7vx485tffg1761-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vc709:part0:1.8 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vc709\1.8\board.xml as part xc7vx690tffg1761-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vcu108:part0:1.6 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vcu108\1.6\board.xml as part xcvu095-ffva2104-2-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vcu108:part0:1.7 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vcu108\1.7\board.xml as part xcvu095-ffva2104-2-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vcu110:part0:1.4 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vcu110\1.4\board.xml as part xcvu190-flgc2104-2-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vcu129:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vcu129\production\1.0\board.xml as part xcvu29p-fsga2577-2l-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vek280:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vek280\production\1.0\board.xml as part xcve2802-vsvh1760-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vek280:part0:1.1 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vek280\production\1.1\board.xml as part xcve2802-vsvh1760-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vek280:part0:1.2 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vek280\production\1.2\board.xml as part xcve2802-vsvh1760-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vek385:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vek385\1.0\board.xml as part xc2ve3858-ssva2112-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vek385:part0:1.1 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vek385\1.1\board.xml as part xc2ve3858-ssva2112-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vek385_1:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vek385_2\1.0\board.xml as part xc2ve3858-ssva2112-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vermeo_t1_rfsoc:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vermeo_t1_rfsoc\1.0\board.xml as part xczu21dr-ffvd1156-2l-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vhk158:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vhk158\production\1.0\board.xml as part xcvh1582-vsva3697-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vhk158:part0:1.1 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vhk158\production\1.1\board.xml as part xcvh1582-vsva3697-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vhk158:part0:1.2 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vhk158\production\1.2\board.xml as part xcvh1582-vsva3697-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk180:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vpk180\production\1.0\board.xml as part xcvp1802-lsvc4072-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk180:part0:1.1 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vpk180\production\1.1\board.xml as part xcvp1802-lsvc4072-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vpk180:part0:1.2 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vpk180\production\1.2\board.xml as part xcvp1802-lsvc4072-2mp-e-s specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vrk160:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vrk160\1.0\board.xml as part xcvr1602-vsva2488-2mp-e-s-es1 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:vrk160:part0:1.1 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\vrk160\1.1\board.xml as part xcvr1602-vsva2488-2mp-e-s-es1 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu111:part0:1.2 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\zcu111\1.2\board.xml as part xczu28dr-ffvg1517-2-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu111:part0:1.3 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\zcu111\1.3\board.xml as part xczu28dr-ffvg1517-2-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu111:part0:1.4 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\zcu111\1.4\board.xml as part xczu28dr-ffvg1517-2-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu1275:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\zcu1275\1.0\board.xml as part xczu29dr-ffvf1760-2-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu1285:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\zcu1285\1.0\board.xml as part xczu39dr-ffvf1760-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu208:part0:2.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\zcu208\production\2.0\board.xml as part xczu48dr-fsvg1517-2-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu208ld:part0:2.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\zcu208ld\production\2.0\board.xml as part xczu58dr-fsvg1517-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu216:part0:2.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\zcu216\production\2.0\board.xml as part xczu49dr-ffvf1760-2-e specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu216ld:part0:2.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\zcu216ld\production\2.0\board.xml as part xczu59dr-ffvf1760-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu670:part0:2.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\zcu670\2.0\board.xml as part xczu67dr-fsve1156-2-i specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zcu670ld:part0:1.0 available at D:/AMDDesignTools/2025.2/data/xhub/boards\XilinxBoardStore\boards\Xilinx\zcu670ld\1.0\board.xml as part xczu57dr-fsve1156-2-i specified in board_part file is either invalid or not available
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'D:/AMDDesignTools/2025.2/Vivado/data/ip'.
+create_project: Time (s): cpu = 00:00:16 ; elapsed = 00:00:08 . Memory (MB): peak = 1682.289 ; gain = 196.359
+INFO: [open_example_project] Importing original IP ...
+INFO: [open_example_project] Generating the example project IP ...
+INFO: [IP_Flow 19-1706] Not generating 'Instantiation Template' target for IP 'xxv_ethernet_0'. Target already exists and is up to date.
+INFO: [IP_Flow 19-1706] Not generating 'Synthesis' target for IP 'xxv_ethernet_0'. Target already exists and is up to date.
+INFO: [IP_Flow 19-1706] Not generating 'Simulation' target for IP 'xxv_ethernet_0'. Target already exists and is up to date.
+INFO: [IP_Flow 19-1706] Not generating 'Implementation' target for IP 'xxv_ethernet_0'. Target already exists and is up to date.
+INFO: [open_example_project] Adding example synthesis HDL files ...
+INFO: [open_example_project] Adding example XDC files ...
+INFO: [open_example_project] Adding simulation HDL files ...
+INFO: [open_example_project] Rebuilding top IP...
+INFO: [Vivado 12-25919] Exporting simulation script for '' simulator
+INFO: [exportsim-Tcl-40] Using compiled simulation libraries for IPs
+INFO: [SIM-utils-72] Using boost library from 'D:/AMDDesignTools/2025.2/Vivado/tps/boost_1_72_0'
+INFO: [exportsim-Tcl-35] Exporting simulation files for "XSIM" (AMD Vivado Simulator)...
+INFO: [exportsim-Tcl-29] Pre-compiled simulation library path: 'D:/AMDDesignTools/2025.2/Vivado/data/xsim'
+INFO: [exportsim-Tcl-29] Script generated: 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/xsim/xxv_ethernet_0.sh'
+INFO: [SIM-utils-43] Exported 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/xsim/xxv_ethernet_0_sv.sveo'
+INFO: [SIM-utils-43] Exported 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/xsim/xgmac_xgmii_if_v.txt'
+INFO: [exportsim-Tcl-35] Exporting simulation files for "MODELSIM" (Siemens ModelSim Simulator)...
+INFO: [exportsim-Tcl-29] Pre-compiled simulation library path: 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.cache/compile_simlib/modelsim'
+INFO: [exportsim-Tcl-29] Script generated: 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/modelsim/xxv_ethernet_0.sh'
+INFO: [SIM-utils-43] Exported 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/modelsim/xxv_ethernet_0_sv.sveo'
+INFO: [SIM-utils-43] Exported 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/modelsim/xgmac_xgmii_if_v.txt'
+INFO: [exportsim-Tcl-35] Exporting simulation files for "QUESTA" (Siemens Questa Advanced Simulator)...
+INFO: [exportsim-Tcl-29] Pre-compiled simulation library path: 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.cache/compile_simlib/questa'
+INFO: [exportsim-Tcl-29] Script generated: 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/questa/xxv_ethernet_0.sh'
+INFO: [SIM-utils-43] Exported 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/questa/xxv_ethernet_0_sv.sveo'
+INFO: [SIM-utils-43] Exported 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/questa/xgmac_xgmii_if_v.txt'
+INFO: [exportsim-Tcl-35] Exporting simulation files for "RIVIERA" (Aldec Riviera-PRO Simulator)...
+INFO: [exportsim-Tcl-29] Pre-compiled simulation library path: 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.cache/compile_simlib/riviera'
+INFO: [exportsim-Tcl-29] Script generated: 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/riviera/xxv_ethernet_0.sh'
+INFO: [SIM-utils-43] Exported 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/riviera/xxv_ethernet_0_sv.sveo'
+INFO: [SIM-utils-43] Exported 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/riviera/xgmac_xgmii_if_v.txt'
+INFO: [exportsim-Tcl-35] Exporting simulation files for "ACTIVEHDL" (Aldec Active-HDL Simulator)...
+INFO: [exportsim-Tcl-29] Pre-compiled simulation library path: 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.cache/compile_simlib/activehdl'
+INFO: [exportsim-Tcl-29] Script generated: 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/activehdl/xxv_ethernet_0.sh'
+INFO: [SIM-utils-43] Exported 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/activehdl/xxv_ethernet_0_sv.sveo'
+INFO: [SIM-utils-43] Exported 'C:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.ip_user_files/sim_scripts/xxv_ethernet_0/activehdl/xgmac_xgmii_if_v.txt'
+INFO: [open_example_project] Open Example Project completed
+update_compile_order -fileset sources_1
+launch_simulation
+Command: launch_simulation 
+INFO: [Vivado 12-25911] Executing simulation for 'XSim' simulator
+INFO: [Vivado 12-28535] Process started - Mon Aug  3 18:26:16 2026
+
+INFO: [Vivado 12-12493] Simulation top is 'xxv_ethernet_0_exdes_tb'
+INFO: [Vivado 12-5698] Checking validity of IPs in the design for the 'XSim' simulator...
+INFO: [Vivado 12-5682] Launching behavioral simulation in 'c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.sim/sim_1/behav/xsim'
+INFO: [Vivado 12-13660] Precompiled IP simulation library mode is enabled (default). The design IP libraries will be referenced from the compiled library path. Please note that if the precompiled version of the library is not found from the path or the IP is in locked state, then the library source files for these IPs will be compiled locally as part of the compile order.
+INFO: [Vivado 12-4795] Using compiled simulation libraries for IPs
+INFO: [SIM-utils-51] Simulation object is 'sim_1'
+INFO: [SIM-utils-72] Using boost library from 'D:/AMDDesignTools/2025.2/Vivado/tps/boost_1_72_0'
+INFO: [USF-XSim-7] Finding pre-compiled libraries...
+INFO: [USF-XSim-11] File 'D:/AMDDesignTools/2025.2/Vivado/data/xsim/xsim.ini' copied to run dir:'c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.sim/sim_1/behav/xsim'
+INFO: [SIM-utils-54] Inspecting design source files for 'xxv_ethernet_0_exdes_tb' in fileset 'sim_1'...
+INFO: [USF-XSim-97] Finding global include files...
+INFO: [USF-XSim-98] Fetching design files from 'sim_1'...
+INFO: [USF-XSim-2] XSim::Compile design
+INFO: [USF-XSim-61] Executing 'COMPILE and ANALYZE' step in 'c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.sim/sim_1/behav/xsim'
+"xvlog --incr --relax -L xxv_ethernet_v5_0_2 -prj xxv_ethernet_0_exdes_tb_vlog.prj"
+!! WARNING !!
+"PYTHONPATH" variable is set greater than default max string limit of "519" characters.
+Please ignore this, if you have already made changes to your system registry to accept more than
+default limit of 519 characters.
+!! WARNING !!
+INFO: [VRFC 10-2263] Analyzing Verilog file "c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_exdes.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_exdes
+INFO: [VRFC 10-2263] Analyzing Verilog file "c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_pkt_gen_mon
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_cdc_sync_2stage
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_user_cdc_sync
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_axis_traffic_gen_mon
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_buf
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_axis_pkt_gen
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_pktprbs_gen
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_traf_chk1
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_pkt_len_gen
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_axis_pkt_mon
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_traf_data_chk
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_example_fsm_axis
+INFO: [VRFC 10-2263] Analyzing Verilog file "c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_exdes_tb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_exdes_tb
+INFO: [VRFC 10-2263] Analyzing Verilog file "c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.sim/sim_1/behav/xsim/glbl.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module glbl
+"xvhdl --incr --relax -prj xxv_ethernet_0_exdes_tb_vhdl.prj"
+!! WARNING !!
+"PYTHONPATH" variable is set greater than default max string limit of "519" characters.
+Please ignore this, if you have already made changes to your system registry to accept more than
+default limit of 519 characters.
+!! WARNING !!
+INFO: [VRFC 10-163] Analyzing VHDL file "c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_0_sim_netlist.vhdl" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_mac_only64_syncer_reset'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_mac_only64_syncer_reset_0'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_shared_clocking'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_xgmii_if'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_fcs_64_full'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_ftype_parser'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_pause_parser'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_reset_flop'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_reset_flop_4'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_reset_flop_5'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_reset_flop_6'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_rx_axis_adapter'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_rx_delete_fcs'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_rx_gfifo_RAM_C2_P1_W72_D8_FL'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_rx_stats'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level_1'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level_2'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level_3'
+INFO: [VRFC 10-3107] analyzing entity '\xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level__parameterized0\'
+INFO: [VRFC 10-3107] analyzing entity '\xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level__parameterized0_8\'
+INFO: [VRFC 10-3107] analyzing entity '\xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level__parameterized1\'
+INFO: [VRFC 10-3107] analyzing entity '\xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level__parameterized2\'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_reset'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_reset_7'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_tx_gfifo_RAM_C2_P1_W72_D32_FL'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_tx_pause_proc'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_tx_stats'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_xfcs'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_rx_fcs'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_rx_gmii_fifo'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_pulse'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_tx_gmii_fifo'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_rx_gmii_adapter'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_tx_gmii_adapter'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_tx_lbus_adapter'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_rx_top'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_x_ethernet_v2_0_mac_tx_top'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_xxv_ethernet_v5_0_2_mac_hsec_cores'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_top'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0_wrapper'
+INFO: [VRFC 10-3107] analyzing entity 'xxv_ethernet_0'
+run_program: Time (s): cpu = 00:00:01 ; elapsed = 00:00:08 . Memory (MB): peak = 1748.598 ; gain = 0.000
+INFO: [USF-XSim-69] 'compile' step finished in '8' seconds
+INFO: [USF-XSim-3] XSim::Elaborate design
+INFO: [USF-XSim-61] Executing 'ELABORATE' step in 'c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.sim/sim_1/behav/xsim'
+"xelab --incr --debug typical --relax --mt 2 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -L xpm --snapshot xxv_ethernet_0_exdes_tb_behav xil_defaultlib.xxv_ethernet_0_exdes_tb xil_defaultlib.glbl -log elaborate.log"
+!! WARNING !!
+"PYTHONPATH" variable is set greater than default max string limit of "519" characters.
+Please ignore this, if you have already made changes to your system registry to accept more than
+default limit of 519 characters.
+!! WARNING !!
+Vivado Simulator v2025.2
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: D:/AMDDesignTools/2025.2/Vivado/bin/unwrapped/win64.o/xelab.exe --incr --debug typical --relax --mt 2 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -L xpm --snapshot xxv_ethernet_0_exdes_tb_behav xil_defaultlib.xxv_ethernet_0_exdes_tb xil_defaultlib.glbl -log elaborate.log 
+Using 2 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+WARNING: [VRFC 10-9180] module 'SIP_OSERDESE3_D1' is instantiated multiple times from VHDL or from both Verilog and VHDL; elaboration result may be incorrect [/proj/xbuilds/SWIP/2025.2_1113_1742/installs/lin64/2025.2/data/secureip/oserdese3_d1/oserdese3_d1_001.vp:16]
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1fs
+Compiling package std.standard
+Compiling package std.textio
+Compiling package ieee.std_logic_1164
+Compiling package ieee.numeric_std
+Compiling package unisim.vcomponents
+Compiling package ieee.vital_timing
+Compiling package ieee.vital_primitives
+Compiling package unisim.vpkg
+Compiling architecture gnd_v of entity unisim.GND [gnd_default]
+Compiling architecture vcc_v of entity unisim.VCC [vcc_default]
+Compiling architecture bufgce_v of entity unisim.BUFGCE [\BUFGCE(ce_type="ASYNC",sim_devi...]
+Compiling architecture mmcme4_adv_v of entity unisim.MMCME4_ADV [\MMCME4_ADV(clkfbout_mult_f=6.0,...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_shared_clocking [xxv_ethernet_0_shared_clocking_d...]
+Compiling architecture mmcme4_adv_v of entity unisim.MMCME4_ADV [\MMCME4_ADV(clkfbout_mult_f=6.0,...]
+Compiling architecture iddre1_v of entity unisim.IDDRE1 [\IDDRE1(ddr_clk_edge="SAME_EDGE"...]
+Compiling architecture oserdese3_v of entity unisim.OSERDESE3 [\OSERDESE3(oddr_mode="TRUE",oser...]
+Compiling architecture oserdese3_v of entity unisim.OSERDESE3 [\OSERDESE3(init='1',oddr_mode="T...]
+Compiling architecture ibuf_v of entity unisim.IBUF [\IBUF(1,9)(1,1)(1,4)(1,7)\]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_xgmii_if [xxv_ethernet_0_xgmii_if_default]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000100000000000")(0...]
+Compiling architecture fdre_v of entity unisim.FDRE [fdre_default]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10111010")(0,7)\]
+Compiling architecture ram64x1s_v of entity unisim.RAM64X1S [\RAM64X1S(init="1000000000000000...]
+Compiling architecture lut1_v of entity unisim.LUT1 [\LUT1(init="0001")(0,3)\]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="0110")(0,3)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01111000")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0111111110000000")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01111111111111111000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01111111111111111111...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01111111")(0,7)\]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="0111")(0,3)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01010111")(0,7)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00000111")(0,7)\]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="0001")(0,3)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00000001")(0,7)\]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_rx_axis_adapter [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10101010111100001100...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11101111")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="1110")(0,3)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11111110")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111111111110")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000001111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101001101010011111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10011001111100001001...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10011001111100001001...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000010000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10011001100110011111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture fdse_v of entity unisim.FDSE [fdse_default]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000010101000")(0...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00011110")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000000000100")(0...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00111010")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000100000000000000...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_rx_delete_fcs [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01010101010101011111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111100001001111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000000000001")(0...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10111000")(0,7)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000001010...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11000100")(0,7)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01000111")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1000000011000000")(0...]
+Compiling architecture srl16e_v of entity unisim.SRL16E [\SRL16E(0,15)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000001011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000010001000...]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="1000")(0,3)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000001001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11101010111010101010...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111111110111")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000001010101000001...]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="0010")(0,3)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111000000100000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111011111110111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11101000100010001110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11101011101111101011...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0110100110010110")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01101001100101101001...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1110101110111110")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10010110011010010110...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10010110")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010100000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111001111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10111011101110111011...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111110110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101111101000001100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000100010001000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000100...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10111111111111111111...]
+Compiling architecture muxf7_v of entity unisim.MUXF7 [muxf7_default]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1101111111111111")(0...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0111111111111111")(0...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000010000000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111110111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000001000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000000...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_fcs_64_full [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000001000100011111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000100010001")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00100000001000000010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000110000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00011111")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000011010101111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000001101010")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000110...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00010000000100000001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000110000000000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000001010110")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000001001...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000001001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10111110111111111011...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10101000100010001000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10100010100000001010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000001010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00001000000010001010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000011...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0001010001011100")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10101010110011001100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111000000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10111111")(0,7)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01000000")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000010001000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111101111111...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_rx_fcs [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10101111111111111000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00010101000101010101...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000101011101010...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111111111101")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01110111111101110000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001010000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10111000111111111011...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00110000101110110011...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000010111000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000010111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10000000")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1110110000001100")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000100010001000100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000111100011110")(0...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00000100")(0,7)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00110110")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10101010101010111010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10111010101110111011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111101111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000100000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111000000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000100000001000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111110111011...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10001010100010101000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01010101010000000101...]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="1011")(0,3)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00000010")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110101...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01010101000000000101...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110100...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00001101111111110000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10001111100011111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111100000100")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110010000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111110100...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11111101")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000100010001000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00011111000100010001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000101010100000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111101111111")(0...]
+Compiling architecture ram32m_v of entity unisim.RAM32M [ram32m_default]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_rx_gfifo_RAM_C2_P1_W72_D8_FL [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture fdpe_v of entity unisim.FDPE [fdpe_default]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_reset_7 [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture structure of entity xil_defaultlib.\xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level__parameterized2\ [\xxv_ethernet_0_x_ethernet_v2_0_...]
+Compiling architecture structure of entity xil_defaultlib.\xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level__parameterized0_8\ [\xxv_ethernet_0_x_ethernet_v2_0_...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01101111111101101111...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01101010")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10010000000010010000...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_rx_gmii_fifo [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0001110111111111")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111101111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111011111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111111011111")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1010100110101010")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11100000111000001110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000001100000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00110110010011001111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000001000000000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111110...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00001000")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000011100010")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010001010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000100011111000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000000110110")(0...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00000110")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000001010100010")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11011111110011111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111010111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000001000100...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1110111111111011")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010000010000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000010000000100000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11101110111100001111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10100000101000001010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01000100010001000100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00010000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000001000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000110000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000100000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11101110111011110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01010100000000000101...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00100010001000000010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000001000000001111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000001000000")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111011...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111110...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000100010001000100...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1110111111111111")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111011111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110001111011111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111000111101111")(0...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11011111")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111110111110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010100010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111001010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101110101011101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0001000000000000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000100010001010100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10111011101110111010...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01001111")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0100000000000000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000100010001000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00100000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111111101111")(0...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01000101")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10111010101110101011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000001000000010000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01010101010101010101...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11001100111011111100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01010101010101010101...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101000101010101010...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1000101010101010")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001010101010101010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000001000...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_rx_gmii_adapter [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000000110111")(0...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000011000001010")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00010010000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111110111111111111...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_pause_parser [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_reset_flop_4 [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_reset_flop_5 [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_reset_flop_6 [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1000000000000000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000010110000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11101010")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1010101010101000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01010100010001000101...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10111011101110111011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000100010001000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture carry8_v of entity unisim.CARRY8 [\CARRY8(1,10)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01010110")(0,7)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10101000")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000111...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00100000")(0,7)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10001010")(0,7)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000000000010")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00001000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111110000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111101010101111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1001101010101010")(0...]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="1001")(0,3)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1001000000001001")(0...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0010001010110010")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01001011111111111111...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01101001")(0,7)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01111000011101111000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10111111010000001011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00101011011101111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00001000000010000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111011111111111")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01111111011111111000...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_rx_stats [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10111010101110101011...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10110100")(0,7)\]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_rx_top [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0010000000000000")(0...]
+Compiling architecture lut1_v of entity unisim.LUT1 [\LUT1(init="0010")(0,3)\]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_reset_flop [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_ftype_parser [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000010000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000100010001000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11010101")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000010001000100")(0...]
+Compiling architecture structure of entity xil_defaultlib.\xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level__parameterized1\ [\xxv_ethernet_0_x_ethernet_v2_0_...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_tx_gfifo_RAM_C2_P1_W72_D32_FL [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture structure of entity xil_defaultlib.\xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level__parameterized0\ [\xxv_ethernet_0_x_ethernet_v2_0_...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_reset [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000100010001000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01110001100011101000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000110100100000110...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01101100110011001100...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10000010000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110111111111110111...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_tx_gmii_fifo [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101111111011101010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000111111101111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111110110011001100...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000100000000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111100101111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111110000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11111000")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00010011111111110000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111100111111001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000011111100110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00001111111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00001111111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00001000000000000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111100001000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111110110011001110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00010000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00001110")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00101111")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00011111000100000001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000100000001000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00110000111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111010101110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000110100000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01110000111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110101...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000100000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110000111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00001101")(0,7)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10000000100000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111010101111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000111111110000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00110101")(0,7)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01110100")(0,7)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10001011")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01110000")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000111100100010")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00110011001100111011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000011111111110000...]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="0100")(0,3)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1011111110100000")(0...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_tx_gmii_adapter [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000110011001010000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0001010101000000")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10001010100010001000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111011111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010100010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00101110001000100010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11101111111111111110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010100000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111110011111010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111110111011101110...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11110011111100110010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10111111111111111011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010111011111110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01110000010100000111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110111111101111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10111010101010101011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000100000001010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000100010001000100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000100010001000100...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111101111111111")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000100010001000100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000111110111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010111011111010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000000010000000100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111101110111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111010101010101111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11101111111011101010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111101011101111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111000011110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000000010000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000001010100010000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11101010101010101111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00001000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00001000000010000000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10101100")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000000010001000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00100000001000100000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01000100010000000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000100010001000")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10101010101010101000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00001000000010000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11001100111111111100...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1101010101010101")(0...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01010100")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1110000011110000")(0...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10101011")(0,7)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00100011")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1000011101111000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000111111110000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10110000")(0,7)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000001111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1000110000001100")(0...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000011111110")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000101111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000000011100")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111101111111011111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000010111101101")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000010000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00001111000111110000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01000100001000110010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11011101111100001101...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000110100111101")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110011111100111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111010000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111110111110000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111100010001000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00010001000100000001...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01010111010101110101...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111110...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000001000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00011111000100000001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000111000101111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111101111111110101...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111110111111100000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10101010101010101011...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0011001100110101")(0...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10101001")(0,7)\]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_tx_pause_proc [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10111000000000001011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000100010001000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10100000101000001100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00110000000000000011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000100...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000100010111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000000010000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10000000111111111000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101100111011001110...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1000100010111000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110111000101011111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110001111100011111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000100111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01000100010001000100...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00010001000100010001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000100000001000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111010000000100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000100010001000100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101111000011111100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101111111111111010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000000111111110100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000100010000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0111111101000000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000100010001000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1000000010111111")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01010101011101010011...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11100010111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11010001111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10000000000000001000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000000000000000100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000100010001110100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10000000100000001000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111011000010001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101110101011101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000010000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11101110111011111010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01010000010111110011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000010000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111101110000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01001111010000000100...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1010001100110011")(0...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0101001100110011")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10111000101110111011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000101000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000111001001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111100110111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000111111111011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111100111011...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1011111110000000")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111000000001110...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111101110000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10100000101000001010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101111101011111010...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_xfcs [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level_1 [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level_2 [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_level_3 [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_syncer_pulse [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10001111")(0,7)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11100001")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0110011010010110")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01101001100101101001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01001101000000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11010100111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110011111100111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1100100011111111")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11110011101111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11001100101000001100...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00100000000000000011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110100...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000100000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11011100110011000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010111111111010...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1010101010000000")(0...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1010101010111010")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110100...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00010101")(0,7)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10001000100010111000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01101111111111110110...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0011101000001010")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01101010101010011010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10111111000010111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0110100100111100")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000001000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000001000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111110111000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000111110001000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10111111101100111010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110100010001001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000100111101000100...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000000000111")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00010001000000010001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110000111100001111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000101001111111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000001010100")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111000111110001111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111111001011")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000100000001000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111110101111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000010101100")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110100111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11110100111101001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11110000010001001111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111110000001110...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111110010101100...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111000101100...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0101011010100110")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111100000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000010...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00111001")(0,7)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10011100001101101001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101011111111111111...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10001001")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111101010101011")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00101000100000011000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10001111000000001000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10010110100110011001...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11101110111110101111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111001111...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_tx_lbus_adapter [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00010000")(0,7)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000010100000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111000011100000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110011...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110010...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111100000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000001000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000100111101000100...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111110111111101111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111011101110")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111010...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00101000")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1101110111011111")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11100001111111110001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010100000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11100000111111100001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_tx_stats [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11010000110000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000010111111110000...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_x_ethernet_v2_0_mac_tx_top [xxv_ethernet_0_x_ethernet_v2_0_m...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_xxv_ethernet_v5_0_2_mac_hsec_cores [xxv_ethernet_0_xxv_ethernet_v5_0...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_mac_only64_syncer_reset [xxv_ethernet_0_mac_only64_syncer...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_mac_only64_syncer_reset_0 [xxv_ethernet_0_mac_only64_syncer...]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_top [xxv_ethernet_0_top_default]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0_wrapper [xxv_ethernet_0_wrapper_default]
+Compiling architecture structure of entity xil_defaultlib.xxv_ethernet_0 [xxv_ethernet_0_default]
+Compiling module xil_defaultlib.xxv_ethernet_0_user_cdc_sync
+Compiling module xil_defaultlib.xxv_ethernet_0_cdc_sync_2stage(W...
+Compiling module xil_defaultlib.xxv_ethernet_0_cdc_sync_2stage(W...
+Compiling module xil_defaultlib.xxv_ethernet_0_cdc_sync_2stage
+Compiling module xil_defaultlib.xxv_ethernet_0_example_fsm_axis
+Compiling module xil_defaultlib.xxv_ethernet_0_pktprbs_gen_defau...
+Compiling module xil_defaultlib.xxv_ethernet_0_pkt_len_gen_defau...
+Compiling module xil_defaultlib.xxv_ethernet_0_axis_pkt_gen_defa...
+Compiling module xil_defaultlib.xxv_ethernet_0_axis_pkt_mon
+Compiling module xil_defaultlib.xxv_ethernet_0_buf(IS_0_LATENCY=...
+Compiling module xil_defaultlib.xxv_ethernet_0_traf_chk1
+Compiling module xil_defaultlib.xxv_ethernet_0_traf_data_chk_def...
+Compiling module xil_defaultlib.xxv_ethernet_0_axis_traffic_gen_...
+Compiling module xil_defaultlib.xxv_ethernet_0_pkt_gen_mon
+Compiling module xil_defaultlib.xxv_ethernet_0_exdes
+Compiling module xil_defaultlib.xxv_ethernet_0_exdes_tb
+Compiling module xil_defaultlib.glbl
+Built simulation snapshot xxv_ethernet_0_exdes_tb_behav
+run_program: Time (s): cpu = 00:00:02 ; elapsed = 00:01:19 . Memory (MB): peak = 1748.598 ; gain = 0.000
+INFO: [USF-XSim-69] 'elaborate' step finished in '79' seconds
+INFO: [USF-XSim-4] XSim::Simulate design
+INFO: [USF-XSim-61] Executing 'SIMULATE' step in 'c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.sim/sim_1/behav/xsim'
+INFO: [USF-XSim-98] *** Running xsim
+   with args "xxv_ethernet_0_exdes_tb_behav -key {Behavioral:sim_1:Functional:xxv_ethernet_0_exdes_tb} -tclbatch {xxv_ethernet_0_exdes_tb.tcl} -log {simulate.log}"
+INFO: [USF-XSim-8] Loading simulator feature
+Time resolution is 1 fs
+source xxv_ethernet_0_exdes_tb.tcl
+# set curr_wave [current_wave_config]
+# if { [string length $curr_wave] == 0 } {
+#   if { [llength [get_objects]] > 0} {
+#     add_wave /
+#     set_property needs_save false [current_wave_config]
+#   } else {
+#      send_msg_id Add_Wave-1 WARNING "No top level signals found. Simulator will start without a wave window. If you want to open a wave window go to 'File->New Waveform Configuration' or type 'create_wave_config' in the TCL console."
+#   }
+# }
+# run 1000ns
+INFO : SYS_RESET RELEASED TO CORE
+INFO : WAITING FOR COMPLETION STATUS..........
+INFO: [USF-XSim-96] XSim completed. Design snapshot 'xxv_ethernet_0_exdes_tb_behav' loaded.
+INFO: [USF-XSim-97] XSim simulation ran for 1000ns
+launch_simulation: Time (s): cpu = 00:00:09 ; elapsed = 00:01:33 . Memory (MB): peak = 1769.945 ; gain = 21.348
+launch_runs synth_1 -jobs 3
+INFO: [Vivado 12-4149] The synthesis checkpoint for IP 'c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.srcs/sources_1/ip/xxv_ethernet_0/xxv_ethernet_0.xci' is already up-to-date
+WARNING: [Vivado 12-7122] Auto Incremental Compile:: No reference checkpoint was found in run synth_1. Auto-incremental flow will not be run, the standard flow will be run instead.
+[Mon Aug  3 18:30:15 2026] Launched synth_1...
+Run output will be captured here: c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.runs/synth_1/runme.log
+launch_runs impl_1 -jobs 3
+INFO: [Vivado 12-4149] The synthesis checkpoint for IP 'c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.srcs/sources_1/ip/xxv_ethernet_0/xxv_ethernet_0.xci' is already up-to-date
+[Mon Aug  3 18:32:44 2026] Launched impl_1...
+Run output will be captured here: c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.runs/impl_1/runme.log
+open_run impl_1
+INFO: [Device 21-403] Loading part xcu26-vsva1365-2LV-e
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.147 . Memory (MB): peak = 2616.707 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 235 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-479] Netlist was created with Vivado 2025.2
+INFO: [Project 1-570] Preparing netlist for logic optimization
+Read ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.055 . Memory (MB): peak = 2674.098 ; gain = 3.387
+INFO: [Timing 38-478] Restoring timing data from binary archive.
+INFO: [Timing 38-479] Binary timing data restore complete.
+INFO: [Project 1-856] Restoring constraints from binary archive.
+INFO: [Project 1-853] Binary constraint restore complete.
+INFO: [Designutils 20-5722] Start Reading Physical Databases.
+Reading placement.
+Read Netlist Cache: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.013 . Memory (MB): peak = 3061.930 ; gain = 0.000
+Reading placer database...
+Read Device Cache: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.023 . Memory (MB): peak = 3061.930 ; gain = 0.000
+Read PlaceDB: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.336 . Memory (MB): peak = 3063.555 ; gain = 1.625
+Read PulsedLatchDB: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3063.555 ; gain = 0.000
+Reading routing.
+Read RouteStorage: Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 3242.031 ; gain = 178.477
+Read Physdb Files: Time (s): cpu = 00:00:02 ; elapsed = 00:00:03 . Memory (MB): peak = 3242.031 ; gain = 180.102
+Restored from archive | CPU: 3.000000 secs | Memory: 0.000000 MB |
+Finished XDEF File Restore: Time (s): cpu = 00:00:02 ; elapsed = 00:00:03 . Memory (MB): peak = 3242.031 ; gain = 180.102
+Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.005 . Memory (MB): peak = 3242.031 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 68 instances were transformed.
+  IBUF => IBUF (IBUFCTRL, INBUF): 42 instances
+  RAM32M => RAM32M (RAMD32(x6), RAMS32(x2)): 24 instances
+  RAM64X1S => RAM64X1S (RAMS64E): 2 instances
+
+open_run: Time (s): cpu = 00:00:41 ; elapsed = 00:00:44 . Memory (MB): peak = 3626.297 ; gain = 1841.438
+open_report: Time (s): cpu = 00:00:25 ; elapsed = 00:00:13 . Memory (MB): peak = 3935.164 ; gain = 174.691
+close_sim
+INFO: [Simtcl 6-16] Simulation closed
+exit
+INFO: [Common 17-206] Exiting Vivado at Mon Aug  3 21:11:42 2026...

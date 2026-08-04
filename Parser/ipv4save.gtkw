@@ -1,0 +1,27 @@
+[*]
+[*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
+[*] Tue Aug 04 12:17:38 2026
+[*]
+[dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\ipv4_parser.fst"
+[dumpfile_mtime] "Tue Aug 04 12:14:48 2026"
+[dumpfile_size] 1307
+[savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\ipv4save.gtkw"
+[timestart] 0
+[size] 1000 600
+[pos] -1 -1
+*-27.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 389
+[signals_width] 174
+[sst_expanded] 1
+[sst_vpaned_height] 157
+@28
+ipv4_parser.clk
+@22
+ipv4_parser.ipv4_fields[163:0]
+ipv4_parser.m_axis_tdata[63:0]
+@28
+ipv4_parser.m_axis_tlast
+@29
+ipv4_parser.m_fields_valid
+[pattern_trace] 1
+[pattern_trace] 0

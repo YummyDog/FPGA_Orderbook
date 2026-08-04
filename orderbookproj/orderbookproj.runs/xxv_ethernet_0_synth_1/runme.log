@@ -1,0 +1,638 @@
+
+*** Running vivado
+    with args -log xxv_ethernet_0.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source xxv_ethernet_0.tcl
+
+
+
+****** Vivado v2025.2 (64-bit)
+  **** SW Build 6299465 on Fri Nov 14 19:35:11 GMT 2025
+  **** IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+  **** SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+  **** Start of session at: Mon Aug  3 18:17:45 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xxv_ethernet_0.tcl -notrace
+create_project: Time (s): cpu = 00:00:09 ; elapsed = 00:00:06 . Memory (MB): peak = 597.141 ; gain = 220.246
+Command: synth_design -top xxv_ethernet_0 -part xcu26-vsva1365-2LV-e -incremental_mode off -mode out_of_context
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xcu26'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xcu26'
+INFO: [Device 21-403] Loading part xcu26-vsva1365-2LV-e
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 1920
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:10 ; elapsed = 00:00:14 . Memory (MB): peak = 1980.336 ; gain = 473.652
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0' [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_0.v:62]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_wrapper' [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_v5_0_2/xxv_ethernet_0_wrapper.v:63]
+	Parameter C_LINE_RATE bound to: 10 - type: integer 
+	Parameter C_NUM_OF_CORES bound to: 1 - type: integer 
+	Parameter C_CLOCKING bound to: Asynchronous - type: string 
+	Parameter C_DATA_PATH_INTERFACE bound to: AXI Stream - type: string 
+	Parameter C_BASE_R_KR bound to: BASE-KR - type: string 
+	Parameter C_INCLUDE_FEC_LOGIC bound to: 0 - type: string 
+	Parameter C_INCLUDE_AUTO_NEG_LT_LOGIC bound to: None - type: string 
+	Parameter C_INCLUDE_USER_FIFO bound to: 1 - type: string 
+	Parameter C_ENABLE_TX_FLOW_CONTROL_LOGIC bound to: 0 - type: integer 
+	Parameter C_ENABLE_RX_FLOW_CONTROL_LOGIC bound to: 0 - type: integer 
+	Parameter C_ENABLE_TIME_STAMPING bound to: 0 - type: integer 
+	Parameter C_PTP_OPERATION_MODE bound to: 2 - type: integer 
+	Parameter C_PTP_CLOCKING_MODE bound to: 0 - type: integer 
+	Parameter C_TX_LATENCY_ADJUST bound to: 0 - type: integer 
+	Parameter C_ENABLE_VLANE_ADJUST_MODE bound to: 0 - type: integer 
+	Parameter C_ENABLE_PIPELINE_REG bound to: 0 - type: integer 
+	Parameter C_RUNTIME_SWITCH bound to: 0 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_top' [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_v5_0_2/xxv_ethernet_0_top.v:63]
+	Parameter SERDES_WIDTH bound to: 64 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'RAM64X1S' [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:154656]
+INFO: [Synth 8-6155] done synthesizing module 'RAM64X1S' (0#1) [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:154656]
+INFO: [Synth 8-6157] synthesizing module 'RAM32M' [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:154113]
+INFO: [Synth 8-6155] done synthesizing module 'RAM32M' (0#1) [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:154113]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_xgmii_if' [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_v5_0_2/xxv_ethernet_0_xgmii_if.v:70]
+INFO: [Synth 8-6157] synthesizing module 'IDDR' [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:84974]
+	Parameter DDR_CLK_EDGE bound to: SAME_EDGE - type: string 
+	Parameter SRTYPE bound to: ASYNC - type: string 
+INFO: [Synth 8-6155] done synthesizing module 'IDDR' (0#1) [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:84974]
+INFO: [Synth 8-6157] synthesizing module 'ODDRE1' [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:117276]
+	Parameter SRVAL bound to: 1'b0 
+INFO: [Synth 8-6155] done synthesizing module 'ODDRE1' (0#1) [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:117276]
+INFO: [Synth 8-6157] synthesizing module 'ODDRE1__parameterized0' [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:117276]
+	Parameter SRVAL bound to: 1'b1 
+INFO: [Synth 8-6155] done synthesizing module 'ODDRE1__parameterized0' (0#1) [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:117276]
+INFO: [Synth 8-6157] synthesizing module 'IBUF' [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:82804]
+INFO: [Synth 8-6155] done synthesizing module 'IBUF' (0#1) [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:82804]
+INFO: [Synth 8-6157] synthesizing module 'MMCME2_BASE' [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:95964]
+	Parameter CLKFBOUT_MULT_F bound to: 6.000000e+00 - type: double 
+	Parameter CLKFBOUT_PHASE bound to: 0.000000e+00 - type: double 
+	Parameter CLKIN1_PERIOD bound to: 6.400000e+00 - type: double 
+	Parameter CLKOUT0_DIVIDE_F bound to: 6.000000e+00 - type: double 
+	Parameter CLKOUT0_DUTY_CYCLE bound to: 5.000000e-01 - type: double 
+	Parameter CLKOUT0_PHASE bound to: 0.000000e+00 - type: double 
+	Parameter DIVCLK_DIVIDE bound to: 1 - type: integer 
+	Parameter REF_JITTER1 bound to: 1.000000e-02 - type: double 
+INFO: [Synth 8-6155] done synthesizing module 'MMCME2_BASE' (0#1) [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:95964]
+INFO: [Synth 8-6157] synthesizing module 'BUFG' [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:2678]
+INFO: [Synth 8-6155] done synthesizing module 'BUFG' (0#1) [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:2678]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_xgmii_if' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_v5_0_2/xxv_ethernet_0_xgmii_if.v:70]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_mac_only64_syncer_reset' [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_v5_0_2/xxv_ethernet_0_top.v:526]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_mac_only64_syncer_reset' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_v5_0_2/xxv_ethernet_0_top.v:526]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_shared_clocking' [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_v5_0_2/xxv_ethernet_0_shared_clocking.v:71]
+INFO: [Synth 8-6157] synthesizing module 'MMCME2_BASE__parameterized0' [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:95964]
+	Parameter CLKFBOUT_MULT_F bound to: 6.000000e+00 - type: double 
+	Parameter CLKFBOUT_PHASE bound to: 0.000000e+00 - type: double 
+	Parameter CLKIN1_PERIOD bound to: 6.400000e+00 - type: double 
+	Parameter CLKOUT0_DIVIDE_F bound to: 6.000000e+00 - type: double 
+	Parameter CLKOUT0_DUTY_CYCLE bound to: 5.000000e-01 - type: double 
+	Parameter CLKOUT0_PHASE bound to: 0.000000e+00 - type: double 
+	Parameter CLKOUT1_DIVIDE bound to: 6 - type: integer 
+	Parameter CLKOUT1_DUTY_CYCLE bound to: 5.000000e-01 - type: double 
+	Parameter CLKOUT1_PHASE bound to: 9.000000e+01 - type: double 
+	Parameter DIVCLK_DIVIDE bound to: 1 - type: integer 
+	Parameter REF_JITTER1 bound to: 1.000000e-02 - type: double 
+INFO: [Synth 8-6155] done synthesizing module 'MMCME2_BASE__parameterized0' (0#1) [D:/AMDDesignTools/2025.2/Vivado/scripts/rt/data/unisim_comp.v:95964]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_shared_clocking' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_v5_0_2/xxv_ethernet_0_shared_clocking.v:71]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_top' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_v5_0_2/xxv_ethernet_0_top.v:63]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_wrapper' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_v5_0_2/xxv_ethernet_0_wrapper.v:63]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_0.v:62]
+INFO: [Synth 8-7129] Port rx_sop in module x_ethernet_v2_0_mac_rx_axis_adapter is either unconnected or has no load
+INFO: [Synth 8-7129] Port i_sop in module x_ethernet_v2_0_mac_fcs_64_full is either unconnected or has no load
+INFO: [Synth 8-7129] Port rd in module x_ethernet_v2_0_mac_rx_gfifo_RAM_C2_P1_W72_D8_FL is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[14] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[13] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[12] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[11] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[10] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[9] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[8] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[7] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[6] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[5] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[4] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[3] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[2] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[1] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_max_packet_len[0] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_min_packet_len[7] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_min_packet_len[6] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_min_packet_len[5] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_min_packet_len[4] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_min_packet_len[3] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_min_packet_len[2] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_min_packet_len[1] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port ctl_rx_min_packet_len[0] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port fcsstompedin in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[15] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[14] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[13] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[12] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[11] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[10] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[9] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[8] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[7] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[6] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[5] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[4] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[3] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[2] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[1] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port length_field[0] in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port inrange_packet in module x_ethernet_v2_0_mac_tx_stats is either unconnected or has no load
+INFO: [Synth 8-7129] Port rd in module x_ethernet_v2_0_mac_tx_gfifo_RAM_C2_P1_W72_D32_FL is either unconnected or has no load
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:22 ; elapsed = 00:00:27 . Memory (MB): peak = 2524.184 ; gain = 1017.500
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:23 ; elapsed = 00:00:28 . Memory (MB): peak = 2524.184 ; gain = 1017.500
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:23 ; elapsed = 00:00:28 . Memory (MB): peak = 2524.184 ; gain = 1017.500
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.368 . Memory (MB): peak = 2524.184 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 106 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/synth/xxv_ethernet_0_ooc.xdc] for cell 'inst'
+WARNING: [Vivado 12-584] No ports matched 'clk'. [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/synth/xxv_ethernet_0_ooc.xdc:71]
+create_clock: Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2524.184 ; gain = 0.000
+Finished Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/synth/xxv_ethernet_0_ooc.xdc] for cell 'inst'
+WARNING: [Project 1-498] One or more constraints failed evaluation while reading constraint file [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/synth/xxv_ethernet_0_ooc.xdc] and the design contains unresolved black boxes. These constraints will be read post-synthesis (as long as their source constraint file is marked as used_in_implementation) and should be applied correctly then. You should review the constraints listed in the file [.Xil/xxv_ethernet_0_propImpl.xdc] and check the run log file to verify that these constraints were correctly applied.
+Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/synth/xxv_ethernet_0_board.xdc] for cell 'inst'
+Finished Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/synth/xxv_ethernet_0_board.xdc] for cell 'inst'
+Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/synth/xxv_ethernet_0.xdc] for cell 'inst'
+Finished Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/synth/xxv_ethernet_0.xdc] for cell 'inst'
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [c:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.gen/sources_1/ip/xxv_ethernet_0/synth/xxv_ethernet_0.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/xxv_ethernet_0_propImpl.xdc].
+Resolution: To avoid this warning, move constraints listed in [.Xil/xxv_ethernet_0_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+INFO: [Timing 38-2] Deriving generated clocks
+Parsing XDC File [C:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.runs/xxv_ethernet_0_synth_1/dont_touch.xdc]
+Finished Parsing XDC File [C:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.runs/xxv_ethernet_0_synth_1/dont_touch.xdc]
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.010 . Memory (MB): peak = 2524.184 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 106 instances were transformed.
+  BUFG => BUFGCE: 4 instances
+  IBUF => IBUF (IBUFCTRL, INBUF): 1 instance 
+  IDDR => IDDRE1 (inverted pins: CB): 36 instances
+  MMCME2_BASE => MMCME4_ADV: 2 instances
+  ODDRE1 => OSERDESE3: 37 instances
+  RAM32M => RAM32M (RAMD32(x6), RAMS32(x2)): 24 instances
+  RAM64X1S => RAM64X1S (RAMS64E): 2 instances
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.397 . Memory (MB): peak = 2524.184 ; gain = 0.000
+INFO: [Designutils 20-5008] Incremental synthesis strategy off
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:47 ; elapsed = 00:00:58 . Memory (MB): peak = 2524.184 ; gain = 1017.500
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xcu26-vsva1365-2LV-e
+INFO: [Synth 8-6742] Reading net delay rules and data
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:47 ; elapsed = 00:00:58 . Memory (MB): peak = 2524.184 ; gain = 1017.500
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:47 ; elapsed = 00:00:58 . Memory (MB): peak = 2524.184 ; gain = 1017.500
+---------------------------------------------------------------------------------
+INFO: [Synth 8-802] inferred FSM for state register 'pause_pkt_state_0_reg' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+INFO: [Synth 8-802] inferred FSM for state register 'pause_pkt_state_1_reg' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+INFO: [Synth 8-802] inferred FSM for state register 'pause_pkt_state_2_reg' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+INFO: [Synth 8-802] inferred FSM for state register 'pause_pkt_state_3_reg' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+INFO: [Synth 8-802] inferred FSM for state register 'pause_pkt_state_4_reg' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+INFO: [Synth 8-802] inferred FSM for state register 'pause_pkt_state_5_reg' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+INFO: [Synth 8-802] inferred FSM for state register 'pause_pkt_state_6_reg' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+INFO: [Synth 8-802] inferred FSM for state register 'pause_pkt_state_7_reg' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+INFO: [Synth 8-802] inferred FSM for state register 'pause_pkt_state_8_reg' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+INFO: [Synth 8-802] inferred FSM for state register 'tx_state_r_reg' in module 'x_ethernet_v2_0_mac_tx_lbus_adapter'
+INFO: [Synth 8-802] inferred FSM for state register 'pkt_state_reg' in module 'x_ethernet_v2_0_mac_tx_gmii_adapter'
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'x_ethernet_v2_0_mac_pause_parser'
+INFO: [Synth 8-802] inferred FSM for state register 'state0_reg' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+INFO: [Synth 8-802] inferred FSM for state register 'state1_reg' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+INFO: [Synth 8-802] inferred FSM for state register 'state2_reg' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+INFO: [Synth 8-802] inferred FSM for state register 'state3_reg' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+INFO: [Synth 8-802] inferred FSM for state register 'state4_reg' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+INFO: [Synth 8-802] inferred FSM for state register 'state5_reg' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+INFO: [Synth 8-802] inferred FSM for state register 'state6_reg' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+INFO: [Synth 8-802] inferred FSM for state register 'state7_reg' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+INFO: [Synth 8-802] inferred FSM for state register 'state8_reg' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                              000 |                              000
+                      S1 |                              001 |                              001
+                     S1B |                              100 |                              100
+                      S2 |                              010 |                              010
+                  iSTATE |                              011 |                              011
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'pause_pkt_state_8_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                              000 |                              000
+                      S1 |                              001 |                              001
+                     S1B |                              010 |                              100
+                      S2 |                              011 |                              010
+                  iSTATE |                              100 |                              011
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'pause_pkt_state_2_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                              000 |                              000
+                      S1 |                              001 |                              001
+                     S1B |                              010 |                              100
+                      S2 |                              011 |                              010
+                  iSTATE |                              100 |                              011
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'pause_pkt_state_3_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                              000 |                              000
+                      S1 |                              001 |                              001
+                     S1B |                              010 |                              100
+                      S2 |                              011 |                              010
+                  iSTATE |                              100 |                              011
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'pause_pkt_state_4_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                              000 |                              000
+                      S1 |                              001 |                              001
+                     S1B |                              010 |                              100
+                      S2 |                              011 |                              010
+                  iSTATE |                              100 |                              011
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'pause_pkt_state_5_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                              000 |                              000
+                      S1 |                              001 |                              001
+                     S1B |                              010 |                              100
+                      S2 |                              011 |                              010
+                  iSTATE |                              100 |                              011
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'pause_pkt_state_6_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                              000 |                              000
+                      S1 |                              001 |                              001
+                     S1B |                              010 |                              100
+                      S2 |                              011 |                              010
+                  iSTATE |                              100 |                              011
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'pause_pkt_state_7_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                              000 |                              000
+                      S1 |                              001 |                              001
+                     S1B |                              010 |                              100
+                      S2 |                              011 |                              010
+                  iSTATE |                              100 |                              011
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'pause_pkt_state_0_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                              000 |                              000
+                      S1 |                              001 |                              001
+                     S1B |                              010 |                              100
+                      S2 |                              011 |                              010
+                  iSTATE |                              100 |                              011
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'pause_pkt_state_1_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_tx_pause_proc'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                 TXP_RUN |                             0000 |                             0000
+                TXP_STOP |                             0001 |                             0001
+              TXP_PPAUSE |                             0010 |                             0011
+               TXP_PAUSE |                             0011 |                             0100
+              TXP_PAUSE1 |                             0100 |                             0101
+              TXP_PAUSE2 |                             0101 |                             0110
+              TXP_PAUSE3 |                             0110 |                             0111
+              TXP_PAUSE4 |                             0111 |                             1000
+              TXP_PAUSE5 |                             1000 |                             1001
+              TXP_PAUSE6 |                             1001 |                             1010
+              TXP_PAUSE7 |                             1010 |                             1011
+                  iSTATE |                             1011 |                             0010
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'tx_state_r_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_tx_lbus_adapter'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                  s_IDLE |                               00 |                              000
+               s_PAYLOAD |                               01 |                              001
+                  s_TERM |                               10 |                              011
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'pkt_state_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_tx_gmii_adapter'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                              000 |                              000
+                      S1 |                              001 |                              001
+                      S2 |                              010 |                              010
+                      S3 |                              011 |                              011
+                      S4 |                              100 |                              100
+                      S5 |                              101 |                              101
+                      S6 |                              110 |                              110
+                  iSTATE |                              111 |                              111
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_pause_parser'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                               00 |                               00
+                      S1 |                               01 |                               01
+                      S2 |                               10 |                               10
+                  iSTATE |                               11 |                               11
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state0_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                               00 |                               00
+                      S1 |                               01 |                               01
+                      S2 |                               10 |                               10
+                  iSTATE |                               11 |                               11
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state1_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                               00 |                               00
+                      S1 |                               01 |                               01
+                      S2 |                               10 |                               10
+                  iSTATE |                               11 |                               11
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state2_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                               00 |                               00
+                      S1 |                               01 |                               01
+                      S2 |                               10 |                               10
+                  iSTATE |                               11 |                               11
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state3_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                               00 |                               00
+                      S1 |                               01 |                               01
+                      S2 |                               10 |                               10
+                  iSTATE |                               11 |                               11
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state4_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                               00 |                               00
+                      S1 |                               01 |                               01
+                      S2 |                               10 |                               10
+                  iSTATE |                               11 |                               11
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state5_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                               00 |                               00
+                      S1 |                               01 |                               01
+                      S2 |                               10 |                               10
+                  iSTATE |                               11 |                               11
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state6_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                               00 |                               00
+                      S1 |                               01 |                               01
+                      S2 |                               10 |                               10
+                  iSTATE |                               11 |                               11
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state7_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                               00 |                               00
+                      S1 |                               01 |                               01
+                      S2 |                               10 |                               10
+                  iSTATE |                               11 |                               11
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state8_reg' using encoding 'sequential' in module 'x_ethernet_v2_0_mac_rx_pause_if'
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:53 ; elapsed = 00:01:04 . Memory (MB): peak = 2524.184 ; gain = 1017.500
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 1320 (col length:264)
+BRAMs: 4224 (col length: RAMB18 264 RAMB36 132)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+INFO: [Synth 8-7129] Port i_sop in module x_ethernet_v2_0_mac_fcs_64_full is either unconnected or has no load
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state0_reg[1]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state0_reg[0]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state1_reg[1]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state1_reg[0]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state2_reg[1]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state2_reg[0]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state3_reg[1]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state3_reg[0]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state4_reg[1]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state4_reg[0]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state5_reg[1]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state5_reg[0]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state6_reg[1]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state6_reg[0]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state7_reg[1]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state7_reg[0]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state8_reg[1]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+WARNING: [Synth 8-3332] Sequential element (FSM_sequential_state8_reg[0]) is unused and will be removed from module x_ethernet_v2_0_mac_rx_pause_if.
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:27 ; elapsed = 00:01:39 . Memory (MB): peak = 2524.184 ; gain = 1017.500
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:01:37 ; elapsed = 00:01:54 . Memory (MB): peak = 2697.555 ; gain = 1190.871
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:01:38 ; elapsed = 00:01:55 . Memory (MB): peak = 2722.820 ; gain = 1216.137
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:01:41 ; elapsed = 00:01:58 . Memory (MB): peak = 2821.117 ; gain = 1314.434
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:01:46 ; elapsed = 00:02:04 . Memory (MB): peak = 2955.242 ; gain = 1448.559
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:47 ; elapsed = 00:02:04 . Memory (MB): peak = 2955.242 ; gain = 1448.559
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:47 ; elapsed = 00:02:05 . Memory (MB): peak = 2955.242 ; gain = 1448.559
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:47 ; elapsed = 00:02:05 . Memory (MB): peak = 2955.242 ; gain = 1448.559
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:48 ; elapsed = 00:02:05 . Memory (MB): peak = 2955.242 ; gain = 1448.559
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:48 ; elapsed = 00:02:05 . Memory (MB): peak = 2955.242 ; gain = 1448.559
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+------------+------+
+|      |Cell        |Count |
++------+------------+------+
+|1     |BUFG        |     4|
+|2     |CARRY8      |    10|
+|3     |IDDR        |    36|
+|4     |LUT1        |    29|
+|5     |LUT2        |   612|
+|6     |LUT3        |   501|
+|7     |LUT4        |   497|
+|8     |LUT5        |   667|
+|9     |LUT6        |  2273|
+|10    |MMCME2_BASE |     2|
+|11    |MUXF7       |    68|
+|12    |ODDRE1      |    37|
+|13    |RAM32M      |    24|
+|14    |RAM64X1S    |     2|
+|15    |SRL16E      |   192|
+|16    |FDPE        |    12|
+|17    |FDRE        |  3602|
+|18    |FDSE        |   284|
+|19    |IBUF        |     1|
++------+------------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:48 ; elapsed = 00:02:05 . Memory (MB): peak = 2955.242 ; gain = 1448.559
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 18 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:09 ; elapsed = 00:01:45 . Memory (MB): peak = 2955.242 ; gain = 1448.559
+Synthesis Optimization Complete : Time (s): cpu = 00:01:48 ; elapsed = 00:02:06 . Memory (MB): peak = 2955.242 ; gain = 1448.559
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.155 . Memory (MB): peak = 2955.242 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 184 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+INFO: [Opt 31-326] The CLKFBOUT to CLKFBIN net for instance inst/i_xxv_ethernet_0_top_0/i_SHARED_CLOCKING/tx_mmcm with COMPENSATION=INTERNAL is optimized away to aid design routability
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 2966.820 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 106 instances were transformed.
+  BUFG => BUFGCE: 4 instances
+  IBUF => IBUF (IBUFCTRL, INBUF): 1 instance 
+  IDDR => IDDRE1 (inverted pins: CB): 36 instances
+  MMCME2_BASE => MMCME4_ADV: 2 instances
+  ODDRE1 => OSERDESE3: 37 instances
+  RAM32M => RAM32M (RAMD32(x6), RAMS32(x2)): 24 instances
+  RAM64X1S => RAM64X1S (RAMS64E): 2 instances
+
+Synth Design complete | Checksum: 5f47a7b3
+INFO: [Common 17-83] Releasing license: Synthesis
+139 Infos, 20 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:02:02 ; elapsed = 00:02:59 . Memory (MB): peak = 2966.820 ; gain = 2309.961
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.010 . Memory (MB): peak = 2966.820 ; gain = 0.000
+INFO: [Common 17-1381] The checkpoint 'C:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.runs/xxv_ethernet_0_synth_1/xxv_ethernet_0.dcp' has been generated.
+INFO: [Coretcl 2-1648] Added synthesis output to IP cache for IP xxv_ethernet_0, cache-ID = fc66196d365a9800
+INFO: [Coretcl 2-1174] Renamed 35 cell refs.
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.011 . Memory (MB): peak = 2966.820 ; gain = 0.000
+INFO: [Common 17-1381] The checkpoint 'C:/Users/lskje/Desktop/FPGA_Orderbook/orderbookproj/orderbookproj.runs/xxv_ethernet_0_synth_1/xxv_ethernet_0.dcp' has been generated.
+INFO: [Vivado 12-24828] Executing command : report_utilization -file xxv_ethernet_0_utilization_synth.rpt -pb xxv_ethernet_0_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Mon Aug  3 18:21:05 2026...

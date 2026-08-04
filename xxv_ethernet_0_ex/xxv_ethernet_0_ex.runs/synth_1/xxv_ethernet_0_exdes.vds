@@ -1,0 +1,560 @@
+#-----------------------------------------------------------
+# Vivado v2025.2 (64-bit)
+# SW Build 6299465 on Fri Nov 14 19:35:11 GMT 2025
+# IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+# SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+# Start of session at: Mon Aug  3 18:30:17 2026
+# Process ID         : 26044
+# Current directory  : c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.runs/synth_1
+# Command line       : vivado.exe -log xxv_ethernet_0_exdes.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source xxv_ethernet_0_exdes.tcl
+# Log file           : c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.runs/synth_1/xxv_ethernet_0_exdes.vds
+# Journal file       : c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.runs/synth_1\vivado.jou
+# Running On         : DESKTOP-MB4FOM3
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 19045
+# Processor Detail   : Intel(R) Core(TM) i5-8600 CPU @ 3.10GHz
+# CPU Frequency      : 3096 MHz
+# CPU Physical cores : 6
+# CPU Logical cores  : 6
+# Host memory        : 17119 MB
+# Swap memory        : 9299 MB
+# Total Virtual      : 26419 MB
+# Available Virtual  : 8249 MB
+#-----------------------------------------------------------
+source xxv_ethernet_0_exdes.tcl -notrace
+create_project: Time (s): cpu = 00:00:09 ; elapsed = 00:00:06 . Memory (MB): peak = 597.883 ; gain = 220.910
+Command: synth_design -top xxv_ethernet_0_exdes -part xcu26-vsva1365-2LV-e
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xcu26'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xcu26'
+INFO: [Device 21-403] Loading part xcu26-vsva1365-2LV-e
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 20012
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:06 ; elapsed = 00:00:07 . Memory (MB): peak = 1955.309 ; gain = 474.309
+---------------------------------------------------------------------------------
+INFO: [Synth 8-11241] undeclared symbol 'stat_rx_status', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:239]
+INFO: [Synth 8-11241] undeclared symbol 'clear_count', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:243]
+INFO: [Synth 8-11241] undeclared symbol 'rx_protocol_error', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:538]
+INFO: [Synth 8-11241] undeclared symbol 'ctl_tx_test_pattern', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1255]
+INFO: [Synth 8-11241] undeclared symbol 'ctl_tx_test_pattern_enable', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1256]
+INFO: [Synth 8-11241] undeclared symbol 'ctl_tx_data_pattern_select', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1257]
+INFO: [Synth 8-11241] undeclared symbol 'ctl_tx_test_pattern_select', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1258]
+INFO: [Synth 8-11241] undeclared symbol 'ctl_tx_test_pattern_seed_a', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1259]
+INFO: [Synth 8-11241] undeclared symbol 'ctl_tx_test_pattern_seed_b', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1260]
+INFO: [Synth 8-11241] undeclared symbol 'ctl_local_loopback', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1261]
+INFO: [Synth 8-11241] undeclared symbol 'ctl_rx_test_pattern', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1262]
+INFO: [Synth 8-11241] undeclared symbol 'ctl_rx_force_resync', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2336]
+INFO: [Synth 8-11241] undeclared symbol 'ctl_rx_test_pattern', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2340]
+INFO: [Synth 8-11241] undeclared symbol 'ctl_rx_test_pattern_enable', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2341]
+INFO: [Synth 8-11241] undeclared symbol 'ctl_rx_data_pattern_select', assumed default net type 'wire' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2342]
+WARNING: [Synth 8-11065] parameter 'STARTUP_TIME' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2700]
+WARNING: [Synth 8-11065] parameter 'GENERATOR_COUNT' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2702]
+WARNING: [Synth 8-11065] parameter 'NO_START' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2703]
+WARNING: [Synth 8-11065] parameter 'TEST_START' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2704]
+WARNING: [Synth 8-11065] parameter 'SUCCESSFUL_COMPLETION' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2705]
+WARNING: [Synth 8-11065] parameter 'NO_BLOCK_LOCK' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2706]
+WARNING: [Synth 8-11065] parameter 'PARTIAL_BLOCK_LOCK' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2707]
+WARNING: [Synth 8-11065] parameter 'INCONSISTENT_BLOCK_LOCK' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2708]
+WARNING: [Synth 8-11065] parameter 'NO_LANE_SYNC' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2709]
+WARNING: [Synth 8-11065] parameter 'PARTIAL_LANE_SYNC' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2710]
+WARNING: [Synth 8-11065] parameter 'INCONSISTENT_LANE_SYNC' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2711]
+WARNING: [Synth 8-11065] parameter 'NO_ALIGN_OR_STATUS' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2712]
+WARNING: [Synth 8-11065] parameter 'LOSS_OF_STATUS' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2713]
+WARNING: [Synth 8-11065] parameter 'TX_TIMED_OUT' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2714]
+WARNING: [Synth 8-11065] parameter 'NO_DATA_SENT' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2715]
+WARNING: [Synth 8-11065] parameter 'SENT_COUNT_MISMATCH' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2716]
+WARNING: [Synth 8-11065] parameter 'BYTE_COUNT_MISMATCH' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2717]
+WARNING: [Synth 8-11065] parameter 'LBUS_PROTOCOL' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2718]
+WARNING: [Synth 8-11065] parameter 'BIT_ERRORS_IN_DATA' becomes localparam in 'xxv_ethernet_0_example_fsm_axis' with formal parameter declaration list [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2719]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_exdes' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_exdes.v:63]
+INFO: [Synth 8-638] synthesizing module 'xxv_ethernet_0' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.runs/synth_1/.Xil/Vivado-26044-DESKTOP-MB4FOM3/realtime/xxv_ethernet_0_stub.vhdl:119]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_pkt_gen_mon' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:61]
+	Parameter PKT_NUM bound to: 20 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_user_cdc_sync' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:586]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_user_cdc_sync' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:586]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_cdc_sync_2stage' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:560]
+	Parameter WIDTH bound to: 64 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_cdc_sync_2stage' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:560]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_cdc_sync_2stage__parameterized0' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:560]
+	Parameter WIDTH bound to: 48 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_cdc_sync_2stage__parameterized0' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:560]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_cdc_sync_2stage__parameterized1' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:560]
+	Parameter WIDTH bound to: 1 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_cdc_sync_2stage__parameterized1' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:560]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_example_fsm_axis' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2669]
+INFO: [Synth 8-155] case statement is not full and has no default [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2774]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_example_fsm_axis' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2669]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_axis_traffic_gen_mon' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:610]
+	Parameter FIXED_PACKET_LENGTH bound to: 256 - type: integer 
+	Parameter MIN_LENGTH bound to: 64 - type: integer 
+	Parameter MAX_LENGTH bound to: 9000 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_axis_pkt_gen' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1174]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_pktprbs_gen' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1451]
+	Parameter BIT_COUNT bound to: 64 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_pktprbs_gen' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1451]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_pkt_len_gen' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2192]
+	Parameter min bound to: 64 - type: integer 
+	Parameter max bound to: 9000 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_pkt_len_gen' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2192]
+INFO: [Synth 8-155] case statement is not full and has no default [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1372]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_axis_pkt_gen' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1174]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_axis_pkt_mon' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2236]
+	Parameter MIN_LENGTH bound to: 64 - type: integer 
+	Parameter MAX_LENGTH bound to: 9000 - type: integer 
+WARNING: [Synth 8-6104] Input port 'clear_count' has an internal driver [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2343]
+INFO: [Synth 8-155] case statement is not full and has no default [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2391]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_axis_pkt_mon' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2236]
+INFO: [Synth 8-155] case statement is not full and has no default [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:934]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_buf' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1062]
+	Parameter IS_0_LATENCY bound to: 1 - type: integer 
+INFO: [Synth 8-155] case statement is not full and has no default [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1111]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_buf' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1062]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_traf_chk1' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2054]
+INFO: [Synth 8-155] case statement is not full and has no default [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2128]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_traf_chk1' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2054]
+INFO: [Synth 8-6157] synthesizing module 'xxv_ethernet_0_traf_data_chk' [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2501]
+INFO: [Synth 8-155] case statement is not full and has no default [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2630]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_traf_data_chk' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2501]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_axis_traffic_gen_mon' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:610]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_pkt_gen_mon' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:61]
+INFO: [Synth 8-6155] done synthesizing module 'xxv_ethernet_0_exdes' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_exdes.v:63]
+WARNING: [Synth 8-3936] Found unconnected internal register 'gen_rtl_loop.md_reg' and it is trimmed from '33' to '32' bits. [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2033]
+WARNING: [Synth 8-7137] Register pkt_len_reg in module xxv_ethernet_0_pkt_len_gen has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2228]
+WARNING: [Synth 8-6014] Unused sequential element lane_mask_reg was removed.  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1354]
+WARNING: [Synth 8-7137] Register busy_reg in module xxv_ethernet_0_axis_pkt_gen has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:1433]
+WARNING: [Synth 8-6014] Unused sequential element rx_block_lock_led_1d_reg was removed.  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2465]
+WARNING: [Synth 8-6014] Unused sequential element rx_block_lock_led_2d_reg was removed.  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2466]
+WARNING: [Synth 8-6014] Unused sequential element rx_block_lock_led_3d_reg was removed.  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2467]
+WARNING: [Synth 8-6014] Unused sequential element d_sop_reg was removed.  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2582]
+WARNING: [Synth 8-6014] Unused sequential element d_eop_reg was removed.  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2583]
+WARNING: [Synth 8-6014] Unused sequential element state_reg[2] was removed.  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2586]
+WARNING: [Synth 8-6014] Unused sequential element zzmask_reg[2] was removed.  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2588]
+WARNING: [Synth 8-6014] Unused sequential element cmpr_reg[2] was removed.  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2589]
+WARNING: [Synth 8-6014] Unused sequential element d_dat_reg[2] was removed.  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2590]
+WARNING: [Synth 8-6014] Unused sequential element read_loop.loc_sop_reg was removed.  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2595]
+WARNING: [Synth 8-6014] Unused sequential element read_loop.loc_eop_reg was removed.  [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v:2596]
+INFO: [Synth 8-7129] Port rx_errout in module xxv_ethernet_0_traf_data_chk is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[63] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[62] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[61] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[60] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[59] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[58] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[57] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[56] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[55] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[54] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[53] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[52] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[51] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[50] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[49] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[48] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[47] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[46] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[45] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[44] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[43] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[42] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[41] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[40] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[39] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[38] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[37] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[36] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[35] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[34] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[33] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[32] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[31] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[30] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[29] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[28] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[27] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[26] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[25] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[24] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[23] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[22] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[21] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[20] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[19] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[18] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[17] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[16] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[15] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[14] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[13] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[12] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[11] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[10] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[9] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[8] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[7] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[6] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[5] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[4] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[3] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[2] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[1] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port rx_dataout[0] in module xxv_ethernet_0_traf_chk1 is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_bad_code in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_packets[1] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_packets[0] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_packets in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_bytes[3] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_bytes[2] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_bytes[1] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_bytes[0] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[13] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[12] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[11] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[10] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[9] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[8] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[7] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[6] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[5] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[4] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[3] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[2] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[1] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_total_good_bytes[0] in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_packet_small in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_jabber in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_packet_large in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_oversize in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_undersize in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_toolong in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_fragment in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_packet_64_bytes in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_packet_65_127_bytes in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_packet_128_255_bytes in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_packet_256_511_bytes in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_packet_512_1023_bytes in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Synth 8-7129] Port stat_rx_packet_1024_1518_bytes in module xxv_ethernet_0_axis_pkt_mon is either unconnected or has no load
+INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 2100.281 ; gain = 619.281
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 2100.281 ; gain = 619.281
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 2100.281 ; gain = 619.281
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.161 . Memory (MB): peak = 2100.281 ; gain = 0.000
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_0/xxv_ethernet_0_in_context.xdc] for cell 'DUT'
+create_generated_clock: Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 2208.332 ; gain = 1.574
+Finished Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_0/xxv_ethernet_0_in_context.xdc] for cell 'DUT'
+Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_example_top.xdc]
+Finished Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_example_top.xdc]
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_example_top.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/xxv_ethernet_0_exdes_propImpl.xdc].
+Resolution: To avoid this warning, move constraints listed in [.Xil/xxv_ethernet_0_exdes_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.runs/synth_1/dont_touch.xdc]
+Finished Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.runs/synth_1/dont_touch.xdc]
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.003 . Memory (MB): peak = 2208.332 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.069 . Memory (MB): peak = 2208.332 ; gain = 0.000
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:27 ; elapsed = 00:00:28 . Memory (MB): peak = 2208.332 ; gain = 727.332
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xcu26-vsva1365-2LV-e
+INFO: [Synth 8-6742] Reading net delay rules and data
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:27 ; elapsed = 00:00:28 . Memory (MB): peak = 2208.332 ; gain = 727.332
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:27 ; elapsed = 00:00:28 . Memory (MB): peak = 2208.332 ; gain = 727.332
+---------------------------------------------------------------------------------
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'xxv_ethernet_0_example_fsm_axis'
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'xxv_ethernet_0_axis_pkt_gen'
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'xxv_ethernet_0_axis_pkt_mon'
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'xxv_ethernet_0_traf_chk1'
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg[0]' in module 'xxv_ethernet_0_traf_data_chk'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                            00000 |                            00000
+                      S1 |                            00001 |                            00001
+                      S2 |                            00010 |                            00011
+                      S3 |                            00011 |                            00010
+                      S4 |                            00100 |                            00110
+                      S5 |                            00101 |                            00111
+                     S16 |                            00110 |                            11000
+                     S17 |                            00111 |                            11001
+                      S6 |                            01000 |                            00101
+                      S7 |                            01001 |                            00100
+                      S8 |                            01010 |                            01100
+                      S9 |                            01011 |                            01101
+                     S10 |                            01100 |                            01111
+                     S11 |                            01101 |                            01110
+                     S12 |                            01110 |                            01010
+                     S13 |                            01111 |                            01011
+                     S14 |                            10000 |                            01001
+                     S15 |                            10001 |                            01000
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'xxv_ethernet_0_example_fsm_axis'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                              000 |                              000
+                      S1 |                              001 |                              001
+                      S2 |                              010 |                              011
+                      S3 |                              011 |                              010
+                      S4 |                              100 |                              110
+                      S7 |                              101 |                              100
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'xxv_ethernet_0_axis_pkt_gen'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                               00 |                               00
+                      S1 |                               01 |                               01
+                      S2 |                               10 |                               11
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'xxv_ethernet_0_axis_pkt_mon'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                               00 |                               00
+                      S1 |                               01 |                               01
+                      S2 |                               10 |                               11
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'xxv_ethernet_0_traf_chk1'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      S0 |                               00 |                               00
+                      S1 |                               01 |                               01
+                      S2 |                               10 |                               11
+                      S3 |                               11 |                               10
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg[0]' using encoding 'sequential' in module 'xxv_ethernet_0_traf_data_chk'
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:29 ; elapsed = 00:00:29 . Memory (MB): peak = 2208.332 ; gain = 727.332
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input   32 Bit       Adders := 18    
+	   2 Input   30 Bit       Adders := 1     
+	   2 Input   17 Bit       Adders := 1     
+	   2 Input    8 Bit       Adders := 2     
+	   2 Input    7 Bit       Adders := 1     
+	   2 Input    4 Bit       Adders := 2     
+	   2 Input    3 Bit       Adders := 5     
++---XORs : 
+	   2 Input     64 Bit         XORs := 1     
++---XORs : 
+	               33 Bit    Wide XORs := 193   
++---Registers : 
+	               71 Bit    Registers := 8     
+	               65 Bit    Registers := 1     
+	               64 Bit    Registers := 15    
+	               48 Bit    Registers := 6     
+	               32 Bit    Registers := 39    
+	               30 Bit    Registers := 1     
+	               17 Bit    Registers := 1     
+	                8 Bit    Registers := 2     
+	                5 Bit    Registers := 2     
+	                4 Bit    Registers := 2     
+	                3 Bit    Registers := 7     
+	                2 Bit    Registers := 4     
+	                1 Bit    Registers := 56    
++---Muxes : 
+	   2 Input   71 Bit        Muxes := 14    
+	   4 Input   71 Bit        Muxes := 7     
+	   2 Input   64 Bit        Muxes := 5     
+	   6 Input   64 Bit        Muxes := 1     
+	   4 Input   64 Bit        Muxes := 2     
+	   2 Input   48 Bit        Muxes := 2     
+	   2 Input   32 Bit        Muxes := 8     
+	  18 Input   32 Bit        Muxes := 1     
+	   6 Input   32 Bit        Muxes := 3     
+	   4 Input   32 Bit        Muxes := 2     
+	   3 Input   30 Bit        Muxes := 1     
+	   2 Input    8 Bit        Muxes := 3     
+	   6 Input    8 Bit        Muxes := 1     
+	   5 Input    8 Bit        Muxes := 1     
+	   8 Input    8 Bit        Muxes := 1     
+	  18 Input    5 Bit        Muxes := 1     
+	  39 Input    5 Bit        Muxes := 1     
+	   2 Input    4 Bit        Muxes := 6     
+	   4 Input    4 Bit        Muxes := 4     
+	   3 Input    4 Bit        Muxes := 2     
+	   2 Input    3 Bit        Muxes := 11    
+	   6 Input    3 Bit        Muxes := 3     
+	   4 Input    3 Bit        Muxes := 2     
+	   7 Input    2 Bit        Muxes := 2     
+	   4 Input    2 Bit        Muxes := 2     
+	   2 Input    2 Bit        Muxes := 2     
+	   2 Input    1 Bit        Muxes := 34    
+	  18 Input    1 Bit        Muxes := 6     
+	   6 Input    1 Bit        Muxes := 12    
+	   3 Input    1 Bit        Muxes := 9     
+	   4 Input    1 Bit        Muxes := 21    
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 1320 (col length:264)
+BRAMs: 4224 (col length: RAMB18 264 RAMB36 132)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:46 ; elapsed = 00:00:47 . Memory (MB): peak = 2214.512 ; gain = 733.512
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:55 ; elapsed = 00:00:57 . Memory (MB): peak = 2550.121 ; gain = 1069.121
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:01:00 ; elapsed = 00:01:02 . Memory (MB): peak = 2608.020 ; gain = 1127.020
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:01:02 ; elapsed = 00:01:03 . Memory (MB): peak = 2639.219 ; gain = 1158.219
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:01:07 ; elapsed = 00:01:09 . Memory (MB): peak = 2824.250 ; gain = 1343.250
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:07 ; elapsed = 00:01:09 . Memory (MB): peak = 2824.250 ; gain = 1343.250
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:07 ; elapsed = 00:01:09 . Memory (MB): peak = 2824.250 ; gain = 1343.250
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:07 ; elapsed = 00:01:09 . Memory (MB): peak = 2824.250 ; gain = 1343.250
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:08 ; elapsed = 00:01:10 . Memory (MB): peak = 2824.250 ; gain = 1343.250
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:08 ; elapsed = 00:01:10 . Memory (MB): peak = 2824.250 ; gain = 1343.250
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++------+---------------+----------+
+|      |BlackBox name  |Instances |
++------+---------------+----------+
+|1     |xxv_ethernet_0 |         1|
++------+---------------+----------+
+
+Report Cell Usage: 
++------+-------------+------+
+|      |Cell         |Count |
++------+-------------+------+
+|1     |xxv_ethernet |     1|
+|2     |BUFG         |     2|
+|3     |CARRY8       |    95|
+|4     |LUT1         |   134|
+|5     |LUT2         |   238|
+|6     |LUT3         |   136|
+|7     |LUT4         |   701|
+|8     |LUT5         |   202|
+|9     |LUT6         |   508|
+|10    |MUXF7        |     8|
+|11    |FDCE         |   753|
+|12    |FDPE         |    57|
+|13    |FDRE         |  1512|
+|14    |FDSE         |   236|
+|15    |IBUF         |    41|
+|16    |OBUF         |    41|
++------+-------------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:08 ; elapsed = 00:01:10 . Memory (MB): peak = 2824.250 ; gain = 1343.250
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 0 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:48 ; elapsed = 00:00:59 . Memory (MB): peak = 2824.250 ; gain = 1235.199
+Synthesis Optimization Complete : Time (s): cpu = 00:01:08 ; elapsed = 00:01:10 . Memory (MB): peak = 2824.250 ; gain = 1343.250
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.088 . Memory (MB): peak = 2824.250 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 146 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.002 . Memory (MB): peak = 2831.879 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 43 instances were transformed.
+  BUFG => BUFGCE: 2 instances
+  IBUF => IBUF (IBUFCTRL, INBUF): 41 instances
+
+Synth Design complete | Checksum: 1fe638fb
+INFO: [Common 17-83] Releasing license: Synthesis
+180 Infos, 35 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:01:20 ; elapsed = 00:01:25 . Memory (MB): peak = 2831.879 ; gain = 2174.309
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.010 . Memory (MB): peak = 2831.879 ; gain = 0.000
+INFO: [Common 17-1381] The checkpoint 'c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.runs/synth_1/xxv_ethernet_0_exdes.dcp' has been generated.
+INFO: [Vivado 12-24828] Executing command : report_utilization -file xxv_ethernet_0_exdes_utilization_synth.rpt -pb xxv_ethernet_0_exdes_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Mon Aug  3 18:31:54 2026...

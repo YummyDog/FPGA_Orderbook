@@ -1,0 +1,6 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1785861116" />
+    <testcase name="test_single_asx_packet" classname="test_udp_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_udp_parser.py" lineno="157" time="0.0057909488677978516" sim_time_ns="140.8" ratio_time="24313.80473465355" />
+  </testsuite>
+</testsuites>

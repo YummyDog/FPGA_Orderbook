@@ -1,0 +1,17 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1785846339" />
+    <testcase name="test_single_asx_packet" classname="test_ipv4_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_ipv4_parser.py" lineno="216" time="0.00657200813293457" sim_time_ns="140.8" ratio_time="21424.197467803377" />
+    <testcase name="test_vlan_tagged" classname="test_ipv4_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_ipv4_parser.py" lineno="274" time="0.004080772399902344" sim_time_ns="147.2" ratio_time="36071.60252395419" />
+    <testcase name="test_ihl_invalid" classname="test_ipv4_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_ipv4_parser.py" lineno="324" time="0.004509925842285156" sim_time_ns="147.2" ratio_time="32639.117614717696" />
+    <testcase name="test_version_invalid" classname="test_ipv4_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_ipv4_parser.py" lineno="366" time="0.004754781723022461" sim_time_ns="147.2" ratio_time="30958.30861956576" />
+    <testcase name="test_fragmented" classname="test_ipv4_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_ipv4_parser.py" lineno="400" time="0.006688833236694336" sim_time_ns="217.60000000000002" ratio_time="32531.832129745148" />
+    <testcase name="test_non_udp_protocol" classname="test_ipv4_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_ipv4_parser.py" lineno="444" time="0.004489898681640625" sim_time_ns="147.20000000000005" ratio_time="32784.704163126604" />
+    <testcase name="test_back_to_back" classname="test_ipv4_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_ipv4_parser.py" lineno="476" time="0.006654977798461914" sim_time_ns="217.5999999999999" ratio_time="32697.32921577758" />
+    <testcase name="test_alternating_vlan" classname="test_ipv4_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_ipv4_parser.py" lineno="515" time="0.0063686370849609375" sim_time_ns="217.5999999999999" ratio_time="34167.43599880202" />
+    <testcase name="test_tvalid_gaps" classname="test_ipv4_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_ipv4_parser.py" lineno="556" time="0.005715608596801758" sim_time_ns="211.19999999999982" ratio_time="36951.445576273276" />
+    <testcase name="test_truncated_before_complete" classname="test_ipv4_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_ipv4_parser.py" lineno="593" time="0.0027391910552978516" sim_time_ns="102.40000000000009" ratio_time="37383.29964313695" />
+    <testcase name="test_reset_mid_packet" classname="test_ipv4_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_ipv4_parser.py" lineno="635" time="0.005719184875488281" sim_time_ns="211.20000000000005" ratio_time="36928.33936968485" />
+    <testcase name="test_all_asx_partitions" classname="test_ipv4_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_ipv4_parser.py" lineno="683" time="0.019667863845825195" sim_time_ns="640.0" ratio_time="32540.39203326343" />
+  </testsuite>
+</testsuites>

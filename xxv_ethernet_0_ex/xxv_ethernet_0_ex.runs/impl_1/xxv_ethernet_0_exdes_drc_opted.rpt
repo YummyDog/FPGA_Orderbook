@@ -1,0 +1,50 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
+| Date         : Mon Aug  3 18:34:47 2026
+| Host         : DESKTOP-MB4FOM3 running 64-bit major release  (build 9200)
+| Command      : report_drc -file xxv_ethernet_0_exdes_drc_opted.rpt -pb xxv_ethernet_0_exdes_drc_opted.pb -rpx xxv_ethernet_0_exdes_drc_opted.rpx
+| Design       : xxv_ethernet_0_exdes
+| Device       : xcu26-vsva1365-2LV-e
+| Speed File   : -2LV
+| Design State : Synthesized
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+Report DRC
+
+Table of Contents
+-----------------
+1. REPORT SUMMARY
+2. REPORT DETAILS
+
+1. REPORT SUMMARY
+-----------------
+            Netlist: netlist
+          Floorplan: design_1
+      Design limits: <entire design considered>
+           Ruledeck: default
+             Max checks: <unlimited>
+             Checks found: 2
++--------+------------------+----------------------------+--------+
+| Rule   | Severity         | Description                | Checks |
++--------+------------------+----------------------------+--------+
+| NSTD-1 | Critical Warning | Unspecified I/O Standard   | 1      |
+| UCIO-1 | Critical Warning | Unconstrained Logical Port | 1      |
++--------+------------------+----------------------------+--------+
+
+2. REPORT DETAILS
+-----------------
+NSTD-1#1 Critical Warning
+Unspecified I/O Standard  
+76 out of 83 logical ports use I/O standard (IOSTANDARD) value 'DEFAULT', instead of a user assigned specific value. This may cause I/O contention or incompatibility with the board power or connectivity affecting performance, signal integrity or in extreme cases cause damage to the device or the components to which it is connected. To correct this violation, specify all I/O standards. This design will fail to generate a bitstream unless all logical ports have a user specified I/O standard value defined. To allow bitstream creation with unspecified I/O standard values (not recommended), use this command: set_property SEVERITY {Warning} [get_drc_checks NSTD-1].  NOTE: When using the Vivado Runs infrastructure (e.g. launch_runs Tcl command), add this command to a .tcl file and add that file as a pre-hook for write_bitstream step for the implementation run. Problem ports: clk, dclk, rx_mac_mii_c_0[3:0], rx_mac_mii_clk_0, rx_mac_mii_d_0[31:0],
+tx_mac_mii_c_0[3:0], tx_mac_mii_clk_0, tx_mac_mii_d_0[31:0].
+Related violations: <none>
+
+UCIO-1#1 Critical Warning
+Unconstrained Logical Port  
+83 out of 83 logical ports have no user assigned specific location constraint (LOC). This may cause I/O contention or incompatibility with the board power or connectivity affecting performance, signal integrity or in extreme cases cause damage to the device or the components to which it is connected. To correct this violation, specify all pin locations. This design will fail to generate a bitstream unless all logical ports have a user specified site LOC constraint defined.  To allow bitstream creation with unspecified pin locations (not recommended), use this command: set_property SEVERITY {Warning} [get_drc_checks UCIO-1].  NOTE: When using the Vivado Runs infrastructure (e.g. launch_runs Tcl command), add this command to a .tcl file and add that file as a pre-hook for write_bitstream step for the implementation run.  Problem ports: clk, completion_status[4:0], dclk, restart_tx_rx_0, rx_mac_mii_c_0[3:0],
+rx_mac_mii_clk_0, rx_mac_mii_d_0[31:0], sys_reset, tx_mac_mii_c_0[3:0],
+tx_mac_mii_clk_0, tx_mac_mii_d_0[31:0].
+Related violations: <none>
+
+

@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2025.2 (64-bit)
+# SW Build 6299465 on Fri Nov 14 19:35:11 GMT 2025
+# IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+# SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+# Start of session at: Mon Aug  3 18:30:17 2026
+# Process ID         : 26044
+# Current directory  : c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.runs/synth_1
+# Command line       : vivado.exe -log xxv_ethernet_0_exdes.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source xxv_ethernet_0_exdes.tcl
+# Log file           : c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.runs/synth_1/xxv_ethernet_0_exdes.vds
+# Journal file       : c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.runs/synth_1\vivado.jou
+# Running On         : DESKTOP-MB4FOM3
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 19045
+# Processor Detail   : Intel(R) Core(TM) i5-8600 CPU @ 3.10GHz
+# CPU Frequency      : 3096 MHz
+# CPU Physical cores : 6
+# CPU Logical cores  : 6
+# Host memory        : 17119 MB
+# Swap memory        : 9299 MB
+# Total Virtual      : 26419 MB
+# Available Virtual  : 8249 MB
+#-----------------------------------------------------------
+source xxv_ethernet_0_exdes.tcl -notrace

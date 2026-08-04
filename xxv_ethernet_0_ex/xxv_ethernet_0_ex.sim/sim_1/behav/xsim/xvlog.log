@@ -1,0 +1,19 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_exdes.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_exdes
+INFO: [VRFC 10-2263] Analyzing Verilog file "c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_pkt_gen_mon.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_pkt_gen_mon
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_cdc_sync_2stage
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_user_cdc_sync
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_axis_traffic_gen_mon
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_buf
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_axis_pkt_gen
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_pktprbs_gen
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_traf_chk1
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_pkt_len_gen
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_axis_pkt_mon
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_traf_data_chk
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_example_fsm_axis
+INFO: [VRFC 10-2263] Analyzing Verilog file "c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/imports/xxv_ethernet_0_exdes_tb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module xxv_ethernet_0_exdes_tb
+INFO: [VRFC 10-2263] Analyzing Verilog file "c:/Users/lskje/Desktop/FPGA_Orderbook/xxv_ethernet_0_ex/xxv_ethernet_0_ex.sim/sim_1/behav/xsim/glbl.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module glbl

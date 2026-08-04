@@ -1,0 +1,2 @@
+xxv_ethernet_0_sim_netlist.vhdl,vhdl,xil_defaultlib,../../../../xxv_ethernet_0_ex.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_0_sim_netlist.vhdl,incdir="D:/AMDDesignTools/2025.2/Vivado/data/rsb/busdef"
+glbl.v,Verilog,xil_defaultlib,glbl.v
