@@ -1,0 +1,25 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1786117022" />
+    <testcase name="test_single_asx_packet" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="300" time="0.09356451034545898" sim_time_ns="390.4" ratio_time="4172.522236888374" />
+    <testcase name="test_vlan_tagged" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="344" time="0.0492861270904541" sim_time_ns="403.20000000000005" ratio_time="8180.801044886587" />
+    <testcase name="test_all_decoded_types" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="381" time="0.02072906494140625" sim_time_ns="550.4" ratio_time="26552.09009937431" />
+    <testcase name="test_undecoded_types" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="422" time="0.019420862197875977" sim_time_ns="396.79999999999995" ratio_time="20431.63665737751" />
+    <testcase name="test_heartbeat" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="453" time="0.007126331329345703" sim_time_ns="300.79999999999995" ratio_time="42209.65684844429" />
+    <testcase name="test_seconds_only" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="486" time="0.00662541389465332" sim_time_ns="307.20000000000005" ratio_time="46366.91456331643" />
+    <testcase name="test_back_to_back" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="511" time="0.010372161865234375" sim_time_ns="480.0" ratio_time="46277.71974990806" />
+    <testcase name="test_alternating_vlan" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="552" time="0.013647079467773438" sim_time_ns="550.4000000000001" ratio_time="40330.97347309574" />
+    <testcase name="test_tvalid_gaps" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="594" time="0.009598731994628906" sim_time_ns="473.60000000000036" ratio_time="49339.8503328366" />
+    <testcase name="test_sequence_numbering" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="622" time="0.007796287536621094" sim_time_ns="396.7999999999997" ratio_time="50896.0191804281" />
+    <testcase name="test_reset_mid_packet" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="664" time="0.01145625114440918" sim_time_ns="505.59999999999945" ratio_time="44133.110703211125" />
+    <testcase name="test_all_asx_partitions" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="707" time="0.02317190170288086" sim_time_ns="915.1999999999998" ratio_time="39496.110924992274" />
+    <testcase name="test_double_completion" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="755" time="0.006927490234375" sim_time_ns="358.39999999999964" ratio_time="51735.908370044" />
+    <testcase name="test_unknown_type" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="806" time="0.006579875946044922" sim_time_ns="352.0" ratio_time="53496.44930792086" />
+    <testcase name="test_large_undecoded" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="838" time="0.007929801940917969" sim_time_ns="409.59999999999945" ratio_time="51653.244690318636" />
+    <testcase name="test_truncated_mid_message" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="871" time="0.005901813507080078" sim_time_ns="313.59999999999945" ratio_time="53136.209679243664" />
+    <testcase name="test_truncated_before_mold" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="914" time="0.004647254943847656" sim_time_ns="294.39999999999964" ratio_time="63349.22520008201" />
+    <testcase name="test_count_mismatch" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="952" time="0.0075185298919677734" sim_time_ns="352.0" ratio_time="46817.66316790867" />
+    <testcase name="test_ihl_options" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="986" time="0.00709223747253418" sim_time_ns="403.1999999999998" ratio_time="56850.88825091603" />
+    <testcase name="test_long_burst" classname="test_fullparser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_fullparser.py" lineno="1031" time="0.019870281219482422" sim_time_ns="748.8000000000002" ratio_time="37684.41884284035" />
+  </testsuite>
+</testsuites>

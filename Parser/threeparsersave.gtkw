@@ -1,0 +1,28 @@
+[*]
+[*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
+[*] Thu Aug 06 07:31:27 2026
+[*]
+[dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\threeparserpipline.fst"
+[dumpfile_mtime] "Thu Aug 06 07:17:19 2026"
+[dumpfile_size] 2081
+[savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\threeparsersave.gtkw"
+[timestart] 0
+[size] 1920 1017
+[pos] -61 -61
+*-25.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] threeparserpipline.
+[sst_width] 306
+[signals_width] 174
+[sst_expanded] 1
+[sst_vpaned_height] 304
+@28
+threeparserpipline.clk
+threeparserpipline.eth_fields_valid
+threeparserpipline.ipv4_fields_valid
+threeparserpipline.udp_fields_valid
+@22
+threeparserpipline.m_fields[359:0]
+@23
+threeparserpipline.s_axis_tdata[63:0]
+[pattern_trace] 1
+[pattern_trace] 0

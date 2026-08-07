@@ -1,0 +1,52 @@
+[*]
+[*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
+[*] Fri Aug 07 15:18:58 2026
+[*]
+[dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\fullparser.fst"
+[dumpfile_mtime] "Fri Aug 07 15:08:45 2026"
+[dumpfile_size] 27197
+[savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\fullparser.gtkw"
+[timestart] 4633000000
+[size] 1920 1017
+[pos] -243 -243
+*-28.000000 5251150000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] fullparser.
+[sst_width] 810
+[signals_width] 206
+[sst_expanded] 1
+[sst_vpaned_height] 304
+@28
+fullparser.clk
+fullparser.u_eth.resetn
+fullparser.eth_fields_valid
+fullparser.udp_fields_valid
+fullparser.u_eth.vlan_present_r
+@22
+fullparser.exchange_seconds[31:0]
+@28
+fullparser.ipv4_fields_valid
+@22
+fullparser.m_axis_tdata[63:0]
+fullparser.m_axis_tkeep[7:0]
+@28
+fullparser.m_axis_tvalid
+fullparser.mold_fields_valid
+@22
+fullparser.msg_fields[511:0]
+fullparser.msg_index[15:0]
+fullparser.msg_length[15:0]
+fullparser.msg_seqnum[63:0]
+fullparser.msg_status[5:0]
+fullparser.msg_type[7:0]
+@28
+fullparser.msg_valid
+fullparser.pkt_count_mismatch
+fullparser.pkt_done
+@22
+fullparser.pkt_fields[522:0]
+@29
+fullparser.m_axis_tlast
+@22
+fullparser.pkt_msg_count[15:0]
+[pattern_trace] 1
+[pattern_trace] 0

@@ -1,0 +1,29 @@
+[*]
+[*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
+[*] Wed Aug 05 15:41:30 2026
+[*]
+[dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\udp_parser.fst"
+[dumpfile_mtime] "Wed Aug 05 15:40:19 2026"
+[dumpfile_size] 1185
+[savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\udpsave.gtkw"
+[timestart] 0
+[size] 1920 1017
+[pos] -165 -165
+*-25.000000 108500000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 250
+[signals_width] 174
+[sst_expanded] 1
+[sst_vpaned_height] 304
+@28
+udp_parser.clk
+@22
+udp_parser.udp_fields[65:0]
+udp_parser.m_fields[359:0]
+@28
+udp_parser.vlan_c
+@23
+udp_parser.m_axis_tdata[63:0]
+@28
+udp_parser.tlast_r
+[pattern_trace] 1
+[pattern_trace] 0

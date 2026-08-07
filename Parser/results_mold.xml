@@ -1,0 +1,23 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1786014125" />
+    <testcase name="test_single_asx_packet" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="207" time="0.005818367004394531" sim_time_ns="147.2" ratio_time="25299.1947549582" />
+    <testcase name="test_vlan_tagged" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="263" time="0.004185676574707031" sim_time_ns="153.60000000000002" ratio_time="36696.57634996583" />
+    <testcase name="test_heartbeat" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="308" time="0.0042400360107421875" sim_time_ns="153.59999999999997" ratio_time="36226.10742240215" />
+    <testcase name="test_end_of_session" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="334" time="0.002947568893432617" sim_time_ns="153.59999999999997" ratio_time="52110.74127638921" />
+    <testcase name="test_sequence_extremes" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="359" time="0.006952524185180664" sim_time_ns="224.0" ratio_time="32218.514317067315" />
+    <testcase name="test_session_variants" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="397" time="0.002907276153564453" sim_time_ns="153.60000000000002" ratio_time="52832.95837297032" />
+    <testcase name="test_back_to_back" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="429" time="0.0073511600494384766" sim_time_ns="223.9999999999999" ratio_time="30471.381182499255" />
+    <testcase name="test_alternating_vlan" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="470" time="0.00755763053894043" sim_time_ns="224.0" ratio_time="29638.9190826209" />
+    <testcase name="test_tvalid_gaps" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="514" time="0.00657963752746582" sim_time_ns="192.0" ratio_time="29180.938797695402" />
+    <testcase name="test_truncated_before_complete" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="544" time="0.004253864288330078" sim_time_ns="128.0" ratio_time="30090.287635915258" />
+    <testcase name="test_reset_mid_packet" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="581" time="0.006801605224609375" sim_time_ns="236.79999999999995" ratio_time="34815.31082445316" />
+    <testcase name="test_all_asx_partitions" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="624" time="0.020697355270385742" sim_time_ns="646.3999999999999" ratio_time="31231.043365472113" />
+    <testcase name="test_truncated_in_beat0" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="674" time="0.001577138900756836" sim_time_ns="89.59999999999991" ratio_time="56811.736719576664" />
+    <testcase name="test_tagged_truncated_beat7" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="706" time="0.0026175975799560547" sim_time_ns="134.4000000000001" ratio_time="51344.790745969614" />
+    <testcase name="test_exact_header_frame" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="752" time="0.0036776065826416016" sim_time_ns="134.4000000000001" ratio_time="36545.507786061615" />
+    <testcase name="test_bubble_every_beat" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="796" time="0.0038590431213378906" sim_time_ns="224.0" ratio_time="58045.47732608427" />
+    <testcase name="test_long_mixed_burst" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="819" time="0.047081708908081055" sim_time_ns="1491.1999999999998" ratio_time="31672.597163185208" />
+    <testcase name="test_all_ones_header" classname="test_mold_parser" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\test_mold_parser.py" lineno="877" time="0.0030388832092285156" sim_time_ns="153.60000000000036" ratio_time="50544.88423034689" />
+  </testsuite>
+</testsuites>

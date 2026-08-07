@@ -1,0 +1,78 @@
+[*]
+[*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
+[*] Fri Aug 07 10:32:15 2026
+[*]
+[dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\itch_parser.fst"
+[dumpfile_mtime] "Fri Aug 07 10:02:11 2026"
+[dumpfile_size] 11539
+[savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Parser\itchsave.gtkw"
+[timestart] 4697000000
+[size] 1920 1017
+[pos] -243 -243
+*-25.000000 4759700000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 748
+[signals_width] 206
+[sst_expanded] 1
+[sst_vpaned_height] 589
+@28
+itch_parser.clk
+@24
+itch_parser.exchange_seconds[31:0]
+@28
+itch_parser.resetn
+@22
+itch_parser.m_axis_tdata[63:0]
+itch_parser.m_axis_tkeep[7:0]
+@28
+itch_parser.m_axis_tlast
+itch_parser.m_axis_tvalid
+@22
+itch_parser.msg_fields[511:0]
+@c00022
+itch_parser.msg_index[15:0]
+@28
+(0)itch_parser.msg_index[15:0]
+(1)itch_parser.msg_index[15:0]
+(2)itch_parser.msg_index[15:0]
+(3)itch_parser.msg_index[15:0]
+(4)itch_parser.msg_index[15:0]
+(5)itch_parser.msg_index[15:0]
+(6)itch_parser.msg_index[15:0]
+(7)itch_parser.msg_index[15:0]
+(8)itch_parser.msg_index[15:0]
+(9)itch_parser.msg_index[15:0]
+(10)itch_parser.msg_index[15:0]
+(11)itch_parser.msg_index[15:0]
+(12)itch_parser.msg_index[15:0]
+(13)itch_parser.msg_index[15:0]
+(14)itch_parser.msg_index[15:0]
+(15)itch_parser.msg_index[15:0]
+@1401202
+-group_end
+@22
+itch_parser.msg_length[15:0]
+itch_parser.msg_seqnum[63:0]
+itch_parser.msg_status[5:0]
+@c00820
+itch_parser.msg_type[7:0]
+@28
+(0)itch_parser.msg_type[7:0]
+(1)itch_parser.msg_type[7:0]
+(2)itch_parser.msg_type[7:0]
+(3)itch_parser.msg_type[7:0]
+(4)itch_parser.msg_type[7:0]
+(5)itch_parser.msg_type[7:0]
+(6)itch_parser.msg_type[7:0]
+(7)itch_parser.msg_type[7:0]
+@1401a00
+-group_end
+@28
+itch_parser.msg_valid
+itch_parser.pkt_count_mismatch
+itch_parser.pkt_done
+@22
+itch_parser.pkt_fields[522:0]
+@23
+itch_parser.pkt_msg_count[15:0]
+[pattern_trace] 1
+[pattern_trace] 0
