@@ -161,7 +161,11 @@ if ($LASTEXITCODE -ne 0) { throw "Analysis failed." }
 # separate '-r' call would fail with "WORK.<TOPLEVEL> not elaborated".
 # ---------------------------------------------------------------------------
 Write-Host "`n--- simulate ---"
-$RunArgs = @("-e", $Toplevel, "--no-save", "-r", "--load", $VhpiLib)
+# G_DEBUG_PKT_FIELDS is FALSE by default so synthesis does not carry the
+# 523-bit pkt_fields bus. The testbench checks every header slice through
+# it, so elaborate with it TRUE.
+$RunArgs = @("-e", "-gG_DEBUG_PKT_FIELDS=true", $Toplevel, "--no-save",
+             "-r", "--load", $VhpiLib)
 if ($Waves) { $RunArgs += @("--wave=$Toplevel.fst", "--dump-arrays") }
 
 & $Nvc @Global @RunArgs

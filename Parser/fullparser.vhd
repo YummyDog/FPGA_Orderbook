@@ -77,7 +77,6 @@ entity fullparser is
     -- Packet-level status, pulsed with the outgoing tlast --------------------
     pkt_done           : out std_logic;
     pkt_msg_count      : out std_logic_vector(15 downto 0);
-    pkt_count_mismatch : out std_logic;
 
     -- Per-stage completion pulses, for verification --------------------------
     eth_fields_valid  : out std_logic;
@@ -262,8 +261,7 @@ begin
       exchange_seconds => exchange_seconds,
 
       pkt_done           => pkt_done,
-      pkt_msg_count      => pkt_msg_count,
-      pkt_count_mismatch => pkt_count_mismatch
+      pkt_msg_count      => pkt_msg_count
     );
 
   ------------------------------------------------------------------------------

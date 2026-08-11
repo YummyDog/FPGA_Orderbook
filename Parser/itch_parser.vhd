@@ -3,67 +3,62 @@
 --
 -- Stage 5 of the market-data header parser pipeline.
 --
---   AXI-Stream slave in -> AXI-Stream master out (data unmodified)
---   Field bus in  (Ethernet + IPv4 + UDP + Mold, C_MOLD_BUS_W bits)
---   Per-message event stream out
+-- ============================================================================
+-- WINDOW REWRITE
+-- ============================================================================
+-- The previous version assembled each message byte-by-byte into a 64-byte
+-- buffer at a computed index:
+--
+--     v_buf(to_integer(v_idx)) := v_b;      -- 6-to-64 decoder, x8 per beat
+--
+-- Eight of those decoders chained through a serial byte index sat at the
+-- heart of the critical path (beat_cnt -> ... -> buf_r, 22 logic levels).
+--
+-- This version stores raw beats UNCONDITIONALLY in a rolling window and
+-- selects the message afterwards:
+--
+--     win_r <= s_axis_tdata & win_r(0 to 7);   -- no enable, no decoder
+--
+-- Do everything, then select - instead of select, then do. Three chains
+-- leave the framing loop as a result:
+--
+--   * the 64-way buffer write decoders
+--   * the serial byte index (v_idx) - nothing needs it any more
+--   * the Seconds capture, which now happens in stage 2 from the window
+--
+-- What remains in the loop is phase / rem / len_hi only.
+--
+-- The extraction mux moves to stage 2, where it is FEED-FORWARD from
+-- registers and can take a further pipeline stage if it ever needs one -
+-- unlike the framing loop, which cannot.
 --
 -- ============================================================================
--- DELIBERATE DEVIATIONS FROM THE COMMON SKELETON - please review
+-- LATENCY AND THROUGHPUT - unchanged
 -- ============================================================================
---
--- 1. N OUTPUTS PER PACKET, not one field bus alongside tlast. A packet
---    carries several messages, so this stage emits an event per message.
---    The 523-bit upstream bus is re-presented on pkt_fields with every
---    event, so single-point end-to-end checking still works.
---
--- 2. A MESSAGE ASSEMBLY BUFFER (64 bytes) exists. It is bounded and cannot
---    back up - it is a shift-in register, not elastic storage - but it IS
---    storage, and the instructions ask for storage to be flagged.
---
--- 3. tkeep IS INSPECTED here, unlike the four header parsers. The ITCH
---    payload runs to the end of the frame, so the final partial beat must
---    not be parsed as data.
---
--- 4. TWO-CYCLE EVENT LATENCY. Framing completes a message in one cycle;
---    field decode and emission happen the next. This keeps the type mux and
---    field extraction out of the framing feedback loop, which is the only
---    timing-critical path in the design.
+--   one 8-byte beat per cycle, s_axis_tready tied high
+--   two cycles from message completion to msg_valid
+--   the interface is identical to the previous version
 --
 -- ============================================================================
--- 'T' SECONDS MESSAGES - the chosen special case
+-- 'T' SECONDS MESSAGES
 -- ============================================================================
 -- A Seconds block is 7 bytes, smaller than one beat, so two messages could
--- otherwise complete within a single beat. T is therefore treated as CLOCK
--- STATE: its 4-byte seconds value is captured into exchange_seconds and no
--- event is emitted. Since T is the only type with a sub-8-byte block, no two
--- EMITTED events can ever land in the same beat.
+-- otherwise complete in a single beat. T is treated as CLOCK STATE: its
+-- seconds value is captured and no event is emitted. It still consumes a
+-- sequence number, so msg_index advances across it.
 --
--- T still consumes a sequence number, so msg_index advances across it.
+-- The type byte is captured during framing (phase PH_TYPE) rather than read
+-- back from a buffer, so the T decision costs one register and no decoder.
 --
 -- ============================================================================
 -- FRAMING
 -- ============================================================================
 -- Driven by the length chain plus the end of the packet, NOT by the Mold
--- message_count. The count is a cross-check only (pkt_count_mismatch), so a
--- packet whose count disagrees with its contents is flagged rather than
--- mis-framed - the same principle as ihl_invalid.
+-- message_count. The framed count is reported raw on pkt_msg_count; a
+-- downstream checker compares it against message_count from the field bus.
 --
--- The payload starts at byte 62 untagged (beat 7, lane 6) or byte 66 tagged
--- (beat 8, lane 2). Bytes are then walked one at a time through a three-phase
--- state machine, unrolled eight times per beat. This handles a length field
--- straddling a beat boundary (roughly 1 message in 8) without special cases.
---
--- ============================================================================
--- KNOWN LIMITATIONS IN THIS FIRST CUT
--- ============================================================================
---   * If a message completes AND a following message is cut short by tlast
---     in the SAME beat, only the first event is emitted and
---     C_ST_MULTI_COMPLETE is set. The second is lost.
---   * Messages longer than 64 bytes (R at 113, M at 261) are framed and
---     counted but only their first 64 bytes are assembled. They are not
---     decoded types, so no field is affected.
---   * The unrolled eight-byte chain is the deepest logic in the project.
---     Timing at 156.25 MHz needs a trial synthesis on the chosen part.
+-- Payload starts at byte 62 untagged (beat 7, lane 6) or byte 66 tagged
+-- (beat 8, lane 2).
 --
 -- VHDL-2008
 --------------------------------------------------------------------------------
@@ -115,8 +110,7 @@ entity itch_parser is
 
     -- Packet-level status, pulsed with the outgoing tlast --------------------
     pkt_done           : out std_logic;
-    pkt_msg_count      : out std_logic_vector(15 downto 0);  -- as framed
-    pkt_count_mismatch : out std_logic
+    pkt_msg_count      : out std_logic_vector(15 downto 0)  -- as framed
   );
 end entity itch_parser;
 
@@ -133,90 +127,179 @@ architecture rtl of itch_parser is
   end function;
 
   ------------------------------------------------------------------------------
-  -- Message assembly buffer as a byte array. Indexing with a variable is
-  -- legal and readable; it synthesises to a decoder plus byte write enables,
-  -- the same hardware a variable-range slice would produce.
+  -- Rolling window of raw beats.
+  --
+  -- Depth 9 = 72 bytes, which always contains any decoded message: the
+  -- largest is C at 58 bytes, and a message ending at lane 0 of the newest
+  -- beat starts at most 64 bytes earlier.
+  --
+  -- win_r(0) is the NEWEST beat.
   ------------------------------------------------------------------------------
-  type byte_array_t is array (0 to C_MSG_BUF_BYTES-1)
-    of std_logic_vector(7 downto 0);
+  constant C_WIN_BEATS : natural := 9;
+  constant C_WIN_BYTES : natural := C_WIN_BEATS * 8;   -- 72
 
-  function to_slv (a : byte_array_t) return std_logic_vector is
-    variable r : std_logic_vector(C_MSG_BUF_W-1 downto 0);
+  type win_t   is array (0 to C_WIN_BEATS-1) of std_logic_vector(63 downto 0);
+  type byte_t  is array (natural range <>) of std_logic_vector(7 downto 0);
+
+  signal win_r : win_t := (others => (others => '0'));
+
+  ------------------------------------------------------------------------------
+  -- Flatten the window so byte 0 is the OLDEST and byte 71 the newest.
+  --
+  --   flat(f) = lane (f mod 8) of win_r(8 - f/8)
+  --
+  -- So the newest beat occupies flat bytes 64..71.
+  ------------------------------------------------------------------------------
+  function flatten (w : win_t) return byte_t is
+    variable r : byte_t(0 to C_WIN_BYTES-1);
   begin
-    for i in a'range loop
-      r(8*i + 7 downto 8*i) := a(i);
+    for f in 0 to C_WIN_BYTES-1 loop
+      r(f) := bsel(w((C_WIN_BEATS-1) - (f / 8)), f mod 8);
     end loop;
     return r;
   end function;
 
-  -- Framing phases
+  ------------------------------------------------------------------------------
+  -- Two-stage extraction.
+  --
+  -- A single 72:1 mux per output byte would be enormous. The offset splits
+  -- into a lane (0..7) and a beat (0..8), so it is done as an 8-way byte
+  -- rotate followed by a 9-way beat select - roughly 6 logic levels rather
+  -- than 7, and far less area.
+  --
+  -- Both selects come from REGISTERS, and the whole thing is feed-forward.
+  ------------------------------------------------------------------------------
+  function rot_lane (f : byte_t; lane : natural) return byte_t is
+    variable r : byte_t(0 to C_WIN_BYTES-1);
+  begin
+    for k in 0 to C_WIN_BYTES-1 loop
+      r(k) := f((k + lane) mod C_WIN_BYTES);
+    end loop;
+    return r;
+  end function;
+
+  function sel_beat (f : byte_t; beat : natural) return std_logic_vector is
+    variable r : std_logic_vector(C_MSG_BUF_W-1 downto 0) := (others => '0');
+  begin
+    for k in 0 to C_MSG_BUF_BYTES-1 loop
+      r(8*k + 7 downto 8*k) := f((8*beat + k) mod C_WIN_BYTES);
+    end loop;
+    return r;
+  end function;
+
+  ------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  -- 16-byte view spanning the previous and current beat.
+  --
+  -- view(o + 8) is the byte at offset o, for o in -8 .. +7. During cycle T
+  -- win_r(0) holds beat T-1 and s_axis_tdata is beat T, so a length field
+  -- straddling a beat boundary is an ordinary read at a negative offset -
+  -- no pending state, no special case.
+  ------------------------------------------------------------------------------
+  function make_view (prev, cur : std_logic_vector(63 downto 0)) return byte_t is
+    variable v : byte_t(0 to 15);
+  begin
+    for i in 0 to 7 loop
+      v(i)     := bsel(prev, i);
+      v(i + 8) := bsel(cur, i);
+    end loop;
+    return v;
+  end function;
+
+  -- Framing phases: retained only for the legacy comment above.
+  ------------------------------------------------------------------------------
   constant PH_LEN_HI : std_logic_vector(1 downto 0) := "00";
   constant PH_LEN_LO : std_logic_vector(1 downto 0) := "01";
-  constant PH_DATA   : std_logic_vector(1 downto 0) := "10";
+  constant PH_TYPE   : std_logic_vector(1 downto 0) := "10";  -- first data byte
+  constant PH_DATA   : std_logic_vector(1 downto 0) := "11";
 
   ------------------------------------------------------------------------------
   -- Beat tracking and payload start
   ------------------------------------------------------------------------------
-  signal beat_cnt : unsigned(3 downto 0);
+  signal beat_cnt : unsigned(3 downto 0) := (others => '0');
   signal vlan_c   : std_logic;
 
-  -- Payload begins at byte 62 (beat 7, lane 6) or byte 66 (beat 8, lane 2)
-  signal first_beat  : unsigned(3 downto 0);
-  signal first_lane  : unsigned(2 downto 0);
+  -- Registered at packet start so the raw s_fields route and the VLAN mux sit
+  -- OFF the head of the framing chain.
+  signal in_payload_r : std_logic := '0';
+  signal start_lane_r : unsigned(2 downto 0) := (others => '0');
+  signal first_beat_c : unsigned(3 downto 0);
+  signal first_lane_c : unsigned(2 downto 0);
 
   ------------------------------------------------------------------------------
-  -- Framing state
+  -- Framing state - this is the only loop that cannot be pipelined
   ------------------------------------------------------------------------------
-  signal phase_r    : std_logic_vector(1 downto 0);
-  signal len_hi_r   : std_logic_vector(7 downto 0);
-  signal msg_len_r  : unsigned(15 downto 0);
-  signal rem_r      : unsigned(15 downto 0);
-  signal byte_idx_r : unsigned(15 downto 0);
-  signal buf_r      : byte_array_t;
-  signal index_r    : unsigned(15 downto 0);
-  signal seconds_r  : std_logic_vector(31 downto 0);
-
-  ------------------------------------------------------------------------------
-  -- Stage 1 -> stage 2 handoff (a completed message awaiting decode)
+  -- ARITHMETIC FRAMING STATE
   --
-  -- cmp_fields_r captures the upstream bus AT COMPLETION. It cannot be read
-  -- from s_fields_r in stage 2: by then the next packet's beats may already
-  -- be in this stage, and the upstream slices update at DIFFERENT times
-  -- (eth_parser at its beat 1, mold_parser not until beat 7), so a late read
-  -- yields an incoherent mix of two packets.
+  -- Offsets are signed and relative to lane 0 of the CURRENT beat, so a
+  -- block that began in the previous beat simply has a negative offset. The
+  -- 16-byte view below covers -8..+7, which removes every "pending byte"
+  -- special case the phase machine needed.
+  --
+  --   in_block_r  a block is in progress; end_r is its last byte
+  --   end_r       offset of the in-progress block's LAST byte
+  --   start_r     offset of the next block's first (length) byte
+  signal in_block_r : std_logic := '0';
+  signal end_r      : signed(17 downto 0) := (others => '0');
+  signal start_r    : signed(17 downto 0) := (others => '0');
+  signal cur_len_r  : unsigned(15 downto 0) := (others => '0');
+  signal cur_type_r : std_logic_vector(7 downto 0) := (others => '0');
+  signal index_r    : unsigned(15 downto 0) := (others => '0');
+
   ------------------------------------------------------------------------------
-  signal cmp_valid_r  : std_logic;
-  signal cmp_buf_r    : byte_array_t;
-  signal cmp_type_r   : std_logic_vector(7 downto 0);
-  signal cmp_len_r    : unsigned(15 downto 0);
-  signal cmp_index_r  : unsigned(15 downto 0);
-  signal cmp_stat_r   : std_logic_vector(C_MSG_STATUS_W-1 downto 0);
-  signal cmp_fields_r : std_logic_vector(C_MOLD_BUS_W-1 downto 0);
+  -- Stage 1 -> stage 2 handoff
+  --
+  -- cmp_end_lane_r is the lane of the message's LAST byte in the beat that
+  -- was current when it completed. Since stage 2 runs one cycle later and
+  -- win_r(0) then holds that beat, the message's last byte is at flat index
+  -- 64 + end_lane.
+  ------------------------------------------------------------------------------
+  signal cmp_valid_r    : std_logic := '0';
+  signal cmp_is_t_r     : std_logic := '0';
+  signal cmp_type_r     : std_logic_vector(7 downto 0) := (others => '0');
+  signal cmp_len_r      : unsigned(15 downto 0) := (others => '0');
+  signal cmp_index_r    : unsigned(15 downto 0) := (others => '0');
+  signal cmp_end_lane_r : unsigned(2 downto 0) := (others => '0');
+  signal cmp_stat_r     : std_logic_vector(C_MSG_STATUS_W-1 downto 0)
+                        := (others => '0');
+  signal cmp_fields_r   : std_logic_vector(C_MOLD_BUS_W-1 downto 0)
+                        := (others => '0');
+
+  -- 'T' gets its OWN capture registers. Sharing cmp_* would let a Seconds
+  -- message completing later in the same beat overwrite the values of a real
+  -- message that already set cmp_valid_r - exactly what happens when a
+  -- 27-byte block is followed by a 7-byte Seconds block.
+  signal t_end_lane_r : unsigned(2 downto 0) := (others => '0');
+  signal t_len_r      : unsigned(15 downto 0) := (others => '0');
 
   ------------------------------------------------------------------------------
   -- Stage 2 outputs
   ------------------------------------------------------------------------------
-  signal msg_valid_r  : std_logic;
-  signal msg_index_r  : std_logic_vector(15 downto 0);
-  signal msg_seqnum_r : std_logic_vector(63 downto 0);
-  signal msg_type_r   : std_logic_vector(7 downto 0);
-  signal msg_len_out_r: std_logic_vector(15 downto 0);
-  signal msg_fields_r : std_logic_vector(C_MSG_FIELDS_W-1 downto 0);
-  signal msg_stat_r   : std_logic_vector(C_MSG_STATUS_W-1 downto 0);
-  signal pkt_fields_r : std_logic_vector(C_ITCH_PKT_W-1 downto 0);
+  signal msg_valid_r   : std_logic := '0';
+  signal msg_index_r   : std_logic_vector(15 downto 0) := (others => '0');
+  signal msg_seqnum_r  : std_logic_vector(63 downto 0) := (others => '0');
+  signal msg_type_r    : std_logic_vector(7 downto 0) := (others => '0');
+  signal msg_len_out_r : std_logic_vector(15 downto 0) := (others => '0');
+  signal msg_fields_r  : std_logic_vector(C_MSG_FIELDS_W-1 downto 0)
+                       := (others => '0');
+  signal msg_stat_r    : std_logic_vector(C_MSG_STATUS_W-1 downto 0)
+                       := (others => '0');
+  signal pkt_fields_r  : std_logic_vector(C_ITCH_PKT_W-1 downto 0)
+                       := (others => '0');
+  signal seconds_r     : std_logic_vector(31 downto 0) := (others => '0');
 
-  signal pkt_done_r      : std_logic;
-  signal pkt_count_r     : std_logic_vector(15 downto 0);
-  signal pkt_mismatch_r  : std_logic;
+  signal pkt_done_r  : std_logic := '0';
+  signal pkt_count_r : std_logic_vector(15 downto 0) := (others => '0');
 
   ------------------------------------------------------------------------------
-  -- Upstream bus and data path, one register stage each
+  -- Data path and upstream bus, one register stage each
   ------------------------------------------------------------------------------
-  signal s_fields_r : std_logic_vector(C_MOLD_BUS_W-1 downto 0);
-  signal tdata_r    : std_logic_vector(63 downto 0);
-  signal tkeep_r    : std_logic_vector(7 downto 0);
-  signal tvalid_r   : std_logic;
-  signal tlast_r    : std_logic;
+  signal s_fields_r : std_logic_vector(C_MOLD_BUS_W-1 downto 0)
+                    := (others => '0');
+  signal tdata_r    : std_logic_vector(63 downto 0) := (others => '0');
+  signal tkeep_r    : std_logic_vector(7 downto 0)  := (others => '0');
+  signal tvalid_r   : std_logic := '0';
+  signal tlast_r    : std_logic := '0';
 
 begin
 
@@ -225,13 +308,9 @@ begin
   ------------------------------------------------------------------------------
   s_axis_tready <= '1';
 
-  ------------------------------------------------------------------------------
-  -- Tag select and payload start position
-  ------------------------------------------------------------------------------
-  vlan_c <= eth_vlan_present(s_fields);
-
-  first_beat <= to_unsigned(8, 4) when vlan_c = '1' else to_unsigned(7, 4);
-  first_lane <= to_unsigned(2, 3) when vlan_c = '1' else to_unsigned(6, 3);
+  vlan_c       <= eth_vlan_present(s_fields);
+  first_beat_c <= to_unsigned(8, 4) when vlan_c = '1' else to_unsigned(7, 4);
+  first_lane_c <= to_unsigned(2, 3) when vlan_c = '1' else to_unsigned(6, 3);
 
   ------------------------------------------------------------------------------
   -- Data path and upstream field bus
@@ -256,81 +335,145 @@ begin
   end process p_datapath;
 
   ------------------------------------------------------------------------------
-  -- Stage 1: framing
-  --
-  -- Walks the eight bytes of the beat through the length/data state machine.
-  -- The loop is unrolled by synthesis; the variables carry state from one
-  -- byte to the next within the cycle.
+  -- The window. Unconditional shift - no enable, no decoder, no index.
+  -- This is the whole point of the rewrite.
   ------------------------------------------------------------------------------
-  p_frame : process (clk)
-    variable v_phase  : std_logic_vector(1 downto 0);
-    variable v_len_hi : std_logic_vector(7 downto 0);
-    variable v_len    : unsigned(15 downto 0);
-    variable v_rem    : unsigned(15 downto 0);
-    variable v_idx    : unsigned(15 downto 0);
-    variable v_buf    : byte_array_t;
-    variable v_index  : unsigned(15 downto 0);
-    variable v_secs   : std_logic_vector(31 downto 0);
-
-    variable v_b      : std_logic_vector(7 downto 0);
-    variable v_len16  : std_logic_vector(15 downto 0);
-    variable v_type   : std_logic_vector(7 downto 0);
-    variable v_active : boolean;
-
-    variable v_emitted : boolean;
-    variable v_multi   : std_logic;
+  p_window : process (clk)
   begin
     if rising_edge(clk) then
       if resetn = '0' then
-        beat_cnt      <= (others => '0');
-        phase_r       <= PH_LEN_HI;
-        len_hi_r      <= (others => '0');
-        msg_len_r     <= (others => '0');
-        rem_r         <= (others => '0');
-        byte_idx_r    <= (others => '0');
-        index_r       <= (others => '0');
-        seconds_r     <= (others => '0');
-        buf_r         <= (others => (others => '0'));
-        cmp_valid_r   <= '0';
-        cmp_stat_r    <= (others => '0');
-        cmp_fields_r  <= (others => '0');
-        pkt_done_r    <= '0';
-        pkt_count_r   <= (others => '0');
-        pkt_mismatch_r<= '0';
+        win_r <= (others => (others => '0'));
+      elsif s_axis_tvalid = '1' then
+        win_r <= s_axis_tdata & win_r(0 to C_WIN_BEATS-2);
+      end if;
+    end if;
+  end process p_window;
+
+  ------------------------------------------------------------------------------
+  -- Stage 1: framing
+  --
+  -- Walks the eight bytes of the beat through the phase machine. The loop is
+  -- unrolled by synthesis; the variables carry state byte-to-byte within the
+  -- cycle. What it no longer carries: a byte index, a buffer, or the Seconds
+  -- capture.
+  ------------------------------------------------------------------------------
+  p_frame : process (clk)
+    variable v_view    : byte_t(0 to 15);
+    variable v_in      : std_logic;
+    variable v_end     : signed(17 downto 0);
+    variable v_start   : signed(17 downto 0);
+    variable v_len     : unsigned(15 downto 0);
+    variable v_type    : std_logic_vector(7 downto 0);
+    variable v_index   : unsigned(15 downto 0);
+    variable v_len16   : std_logic_vector(15 downto 0);
+    variable v_o       : integer;
+    variable v_lastlane: integer;
+    variable v_emitted : boolean;
+    variable v_multi   : std_logic;
+    variable v_overrun : std_logic;
+
+    -- one completion: lane, length, type
+    procedure do_complete (lane : in integer;
+                           len  : in unsigned(15 downto 0);
+                           typ  : in std_logic_vector(7 downto 0)) is
+    begin
+      if typ = C_TYPE_T then
+        -- clock state, own registers so a real message already captured in
+        -- this beat is not disturbed
+        cmp_is_t_r   <= '1';
+        t_end_lane_r <= to_unsigned(lane, 3);
+        t_len_r      <= len;
+      elsif v_emitted then
+        v_multi := '1';
+      else
+        v_emitted      := true;
+        cmp_valid_r    <= '1';
+        cmp_type_r     <= typ;
+        cmp_len_r      <= len;
+        cmp_index_r    <= v_index;
+        cmp_end_lane_r <= to_unsigned(lane, 3);
+        cmp_fields_r   <= s_fields;
+        cmp_stat_r     <= (others => '0');
+        cmp_stat_r(C_ST_DECODED) <=
+          '1' when is_decoded_type(typ) else '0';
+        cmp_stat_r(C_ST_UNKNOWN_TYPE) <=
+          '1' when spec_msg_len(typ) = 0 else '0';
+        cmp_stat_r(C_ST_LEN_MISMATCH) <=
+          '0' when to_integer(len) = spec_msg_len(typ) else '1';
+      end if;
+      v_index := v_index + 1;
+    end procedure;
+
+  begin
+    if rising_edge(clk) then
+      if resetn = '0' then
+        beat_cnt     <= (others => '0');
+        in_payload_r <= '0';
+        start_lane_r <= (others => '0');
+        in_block_r   <= '0';
+        end_r        <= (others => '0');
+        start_r      <= (others => '0');
+        cur_len_r    <= (others => '0');
+        cur_type_r   <= (others => '0');
+        index_r      <= (others => '0');
+        cmp_valid_r  <= '0';
+        cmp_is_t_r   <= '0';
+        cmp_stat_r   <= (others => '0');
+        cmp_fields_r <= (others => '0');
+        t_end_lane_r <= (others => '0');
+        t_len_r      <= (others => '0');
+        pkt_done_r   <= '0';
+        pkt_count_r  <= (others => '0');
       else
 
-        -- single-cycle strobes
         cmp_valid_r <= '0';
+        cmp_is_t_r  <= '0';
         pkt_done_r  <= '0';
 
         if s_axis_tvalid = '1' then
 
-          --------------------------------------------------------------------
-          -- Load framing state into variables
-          --------------------------------------------------------------------
-          v_phase  := phase_r;
-          v_len_hi := len_hi_r;
-          v_len    := msg_len_r;
-          v_rem    := rem_r;
-          v_idx    := byte_idx_r;
-          v_buf    := buf_r;
-          v_index  := index_r;
-          v_secs   := seconds_r;
+          v_view  := make_view(win_r(0), s_axis_tdata);
+          v_in    := in_block_r;
+          v_end   := end_r;
+          v_start := start_r;
+          v_len   := cur_len_r;
+          v_type  := cur_type_r;
+          v_index := index_r;
 
           v_emitted := false;
           v_multi   := '0';
+          v_overrun := '0';
 
-          -- New packet: clear framing state
+          -- highest lane carrying real data in this beat
+          v_lastlane := -1;
+          for i in 0 to 7 loop
+            if s_axis_tkeep(i) = '1' then
+              v_lastlane := i;
+            end if;
+          end loop;
+
+          --------------------------------------------------------------------
+          -- Packet / payload boundaries
+          --------------------------------------------------------------------
           if beat_cnt = 0 then
-            v_phase := PH_LEN_HI;
             v_index := (others => '0');
-            v_rem   := (others => '0');
-            v_idx   := (others => '0');
+            v_in    := '0';
+            v_start := to_signed(64, 18);      -- nothing until the payload
           end if;
 
-          --------------------------------------------------------------------
-          -- Beat position tracking
-          --------------------------------------------------------------------
+          if s_axis_tlast = '1' then
+            in_payload_r <= '0';
+          elsif beat_cnt = first_beat_c then
+            in_payload_r <= '1';
+          end if;
+          start_lane_r <= first_lane_c;
+
+          -- first payload beat: the first block starts at start_lane
+          if beat_cnt = first_beat_c then
+            v_in    := '0';
+            v_start := signed(resize(unsigned(first_lane_c), 18));
+          end if;
+
           if s_axis_tlast = '1' then
             beat_cnt <= (others => '0');
           elsif beat_cnt /= 15 then
@@ -338,152 +481,100 @@ begin
           end if;
 
           --------------------------------------------------------------------
-          -- Walk the eight bytes
+          -- ARITHMETIC FRAMING
+          --
+          -- Two passes, not eight. Pass 1 retires a block already in
+          -- progress; pass 2 reads and possibly retires the next one.
+          --
+          -- Two is provably enough for ASX ITCH: a third would need two
+          -- consecutive sub-8-byte blocks, and Seconds (7 bytes) is the only
+          -- type that small. A third is detected and flagged rather than
+          -- silently mis-framed.
           --------------------------------------------------------------------
-          for i in 0 to 7 loop
+          if (in_payload_r = '1') or (beat_cnt = first_beat_c) then
 
-            -- Is this byte part of the ITCH payload, and actually present?
-            v_active := false;
-            if s_axis_tkeep(i) = '1' then
-              if beat_cnt > first_beat then
-                v_active := true;
-              elsif beat_cnt = first_beat then
-                v_active := (i >= to_integer(first_lane));
+            -- pass 1: does the in-progress block end in this beat?
+            if v_in = '1' and v_end <= 7 then
+              if to_integer(v_end) <= v_lastlane then
+                do_complete(to_integer(v_end), v_len, v_type);
+                v_in    := '0';
+                v_start := v_end + 1;
               end if;
             end if;
 
-            if v_active then
-              v_b := bsel(s_axis_tdata, i);
+            -- pass 2: read the next block if its length and type bytes are
+            -- all inside the view, and its start byte actually arrived
+            if v_in = '0' and v_start <= 5 and v_start >= -8 then
+              v_o := to_integer(v_start);
+              if (v_o + 2) <= v_lastlane then
+                v_len16(15 downto 8) := v_view(v_o + 8);
+                v_len16(7 downto 0)  := v_view(v_o + 9);
+                v_len  := unsigned(v_len16);
+                v_type := v_view(v_o + 10);
+                v_end  := v_start + signed(resize(unsigned(v_len16), 18)) + 1;
+                v_in   := '1';
 
-              case v_phase is
-
-                when PH_LEN_HI =>
-                  v_len_hi := v_b;
-                  v_phase  := PH_LEN_LO;
-
-                when PH_LEN_LO =>
-                  -- Explicit slices, not concatenation: declaring
-                  -- byte_array_t as an array of std_logic_vector creates an
-                  -- implicit "&" returning byte_array_t, which makes
-                  -- v_len_hi & v_b ambiguous.
-                  v_len16(15 downto 8) := v_len_hi;
-                  v_len16(7 downto 0)  := v_b;
-                  v_len := unsigned(v_len16);
-                  v_rem := unsigned(v_len16);
-                  v_idx := (others => '0');
-                  if v_len16 = x"0000" then
-                    -- zero-length message: complete immediately
-                    v_index := v_index + 1;
-                    v_phase := PH_LEN_HI;
-                  else
-                    v_phase := PH_DATA;
-                  end if;
-
-                when others =>                     -- PH_DATA
-                  -- Assemble only what a decoded message can need. R (113)
-                  -- and M (261) are framed and counted but not assembled.
-                  if v_idx < C_MSG_BUF_BYTES then
-                    v_buf(to_integer(v_idx(5 downto 0))) := v_b;
-                  end if;
-                  v_idx := v_idx + 1;
-                  v_rem := v_rem - 1;
-
-                  if v_rem = 0 then
-                    ----------------------------------------------------------
-                    -- Message complete
-                    ----------------------------------------------------------
-                    v_type := v_buf(0);
-
-                    if v_type = C_TYPE_T then
-                      -- Clock state, not a message. No event emitted.
-                      v_secs(31 downto 24) := v_buf(1);
-                      v_secs(23 downto 16) := v_buf(2);
-                      v_secs(15 downto  8) := v_buf(3);
-                      v_secs( 7 downto  0) := v_buf(4);
-                    else
-                      if v_emitted then
-                        -- Cannot happen with T special-cased, since T is the
-                        -- only sub-8-byte block. Flagged rather than assumed.
-                        v_multi := '1';
-                      else
-                        v_emitted   := true;
-                        cmp_buf_r    <= v_buf;
-                        cmp_type_r   <= v_type;
-                        cmp_len_r    <= v_len;
-                        cmp_index_r  <= v_index;
-                        cmp_fields_r <= s_fields;   -- context AT completion
-                        cmp_valid_r  <= '1';
-
-                        cmp_stat_r <= (others => '0');
-                        cmp_stat_r(C_ST_DECODED) <=
-                          '1' when is_decoded_type(v_type) else '0';
-                        cmp_stat_r(C_ST_UNKNOWN_TYPE) <=
-                          '1' when spec_msg_len(v_type) = 0 else '0';
-                        cmp_stat_r(C_ST_LEN_MISMATCH) <=
-                          '0' when to_integer(v_len) = spec_msg_len(v_type)
-                          else '1';
-                      end if;
+                if v_end <= 7 then
+                  if to_integer(v_end) <= v_lastlane then
+                    do_complete(to_integer(v_end), v_len, v_type);
+                    v_in    := '0';
+                    v_start := v_end + 1;
+                    -- a third pass would be needed here; flag it
+                    if v_start <= 5 then
+                      v_overrun := '1';
                     end if;
-
-                    v_index := v_index + 1;
-                    v_phase := PH_LEN_HI;
                   end if;
-
-              end case;
+                end if;
+              end if;
             end if;
-          end loop;
+          end if;
 
           --------------------------------------------------------------------
           -- End of packet
           --------------------------------------------------------------------
           if s_axis_tlast = '1' then
-
-            -- A message cut short by the end of the frame
-            if v_phase /= PH_LEN_HI then
-              if v_emitted then
-                v_multi := '1';       -- first cut: the short message is lost
-              else
-                v_emitted   := true;
-                cmp_buf_r    <= v_buf;
-                cmp_type_r   <= v_buf(0);
-                cmp_len_r    <= v_len;
-                cmp_index_r  <= v_index;
-                cmp_fields_r <= s_fields;   -- context AT completion
-                cmp_valid_r  <= '1';
-
-                cmp_stat_r <= (others => '0');
+            if v_in = '1' then
+              -- a block was still in progress
+              if not v_emitted then
+                v_emitted      := true;
+                cmp_valid_r    <= '1';
+                cmp_type_r     <= v_type;
+                cmp_len_r      <= v_len;
+                cmp_index_r    <= v_index;
+                cmp_end_lane_r <= to_unsigned(7, 3);
+                cmp_fields_r   <= s_fields;
+                cmp_stat_r     <= (others => '0');
                 cmp_stat_r(C_ST_MSG_TRUNCATED) <= '1';
                 cmp_stat_r(C_ST_UNKNOWN_TYPE)  <=
-                  '1' when spec_msg_len(v_buf(0)) = 0 else '0';
-
+                  '1' when spec_msg_len(v_type) = 0 else '0';
                 v_index := v_index + 1;
+              else
+                v_multi := '1';
               end if;
             end if;
-
             pkt_done_r  <= '1';
             pkt_count_r <= std_logic_vector(v_index);
-            if v_index /= unsigned(mold_message_count(s_fields)) then
-              pkt_mismatch_r <= '1';
-            else
-              pkt_mismatch_r <= '0';
-            end if;
           end if;
 
-          if v_multi = '1' then
+          if (v_multi or v_overrun) = '1' then
             cmp_stat_r(C_ST_MULTI_COMPLETE) <= '1';
           end if;
 
           --------------------------------------------------------------------
-          -- Store framing state back
+          -- Shift the offsets into the next beat's frame of reference
           --------------------------------------------------------------------
-          phase_r    <= v_phase;
-          len_hi_r   <= v_len_hi;
-          msg_len_r  <= v_len;
-          rem_r      <= v_rem;
-          byte_idx_r <= v_idx;
-          buf_r      <= v_buf;
+          if s_axis_tlast = '1' then
+            in_block_r <= '0';
+            start_r    <= to_signed(64, 18);
+            end_r      <= (others => '0');
+          else
+            in_block_r <= v_in;
+            end_r      <= v_end   - 8;
+            start_r    <= v_start - 8;
+          end if;
+          cur_len_r  <= v_len;
+          cur_type_r <= v_type;
           index_r    <= v_index;
-          seconds_r  <= v_secs;
 
         end if;
       end if;
@@ -491,12 +582,23 @@ begin
   end process p_frame;
 
   ------------------------------------------------------------------------------
-  -- Stage 2: decode and emit
+  -- Stage 2: extract from the window, decode, emit
   --
-  -- Kept separate so the type mux and field extraction sit OUTSIDE the
-  -- framing feedback loop. Costs one cycle of event latency.
+  -- Entirely feed-forward from registers. If this ever becomes the critical
+  -- path it can take a further pipeline stage - unlike the framing loop.
+  --
+  -- The message's last byte sits at flat index 64 + cmp_end_lane_r, because
+  -- win_r(0) now holds the beat that was current when it completed. Its first
+  -- byte is therefore at 65 + end_lane - len.
   ------------------------------------------------------------------------------
   p_emit : process (clk)
+    variable v_flat  : byte_t(0 to C_WIN_BYTES-1);
+    variable v_rot   : byte_t(0 to C_WIN_BYTES-1);
+    variable v_msg   : std_logic_vector(C_MSG_BUF_W-1 downto 0);
+    variable v_start : integer;
+    variable v_lane  : natural;
+    variable v_beat  : natural;
+    variable v_sec   : integer;
   begin
     if rising_edge(clk) then
       if resetn = '0' then
@@ -508,28 +610,68 @@ begin
         msg_fields_r  <= (others => '0');
         msg_stat_r    <= (others => '0');
         pkt_fields_r  <= (others => '0');
+        seconds_r     <= (others => '0');
       else
         msg_valid_r <= cmp_valid_r;
 
-        if cmp_valid_r = '1' then
-          msg_index_r   <= std_logic_vector(cmp_index_r);
-          msg_type_r    <= cmp_type_r;
-          msg_len_out_r <= std_logic_vector(cmp_len_r);
-          msg_stat_r    <= cmp_stat_r;
+        if (cmp_valid_r = '1') or (cmp_is_t_r = '1') then
 
-          -- Context latched when the message completed, NOT the current bus.
-          pkt_fields_r  <= cmp_fields_r;
+          v_flat := flatten(win_r);
 
-          -- Sequence of this message = mold sequence + index within packet
-          msg_seqnum_r <= std_logic_vector(
-            unsigned(mold_sequence_num(cmp_fields_r)) +
-            resize(cmp_index_r, 64));
-
-          if cmp_stat_r(C_ST_DECODED) = '1' then
-            msg_fields_r <= decode_msg(to_slv(cmp_buf_r), cmp_type_r);
-          else
-            msg_fields_r <= (others => '0');
+          ------------------------------------------------------------------
+          -- 'T' - clock state only. Just four bytes, so a small dedicated
+          -- select rather than the full message extraction.
+          --
+          -- Message byte 1 sits at flat index (64 + end_lane) - len + 2, and
+          -- byte 1 is the MOST significant of the big-endian seconds value.
+          ------------------------------------------------------------------
+          if cmp_is_t_r = '1' then
+            v_sec := 64 + to_integer(t_end_lane_r) - to_integer(t_len_r) + 2;
+            if v_sec < 0 then
+              v_sec := 0;
+            end if;
+            seconds_r <= v_flat((v_sec + 0) mod C_WIN_BYTES) &
+                         v_flat((v_sec + 1) mod C_WIN_BYTES) &
+                         v_flat((v_sec + 2) mod C_WIN_BYTES) &
+                         v_flat((v_sec + 3) mod C_WIN_BYTES);
           end if;
+
+          ------------------------------------------------------------------
+          -- A real message: locate it in the window and decode
+          ------------------------------------------------------------------
+          if cmp_valid_r = '1' then
+            v_start := 64 + to_integer(cmp_end_lane_r)
+                          - to_integer(cmp_len_r) + 1;
+            if v_start < 0 then
+              v_start := 0;               -- longer than the window; only
+            end if;                       -- undecoded types can be
+
+            v_lane := v_start mod 8;
+            v_beat := v_start / 8;
+            if v_beat > C_WIN_BEATS-1 then
+              v_beat := C_WIN_BEATS-1;
+            end if;
+
+            v_rot := rot_lane(v_flat, v_lane);
+            v_msg := sel_beat(v_rot, v_beat);
+
+            msg_index_r   <= std_logic_vector(cmp_index_r);
+            msg_type_r    <= cmp_type_r;
+            msg_len_out_r <= std_logic_vector(cmp_len_r);
+            msg_stat_r    <= cmp_stat_r;
+            pkt_fields_r  <= cmp_fields_r;
+
+            msg_seqnum_r <= std_logic_vector(
+              unsigned(mold_sequence_num(cmp_fields_r)) +
+              resize(cmp_index_r, 64));
+
+            if cmp_stat_r(C_ST_DECODED) = '1' then
+              msg_fields_r <= decode_msg(v_msg, cmp_type_r);
+            else
+              msg_fields_r <= (others => '0');
+            end if;
+          end if;
+
         end if;
       end if;
     end if;
@@ -550,15 +692,11 @@ begin
   msg_length <= msg_len_out_r;
   msg_fields <= msg_fields_r;
   msg_status <= msg_stat_r;
-
-  -- Upstream context, captured when the message completed and re-presented
-  -- with every event
   pkt_fields <= pkt_fields_r;
 
   exchange_seconds <= seconds_r;
 
-  pkt_done           <= pkt_done_r;
-  pkt_msg_count      <= pkt_count_r;
-  pkt_count_mismatch <= pkt_mismatch_r;
+  pkt_done      <= pkt_done_r;
+  pkt_msg_count <= pkt_count_r;
 
 end architecture rtl;

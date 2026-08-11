@@ -140,10 +140,7 @@ class ItchTb:
                 })
 
             if safe_int(d.pkt_done) == 1:
-                self.pkt_done_snaps.append((
-                    safe_int(d.pkt_msg_count),
-                    safe_int(d.pkt_count_mismatch),
-                ))
+                self.pkt_done_snaps.append(safe_int(d.pkt_msg_count))
 
     async def drive(self, beats, upstream: int, gaps=None, idle_after=True):
         """
@@ -312,9 +309,8 @@ async def test_single_asx_packet(dut):
         f"expected {exp_secs}")
 
     assert len(tb.pkt_done_snaps) == 1
-    count, mismatch = tb.pkt_done_snaps[0]
+    count = tb.pkt_done_snaps[0]
     assert count == exp_framed, f"pkt_msg_count: got {count}, expected {exp_framed}"
-    assert mismatch == 0
 
     # the suppressed T must still have advanced the sequence
     assert tb.events[0]["seqnum"] == 1001, (
@@ -475,8 +471,8 @@ async def test_single_message(dut):
     assert tb.events[0]["index"] == 0
     assert tb.events[0]["seqnum"] == 42, "the first message carries the Mold sequence"
 
-    count, mismatch = tb.pkt_done_snaps[0]
-    assert count == 1 and mismatch == 0
+    count = tb.pkt_done_snaps[0]
+    assert count == 1
 
 
 # ===========================================================================
@@ -507,9 +503,10 @@ async def test_heartbeat(dut):
         f"a heartbeat carries no messages, but {len(tb.events)} events fired")
 
     assert len(tb.pkt_done_snaps) == 1
-    count, mismatch = tb.pkt_done_snaps[0]
+    count = tb.pkt_done_snaps[0]
     assert count == 0, f"pkt_msg_count: got {count}, expected 0"
-    assert mismatch == 0, "0 framed vs count 0 is not a mismatch"
+    # 0 framed against a Mold count of 0 - the testbench checks agreement
+    assert count == mold.expected_mold_fields(frame)["message_count"]
 
 
 # ===========================================================================
@@ -544,11 +541,10 @@ async def test_seconds_only(dut):
         f"exchange_seconds: got {safe_int(dut.exchange_seconds)}, "
         f"expected {secs}")
 
-    count, mismatch = tb.pkt_done_snaps[0]
+    count = tb.pkt_done_snaps[0]
     assert count == 1, (
         f"pkt_msg_count: got {count}, expected 1 - a suppressed message is "
         "still framed and still consumes a sequence number")
-    assert mismatch == 0
 
 
 # ===========================================================================
@@ -586,8 +582,8 @@ async def test_back_to_back(dut):
 
     assert len(tb.pkt_done_snaps) == 2, (
         f"expected 2 pkt_done pulses, saw {len(tb.pkt_done_snaps)}")
-    assert tb.pkt_done_snaps[0] == (n1, 0)
-    assert tb.pkt_done_snaps[1] == (n2, 0)
+    assert tb.pkt_done_snaps[0] == n1
+    assert tb.pkt_done_snaps[1] == n2
 
     # msg_index must restart per packet while the sequence keeps running
     assert tb.events[3]["index"] == 0, "msg_index should restart each packet"
@@ -671,7 +667,7 @@ async def test_sequence_numbering(dut):
     assert safe_int(dut.exchange_seconds) == 1002, (
         "exchange_seconds should hold the LAST Seconds value")
 
-    count, _ = tb.pkt_done_snaps[0]
+    count = tb.pkt_done_snaps[0]
     assert count == 6, f"pkt_msg_count: got {count}, expected 6"
 
 
@@ -710,8 +706,8 @@ async def test_reset_mid_packet(dut):
     tb.check_passthrough(beats)
     compare_events(tb.events, exp, dut)
 
-    count, mismatch = tb.pkt_done_snaps[-1]
-    assert count == exp_framed and mismatch == 0
+    count = tb.pkt_done_snaps[-1]
+    assert count == exp_framed
 
 
 # ===========================================================================
@@ -854,7 +850,7 @@ async def test_double_completion(dut):
             "which the T special case is supposed to make impossible")
 
     assert safe_int(dut.exchange_seconds) == exp_secs
-    count, _ = tb.pkt_done_snaps[0]
+    count = tb.pkt_done_snaps[0]
     assert count == 3
 
 
@@ -980,11 +976,18 @@ async def test_count_mismatch(dut):
         f"the length chain holds 2 messages, saw {len(tb.events)} events")
     compare_events(tb.events, exp, dut)
 
-    count, mismatch = tb.pkt_done_snaps[0]
+    count = tb.pkt_done_snaps[0]
     assert count == 2, f"pkt_msg_count: got {count}, expected 2"
-    assert mismatch == 1, (
-        "pkt_count_mismatch should be set when the Mold count disagrees "
-        "with the framed count")
+
+    # The parser reports the framed count raw; the disagreement with the Mold
+    # header is derived here, the way a downstream checker would. Both inputs
+    # are available: pkt_msg_count from the parser, message_count from the
+    # field bus.
+    mold_count = mold.expected_mold_fields(frame)["message_count"]
+    assert mold_count == 5, "the frame should claim 5 messages"
+    assert count != mold_count, (
+        f"framed {count} messages against a Mold count of {mold_count} - "
+        "a downstream checker must be able to see this disagreement")
 
 
 # ---------------------------------------------------------------------------
@@ -1028,5 +1031,5 @@ async def test_long_burst(dut):
     assert [g["index"] for g in tb.events] == list(range(n))
     assert [g["seqnum"] for g in tb.events] == list(range(10_000, 10_000 + n))
 
-    count, mismatch = tb.pkt_done_snaps[0]
-    assert count == n and mismatch == 0
+    count = tb.pkt_done_snaps[0]
+    assert count == n
