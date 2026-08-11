@@ -4,51 +4,38 @@
 -- Stage 5 of the market-data header parser pipeline.
 --
 -- ============================================================================
--- WINDOW REWRITE
+-- STRUCTURE
 -- ============================================================================
--- The previous version assembled each message byte-by-byte into a 64-byte
--- buffer at a computed index:
---
---     v_buf(to_integer(v_idx)) := v_b;      -- 6-to-64 decoder, x8 per beat
---
--- Eight of those decoders chained through a serial byte index sat at the
--- heart of the critical path (beat_cnt -> ... -> buf_r, 22 logic levels).
---
--- This version stores raw beats UNCONDITIONALLY in a rolling window and
--- selects the message afterwards:
+-- Raw beats are stored UNCONDITIONALLY in a rolling window, and the message is
+-- selected out of that window afterwards:
 --
 --     win_r <= s_axis_tdata & win_r(0 to 7);   -- no enable, no decoder
 --
--- Do everything, then select - instead of select, then do. Three chains
--- leave the framing loop as a result:
+-- Do everything, then select - rather than select, then do. Nothing on the
+-- window path depends on framing state, so the framing loop carries only the
+-- block offsets plus the current length and type. There is no byte index, no
+-- per-byte buffer write, and no Seconds capture inside the loop.
 --
---   * the 64-way buffer write decoders
---   * the serial byte index (v_idx) - nothing needs it any more
---   * the Seconds capture, which now happens in stage 2 from the window
---
--- What remains in the loop is phase / rem / len_hi only.
---
--- The extraction mux moves to stage 2, where it is FEED-FORWARD from
--- registers and can take a further pipeline stage if it ever needs one -
--- unlike the framing loop, which cannot.
+-- Extraction runs in stage 2, where it is FEED-FORWARD from registers and can
+-- take a further pipeline stage if it ever needs one - unlike the framing
+-- loop, which cannot.
 --
 -- ============================================================================
--- LATENCY AND THROUGHPUT - unchanged
+-- LATENCY AND THROUGHPUT
 -- ============================================================================
 --   one 8-byte beat per cycle, s_axis_tready tied high
 --   two cycles from message completion to msg_valid
---   the interface is identical to the previous version
 --
 -- ============================================================================
 -- 'T' SECONDS MESSAGES
 -- ============================================================================
--- A Seconds block is 7 bytes, smaller than one beat, so two messages could
--- otherwise complete in a single beat. T is treated as CLOCK STATE: its
--- seconds value is captured and no event is emitted. It still consumes a
--- sequence number, so msg_index advances across it.
+-- A Seconds block is 7 bytes, smaller than one beat, so two messages can
+-- complete in a single beat. T is treated as CLOCK STATE: its seconds value is
+-- captured and no event is emitted. It still consumes a sequence number, so
+-- msg_index advances across it.
 --
--- The type byte is captured during framing (phase PH_TYPE) rather than read
--- back from a buffer, so the T decision costs one register and no decoder.
+-- The type byte is captured during framing rather than read back out of the
+-- window, so the T decision costs one register and no select.
 --
 -- ============================================================================
 -- FRAMING
@@ -188,7 +175,6 @@ architecture rtl of itch_parser is
   end function;
 
   ------------------------------------------------------------------------------
-  ------------------------------------------------------------------------------
   -- 16-byte view spanning the previous and current beat.
   --
   -- view(o + 8) is the byte at offset o, for o in -8 .. +7. During cycle T
@@ -206,13 +192,6 @@ architecture rtl of itch_parser is
     return v;
   end function;
 
-  -- Framing phases: retained only for the legacy comment above.
-  ------------------------------------------------------------------------------
-  constant PH_LEN_HI : std_logic_vector(1 downto 0) := "00";
-  constant PH_LEN_LO : std_logic_vector(1 downto 0) := "01";
-  constant PH_TYPE   : std_logic_vector(1 downto 0) := "10";  -- first data byte
-  constant PH_DATA   : std_logic_vector(1 downto 0) := "11";
-
   ------------------------------------------------------------------------------
   -- Beat tracking and payload start
   ------------------------------------------------------------------------------
@@ -227,18 +206,16 @@ architecture rtl of itch_parser is
   signal first_lane_c : unsigned(2 downto 0);
 
   ------------------------------------------------------------------------------
-  -- Framing state - this is the only loop that cannot be pipelined
-  ------------------------------------------------------------------------------
-  -- ARITHMETIC FRAMING STATE
+  -- ARITHMETIC FRAMING STATE - this is the only loop that cannot be pipelined
   --
-  -- Offsets are signed and relative to lane 0 of the CURRENT beat, so a
-  -- block that began in the previous beat simply has a negative offset. The
-  -- 16-byte view below covers -8..+7, which removes every "pending byte"
-  -- special case the phase machine needed.
+  -- Offsets are signed and relative to lane 0 of the CURRENT beat, so a block
+  -- that began in the previous beat simply has a negative offset. The 16-byte
+  -- view above covers -8..+7, which removes every "pending byte" special case.
   --
   --   in_block_r  a block is in progress; end_r is its last byte
   --   end_r       offset of the in-progress block's LAST byte
   --   start_r     offset of the next block's first (length) byte
+  ------------------------------------------------------------------------------
   signal in_block_r : std_logic := '0';
   signal end_r      : signed(17 downto 0) := (others => '0');
   signal start_r    : signed(17 downto 0) := (others => '0');
@@ -335,8 +312,8 @@ begin
   end process p_datapath;
 
   ------------------------------------------------------------------------------
-  -- The window. Unconditional shift - no enable, no decoder, no index.
-  -- This is the whole point of the rewrite.
+  -- The window. Unconditional shift - no enable, no decoder, no index, and
+  -- so no dependence on anything the framing loop computes.
   ------------------------------------------------------------------------------
   p_window : process (clk)
   begin
@@ -352,10 +329,10 @@ begin
   ------------------------------------------------------------------------------
   -- Stage 1: framing
   --
-  -- Walks the eight bytes of the beat through the phase machine. The loop is
-  -- unrolled by synthesis; the variables carry state byte-to-byte within the
-  -- cycle. What it no longer carries: a byte index, a buffer, or the Seconds
-  -- capture.
+  -- Two arithmetic passes per beat over the 16-byte view of the previous and
+  -- current beat. The variables carry the block offsets from pass to pass
+  -- within the cycle; only in_block / end / start / len / type are registered
+  -- across beats.
   ------------------------------------------------------------------------------
   p_frame : process (clk)
     variable v_view    : byte_t(0 to 15);
