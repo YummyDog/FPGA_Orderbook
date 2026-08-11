@@ -1,5 +1,0 @@
-vhdl xil_defaultlib  \
-"../../../../xxv_ethernet_0_ex.gen/sources_1/ip/xxv_ethernet_0/xxv_ethernet_0_sim_netlist.vhdl" \
-
-# Do not sort compile order
-nosort
