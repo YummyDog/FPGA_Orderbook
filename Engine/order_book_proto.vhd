@@ -134,54 +134,35 @@ begin
         beat_reg <= (others => '0');
         wsel     <= (others => '0');
       else
-        -- Set to next addr (starts at 0)
-        addr        := hash(key, 0); -- Needed for first beat only
-        addr_victim := hash(slot_key(key_r), to_integer(table_cnt)); -- Second beat+
-
+   
+        if busy_r = '0' then
+            key_r <= 1 & key;
+            addr_r <= hash(key, 0);
+        else
+            key_r <= rdata(to_integer(table_cnt));
+            addr_r <= hash(rdata(to_integer(table_cnt))(15 downto 0),to_integer(table_cnt));
+        end if;
+        -- Both the key and addr registers are taken from the read port every cycle, except on the first cycle where the key
+        -- and addr registers are loaded straight from the input key.
+        
         if s_xfer = '1' then
-          -- First Beat -> AXI handsahke complete + read port being set to addr0
+          -- First Beat -> AXI handsahke complete: key saved to reg + status bit set high
           busy_r <= '1';
-
-          key_r <= ('1' & key); --status bit
-
-          raddr(0) <= addr; --Read address for first key
-          addr_r   <= addr; --Capture addr from first key
-          eviction <= '0';
-          beat_reg <= beat_reg(0) & '1';
 
         end if;
 
         if busy_r = '1' then
           -- Second beat+ set write ports to write from first table -> eviction logic
-          key_r <= rdata(to_integer(table_cnt));
-
-          raddr(to_integer(table_cnt)) <= addr_victim;
-          addr_r                       <= addr_victim; --Capture victim addr
-          we                           <= '1';
-
+  
+          we       <= '1';
           waddr    <= addr_r;
           wdata    <= key_r; --write key to table
-          beat_reg <= beat_reg(0) & '1';
           wsel     <= std_logic_vector(table_cnt - 1);
 
           if rdata(to_integer(table_cnt))(C_VALID_BIT) = '0' then
             -- EMPTY
             busy_r <= '0';
-          else
-            eviction <= '1';
           end if;
-        end if;
-
-        if beat_reg(1) = '1' and eviction = '1' then
-          -- Last beat (exculdes empty addr on first table)
-          wsel  <= std_logic_vector(table_cnt - 1);
-          waddr <= addr_r;
-          wdata <= key_r; --write key to table
-        end if;
-
-        if eviction = '0' and busy_r = '0' then
-          we       <= '0';
-          beat_reg <= (others => '0');
         end if;
 
       end if;
@@ -190,5 +171,15 @@ begin
 
   busy       <= busy_r;
   s_tready_i <= not busy_r;
+
+  raddr(0) <= hash(key, 0) when busy_r = '0' else
+  hash(key_r, 0);
+
+
+
+  g_raddr : for i in 1 to C_NUM_TABLES - 1 generate
+    raddr(i) <= hash(key_r(15 downto 0), i);
+  end generate g_raddr;
+
 
 end architecture rtl;
