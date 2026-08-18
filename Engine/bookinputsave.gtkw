@@ -1,0 +1,34 @@
+[*]
+[*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
+[*] Thu Aug 13 12:25:20 2026
+[*]
+[dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Engine\book_input_stage.fst"
+[dumpfile_mtime] "Thu Aug 13 12:16:37 2026"
+[dumpfile_size] 12442
+[savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Engine\bookinputsave.gtkw"
+[timestart] 0
+[size] 1920 1017
+[pos] -217 -217
+*-29.000000 3006100000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 312
+[signals_width] 158
+[sst_expanded] 1
+[sst_vpaned_height] 339
+@28
+book_input_stage.clk
+book_input_stage.m_tvalid
+book_input_stage.m_tready
+book_input_stage.s_tvalid
+book_input_stage.s_tready
+@820
+book_input_stage.s_ttype[7:0]
+@24
+book_input_stage.m_book_id[31:0]
+book_input_stage.m_order_id[63:0]
+book_input_stage.m_price[31:0]
+book_input_stage.m_qty[31:0]
+@28
+book_input_stage.m_px_valid
+book_input_stage.m_side
+[pattern_trace] 1
+[pattern_trace] 0
