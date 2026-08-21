@@ -60,7 +60,8 @@ entity order_book is
     s_undisc   : in std_logic; -- order rests with zero visible qty
     s_implied  : in std_logic; -- TMC-generated
 
-    key : in t_key; --test vector
+    key    : in t_key; --test vector
+    key_op : in std_logic_vector(1 downto 0); -- Key operation : 0 = INSERTION, 1 = LOOKUP, 2 = DELETION.
 
     busy : out std_logic;
 
@@ -92,15 +93,13 @@ architecture rtl of order_book is
   signal key_r  : t_slot := (others => '0'); -- Key reg
   signal addr_r : t_addr := (others => '0'); -- Addr reg
 
-  signal eviction : std_logic := '0'; -- No eviction
-  signal beat_reg : unsigned(1 downto 0);
-
 begin
 
   s_tready <= s_tready_i;
   s_xfer   <= s_tvalid and s_tready_i;
 
   counter : process (clk)
+    -- Cycles through tables individually for insertion.
   begin
     if rising_edge(clk) then
       if resetn = '0' then
@@ -119,6 +118,9 @@ begin
     end if;
   end process counter;
 
+  ------------------------------------------------------------------------------
+  -- INSERTION
+  ------------------------------------------------------------------------------
   insert : process (clk) is
   begin
     if rising_edge(clk) then
@@ -128,11 +130,9 @@ begin
         addr_r   <= (others => '0');
         waddr    <= (others => '0');
         wdata    <= (others => '0');
-        eviction <= '0';
         beat_reg <= (others => '0');
         wsel     <= (others => '0');
       else
-
         if s_xfer = '1' then
           key_r  <= '1' & key;
           addr_r <= hash(key, 0);
@@ -146,7 +146,7 @@ begin
         -- Both the key and addr registers are taken from the read port every cycle, except on the first cycle where the key
         -- and addr registers are loaded straight from the input key.
 
-        if s_xfer = '1' then
+        if s_xfer = '1' and key_op = "00" then
           -- First Beat -> AXI handsahke complete: key saved to reg + status bit set high
           busy_r <= '1';
 
@@ -154,32 +154,46 @@ begin
 
         if busy_r = '1' then
           -- Second beat+ set write ports to write from first table -> eviction logic
-
           we    <= '1';
           waddr <= addr_r;
           wdata <= key_r; --write key to table
           wsel  <= std_logic_vector(table_cnt - 1);
-          if rdata(to_integer(table_cnt-1))(C_VALID_BIT) = '0' then
+          if rdata(to_integer(table_cnt - 1))(C_VALID_BIT) = '0' then
             -- EMPTY slot
             busy_r <= '0';
           end if;
         else
           we <= '0';
         end if;
-
       end if;
     end if;
   end process insert;
+  ------------------------------------------------------------------------------
+  -- LOOKUP
+  ------------------------------------------------------------------------------
+  lookup : process (clk) is
+  begin
+    if rising_edge(clk) then
+      if resetn = '0' then
+        
+        
+      else
+        if s_xfer = '1' and key_op = "01" then
+          
+        end if;
+      end if;
+    end if;
+  end process lookup;
 
   busy       <= busy_r;
   s_tready_i <= not busy_r;
 
   raddr(0) <= hash(key, 0) when busy_r = '0' else
-  hash(key_r(15 downto 0), 0);
-  -- input key addr on beat 0 and key reg addr on beats 1+ 
+  hash(rdata(0)(15 downto 0), 0);
+  -- input key addr on beat 0 and data read on beats 1+ (for cases when a key is moved back to the start of the table index)
 
   g_raddr : for i in 1 to C_NUM_TABLES - 1 generate
-    raddr(i) <= hash(key_r(15 downto 0), i);
+    raddr(i) <= hash(rdata(to_integer(table_cnt - 1))(15 downto 0), i);
   end generate g_raddr;
-
+  -- Read address for the current table is set to the address of the key in the previous table
 end architecture rtl;
