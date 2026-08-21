@@ -130,7 +130,6 @@ begin
         addr_r   <= (others => '0');
         waddr    <= (others => '0');
         wdata    <= (others => '0');
-        beat_reg <= (others => '0');
         wsel     <= (others => '0');
       else
         if s_xfer = '1' then
@@ -179,7 +178,7 @@ begin
         
       else
         if s_xfer = '1' and key_op = "01" then
-          
+
         end if;
       end if;
     end if;
@@ -189,7 +188,7 @@ begin
   s_tready_i <= not busy_r;
 
   raddr(0) <= hash(key, 0) when busy_r = '0' else
-  hash(rdata(0)(15 downto 0), 0);
+  hash(rdata(to_integer(table_cnt - 1)(15 downto 0), 0);
   -- input key addr on beat 0 and data read on beats 1+ (for cases when a key is moved back to the start of the table index)
 
   g_raddr : for i in 1 to C_NUM_TABLES - 1 generate
