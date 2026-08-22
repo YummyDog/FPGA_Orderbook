@@ -43,9 +43,12 @@ entity order_book_top is
     s_undisc   : in  std_logic;
     s_implied  : in  std_logic;
 
-    key        : in  t_key;          -- test vector
+    key        : in  t_key;                        -- test vector
+    key_op     : in  std_logic_vector(1 downto 0); -- 00 INSERT, 01 LOOKUP, 10 DELETE
 
-    busy       : out std_logic
+    busy          : out std_logic;
+    lookup_found  : out std_logic;   -- high when lookup_return is valid
+    lookup_return : out t_key
   );
 end entity order_book_top;
 
@@ -81,7 +84,10 @@ begin
       s_implied  => s_implied,
 
       key        => key,
+      key_op     => key_op,
       busy       => busy,
+      lookup_found  => lookup_found,
+      lookup_return => lookup_return,
 
       we         => we,
       wsel       => wsel,

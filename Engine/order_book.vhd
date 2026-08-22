@@ -26,6 +26,21 @@
 --
 -- VHDL-2008
 --------------------------------------------------------------------------------
+-- IMPORTANT NOTES
+--
+-- -> Before implementation, HDL needs to be as dynamic as possible (No hardcoding values) this will help in testing.
+--    values should be added in serperate package file
+-- 
+-- -> First stage is getting each operation to work by themselves -> secodn stage is to get operations 
+--    working simaltneously (multi read ram module will be needed)
+--
+-- -> Design will msot likely shift to a key-value-store which will use a set of tables for data and a set of tables for keys.
+--    For devlopment, keys and value are identical with keys stored with a valid bit in the table
+--
+-- -> May need a seperate module or FSM to launch a pipeline of operations eg replace: 1. lookup 2. delete 3. Insertion
+--
+-- -> arbiter for write ports for different processes
+--------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -61,10 +76,12 @@ entity order_book is
     s_implied  : in std_logic; -- TMC-generated
 
     key    : in t_key; --test vector
-    key_op : in std_logic_vector(1 downto 0); -- Key operation : 0 = INSERTION, 1 = LOOKUP, 2 = DELETION.
+    key_op : in std_logic_vector(1 downto 0); -- Key operation : 0 = INSERTION, 1 = LOOKUP, 2 = DELETION, 3 MODIFY
 
     busy : out std_logic;
 
+    lookup_return : out t_key     := (others => '0'); --Exact data type may shift with a KVS system
+    lookup_found  : out std_logic := '0';
     -- Write port
     we    : out std_logic;
     wsel  : out t_sel := (others => '0'); -- which table
@@ -74,7 +91,6 @@ entity order_book is
     -- Read ports
     raddr : out t_addr_set; -- one address per table
     rdata : in t_slot_set -- all tables, valid 1 cycle after raddr
-
   );
 end entity order_book;
 architecture rtl of order_book is
@@ -86,12 +102,30 @@ architecture rtl of order_book is
   signal s_xfer     : std_logic := '0'; -- slave  handshake completes this cycle
   signal m_xfer     : std_logic := '0'; -- master handshake completes this cycle
 
-  signal busy_r : std_logic := '0';
+  ------------------------------------------------------------------------------
+  -- Insertion
+  ------------------------------------------------------------------------------
+  signal busy_r          : std_logic                                                      := '0';
+  signal table_cnt       : unsigned(integer(ceil(log2(real(C_NUM_TABLES)))) - 1 downto 0) := (others => '0'); -- Unsigned coutner for number of tables
+  signal key_r           : t_slot                                                         := (others => '0'); -- Key reg
+  signal addr_r          : t_addr                                                         := (others => '0'); -- Addr reg
+  signal insertion_we    : std_logic                                                      := '0';
+  signal insertion_waddr : t_addr                                                         := (others => '0');
+  signal insertion_wdata : t_slot                                                         := (others => '0');
+  signal insertion_wsel  : t_sel                                                          := (others => '0');
 
-  signal table_cnt : unsigned(integer(ceil(log2(real(C_NUM_TABLES)))) - 1 downto 0) := (others => '0'); -- Unsigned coutner for number of tables
-
-  signal key_r  : t_slot := (others => '0'); -- Key reg
-  signal addr_r : t_addr := (others => '0'); -- Addr reg
+  ------------------------------------------------------------------------------
+  -- Lookup/Modify/Delete
+  ------------------------------------------------------------------------------
+  signal lookup_r       : t_key                                                          := (others => '0');
+  signal looking_r      : std_logic                                                      := '0';
+  signal lookup_found_r : std_logic                                                      := '0';
+  signal modify_we      : std_logic                                                      := '0';
+  signal modify_waddr   : t_addr                                                         := (others => '0');
+  signal modify_wdata   : t_slot                                                         := (others => '0');
+  signal modify_wsel    : t_sel                                                          := (others => '0');
+  signal table_reg      : unsigned(integer(ceil(log2(real(C_NUM_TABLES)))) - 1 downto 0) := (others => '0'); -- register to hold a tables address for deletion
+  signal op_r           : std_logic_vector(1 downto 0);
 
 begin
 
@@ -125,16 +159,20 @@ begin
   begin
     if rising_edge(clk) then
       if resetn = '0' then
-        busy_r   <= '0';
-        key_r    <= (others => '0');
-        addr_r   <= (others => '0');
-        waddr    <= (others => '0');
-        wdata    <= (others => '0');
-        wsel     <= (others => '0');
+        busy_r          <= '0';
+        key_r           <= (others => '0');
+        addr_r          <= (others => '0');
+        insertion_waddr <= (others => '0');
+        insertion_wdata <= (others => '0');
+        insertion_wsel  <= (others => '0');
+        insertion_we    <= '0';
       else
-        if s_xfer = '1' then
+        if s_xfer = '1' and key_op = "00" then
+          -- First Beat -> AXI handsahke complete: key saved to reg + status bit set high
+          busy_r <= '1';
           key_r  <= '1' & key;
           addr_r <= hash(key, 0);
+
         elsif busy_r = '0' then
           key_r  <= (others => '0');
           addr_r <= (others => '0');
@@ -145,54 +183,104 @@ begin
         -- Both the key and addr registers are taken from the read port every cycle, except on the first cycle where the key
         -- and addr registers are loaded straight from the input key.
 
-        if s_xfer = '1' and key_op = "00" then
-          -- First Beat -> AXI handsahke complete: key saved to reg + status bit set high
-          busy_r <= '1';
-
-        end if;
-
         if busy_r = '1' then
           -- Second beat+ set write ports to write from first table -> eviction logic
-          we    <= '1';
-          waddr <= addr_r;
-          wdata <= key_r; --write key to table
-          wsel  <= std_logic_vector(table_cnt - 1);
+          insertion_we    <= '1';
+          insertion_waddr <= addr_r;
+          insertion_wdata <= key_r; --write key to table
+          insertion_wsel  <= std_logic_vector(table_cnt - 1);
           if rdata(to_integer(table_cnt - 1))(C_VALID_BIT) = '0' then
             -- EMPTY slot
             busy_r <= '0';
           end if;
         else
-          we <= '0';
+          insertion_we    <= '0';
+          insertion_waddr <= (others => '0');
+          insertion_wdata <= (others => '0');
+          insertion_wsel  <= (others => '0');
+
         end if;
       end if;
     end if;
   end process insert;
+
   ------------------------------------------------------------------------------
-  -- LOOKUP
+  -- LOOKUP, DELETE, MODIFY
   ------------------------------------------------------------------------------
   lookup : process (clk) is
   begin
     if rising_edge(clk) then
       if resetn = '0' then
-        
-        
+        lookup_found_r <= '0';
+        lookup_r       <= (others => '0');
+        looking_r      <= '0';
+        op_r           <= (others => '0');
+        table_reg      <= (others => '0');
+        modify_waddr   <= (others => '0');
+        modify_wdata   <= (others => '0');
+        modify_wsel    <= (others => '0');
+        modify_we      <= '0';
       else
-        if s_xfer = '1' and key_op = "01" then
+        if s_xfer = '1' and (key_op = "01" or key_op = "10" or key_op = "11") then
 
+          looking_r <= '1';
+          lookup_r  <= key;
+          op_r      <= key_op;
+
+        end if;
+
+        -- !!NOTES lookup may need to be pipelined depending on no. of tables or clock speed
+        -- or deletion/modification pipeline could possibly done in the cycle after lookup
+        if looking_r = '1' then
+          for i in 0 to C_NUM_TABLES - 1 loop
+            if rdata(i)(15 downto 0) = lookup_r then
+              lookup_found_r <= '1';
+              lookup_return  <= rdata(i)(15 downto 0);
+              table_reg      <= to_unsigned(i, table_reg'length);
+            end if;
+          end loop;
+          looking_r <= '0';
+        elsif op_r = "10" then
+          -- If deletion
+          modify_we    <= '0';
+          modify_waddr <= hash(lookup_r, to_integer(table_reg));
+          modify_wdata <= '0' & lookup_r;
+          modify_wsel  <= std_logic_vector(table_reg);
+        else
+          lookup_found_r <= '0';
+          modify_waddr   <= (others => '0');
+          modify_wdata   <= (others => '0');
+          modify_wsel    <= (others => '0');
+          modify_we      <= '0';
         end if;
       end if;
     end if;
   end process lookup;
 
+  ------------------------------------------------------------------------------
+  -- Deletion
+  ------------------------------------------------------------------------------
   busy       <= busy_r;
-  s_tready_i <= not busy_r;
+  s_tready_i <= not (busy_r or looking_r);
+
+  lookup_found <= lookup_found_r;
+
+  -- !!NOTES
+  -- All table reads are set to the address of the input key anticipating a lookup (exc table 0)
 
   raddr(0) <= hash(key, 0) when busy_r = '0' else
-  hash(rdata(to_integer(table_cnt - 1)(15 downto 0), 0);
+  hash(rdata(to_integer(table_cnt - 1))(15 downto 0), 0);
   -- input key addr on beat 0 and data read on beats 1+ (for cases when a key is moved back to the start of the table index)
 
   g_raddr : for i in 1 to C_NUM_TABLES - 1 generate
-    raddr(i) <= hash(rdata(to_integer(table_cnt - 1))(15 downto 0), i);
+    raddr(i) <= hash(key, i) when busy_r = '0' else
+    hash(rdata(to_integer(table_cnt - 1))(15 downto 0), i);
   end generate g_raddr;
-  -- Read address for the current table is set to the address of the key in the previous table
+  -- For insertion logic -> Read address for the current table is set to the address of the key in the previous table
+
+  we    <= (insertion_we or modify_we);
+  waddr <= (insertion_waddr or modify_waddr);
+  wdata <= (insertion_wdata or modify_wdata);
+  wsel  <= (insertion_wsel or modify_wsel);
+
 end architecture rtl;

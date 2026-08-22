@@ -1,6 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1787295368" />
-    <testcase name="test_insert_eviction_chains" classname="test_order_book" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Engine\test_order_book.py" lineno="277" time="0.10764575004577637" sim_time_ns="656.0" ratio_time="6094.0631629305935" />
+    <property name="random_seed" value="1787407845" />
+    <testcase name="test_insert_and_lookup" classname="test_order_book" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Engine\test_order_book.py" lineno="309" time="0.09340643882751465" sim_time_ns="758.4" ratio_time="8119.354613234637" />
   </testsuite>
 </testsuites>
