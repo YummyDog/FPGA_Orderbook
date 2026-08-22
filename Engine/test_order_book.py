@@ -4,7 +4,7 @@ cocotb testbench for order_book - insertion walkthrough.
 Drives keys in through the AXI-Stream slave handshake with key_op = INSERT,
 printing the state of all four tables every cycle so the eviction chain can be
 followed step by step. Three lookups follow, one against each of three
-different tables.
+different tables, then two deletions and three in-place modifications.
 
 No assertions. This is a visibility harness, not a regression test.
 
@@ -38,6 +38,7 @@ KEY_MASK = (1 << KEY_W) - 1
 OP_INSERT = 0b00
 OP_LOOKUP = 0b01
 OP_DELETE = 0b10
+OP_MODIFY = 0b11
 
 # ---------------------------------------------------------------------------
 # Stimulus
@@ -110,10 +111,53 @@ EXPECTED_OCCUPANCY = 16
 # ---------------------------------------------------------------------------
 LOOKUP_KEYS = [0x5C6F, 0xF4BF, 0xF2A5]
 
+# ---------------------------------------------------------------------------
+# Deletions, run after the lookups.
+#
+#   4068  ->  T0[3]
+#   AB74  ->  T1[4]
+#
+# AB74 is the key 4068 displaced on the way in, so deleting both also confirms
+# the eviction landed where the insert trace claimed it did.
+#
+# key_op must stay at 10 through the compare cycle, not just the handshake -
+# the RTL samples it while looking_r is high, one cycle after the transfer.
+# ---------------------------------------------------------------------------
+DELETE_KEYS = [0x4068, 0xAB74]
+
+# ---------------------------------------------------------------------------
+# Modifications, run after the deletions.
+#
+#   4EE3 -> BEEF   at T0[7]
+#   2B4A -> 1234   at T1[3]
+#   F2A5 -> 4321   at T3[4]
+#
+# The slot is found by probing for the OLD key, then rewritten with the value
+# on key_modify. The address does not change - modify is delete with different
+# write data, not delete-then-insert.
+#
+# Note what that means while key and value are the same field: the new value
+# ends up stored at hash(old_key), so a later lookup of BEEF will NOT find it.
+# That is expected here and goes away once keys and values live in separate
+# tables, where the key stays put and only the value is rewritten.
+#
+# key_op must stay at 11 through the compare cycle, and key_modify must be
+# stable alongside it.
+# ---------------------------------------------------------------------------
+MODIFY_KEYS = [
+    (0x4EE3, 0xBEEF),
+    (0x2B4A, 0x1234),
+    (0xF2A5, 0x4321),
+]
+
 EXPECTED_LOCATION = {
     0x5C6F: (0, 2),
     0xF4BF: (2, 0),
     0xF2A5: (3, 4),
+    0x4068: (0, 3),
+    0xAB74: (1, 4),
+    0x4EE3: (0, 7),
+    0x2B4A: (1, 3),
 }
 
 # Safety net - the RTL has no hop bound, so a cycling chain would otherwise
@@ -273,6 +317,7 @@ def trace(dut, cycle):
     tvalid = safe_int(dut.s_tvalid)
     tready = safe_int(dut.s_tready)
     kop = safe_int(dut.key_op)
+    kmod = safe_int(dut.key_modify)
     lfound = safe_int(dut.lookup_found)
     lret = safe_int(dut.lookup_return)
 
@@ -293,9 +338,10 @@ def trace(dut, cycle):
         observed = (wsel, waddr, wdata & KEY_MASK)
 
     dut._log.info(
-        "cyc %2d | tvalid=%s tready=%s op=%s busy=%s | raddr=%s rdata=[%s] "
-        "| write %s | found=%s ret=%s",
-        cycle, fmt(tvalid), fmt(tready), fmt(kop), fmt(busy),
+        "cyc %2d | tvalid=%s tready=%s op=%s mod=%s busy=%s | raddr=%s "
+        "rdata=[%s] | write %s | found=%s ret=%s",
+        cycle, fmt(tvalid), fmt(tready), fmt(kop),
+        "----" if kmod is None else f"{kmod:04X}", fmt(busy),
         raddr, " ".join(rd), wr,
         fmt(lfound),
         "----" if lret is None else f"{lret & KEY_MASK:04X}",
@@ -307,10 +353,11 @@ def trace(dut, cycle):
 # Test
 # ---------------------------------------------------------------------------
 @cocotb.test()
-async def test_insert_and_lookup(dut):
+async def test_insert_lookup_delete_modify(dut):
     """
     Insert the key sequence one at a time with key_op = INSERT, then run
-    three lookups with key_op = LOOKUP. Every cycle is printed.
+    three lookups with key_op = LOOKUP, two deletions with key_op = DELETE,
+    then three modifications with key_op = MODIFY. Every cycle is printed.
 
     Each key is offered on the slave interface with a proper handshake:
     s_tvalid is raised and held until a rising edge where s_tready is also
@@ -323,6 +370,7 @@ async def test_insert_and_lookup(dut):
     dut.s_tvalid.value = 0
     dut.key.value = 0
     dut.key_op.value = OP_INSERT
+    dut.key_modify.value = 0
 
     # Command bus is unused by the insert path but must not sit at 'U'.
     dut.s_op.value = 0                 # OP_ADD
@@ -528,6 +576,208 @@ async def test_insert_and_lookup(dut):
                           key, exp_t, exp_a)
         lookup_results.append((key, hit, found, got))
 
+    # ---- deletions -------------------------------------------------------
+    dut._log.info("")
+    dut._log.info("=" * 82)
+    dut._log.info("DELETIONS  (key_op = 10)")
+    dut._log.info("=" * 82)
+
+    delete_results = []
+
+    for key in DELETE_KEYS:
+        exp_t, exp_a = EXPECTED_LOCATION[key]
+
+        # Confirm it is actually there before asking for it to be removed,
+        # so a failed delete cannot be confused with a key that was never
+        # placed.
+        await FallingEdge(dut.clk)
+        await ReadOnly()
+        before = read_tables(rams)
+        await RisingEdge(dut.clk)
+
+        present = find_key(before, key)
+
+        dut._log.info("")
+        dut._log.info("-" * 82)
+        dut._log.info("DELETE %04X   candidates: %s   expect it at T%d[%d]",
+                      key,
+                      ", ".join(f"T{t}[{a}]"
+                                for t, a in enumerate(hash_all(key))),
+                      exp_t, exp_a)
+        if present:
+            dut._log.info("    before: resting at T%d[%d]", present[0], present[1])
+        else:
+            dut._log.info("    before: NOT PRESENT - nothing to delete")
+        dut._log.info("-" * 82)
+
+        dut.key.value = key
+        dut.key_op.value = OP_DELETE
+        dut.s_tvalid.value = 1
+
+        cycle = 0
+        while cycle < MAX_CYCLES:
+            await FallingEdge(dut.clk)
+            await ReadOnly()
+            accepted = safe_int(dut.s_tready) == 1
+            trace(dut, cycle)
+            await RisingEdge(dut.clk)
+            cycle += 1
+            if accepted:
+                break
+
+        dut.s_tvalid.value = 0
+        # key and key_op are both held: the RTL samples key_op on the compare
+        # cycle, and the read addresses are combinational off key.
+
+        for _ in range(4):
+            await FallingEdge(dut.clk)
+            await ReadOnly()
+            trace(dut, cycle)
+            await RisingEdge(dut.clk)
+            cycle += 1
+
+        dut.key_op.value = OP_INSERT
+        await RisingEdge(dut.clk)
+
+        await FallingEdge(dut.clk)
+        await ReadOnly()
+        after = read_tables(rams)
+        await RisingEdge(dut.clk)
+
+        dump(dut._log, after,
+             f"tables after deleting {key:04X}  "
+             f"(occupancy {occupancy(after)}/{NUM_TABLES * DEPTH})")
+
+        still_there = find_key(after, key)
+        if still_there is None:
+            dut._log.info("    DELETED  %04X no longer in any table", key)
+            gone = True
+        else:
+            dut._log.info("    NOT DELETED  %04X still at T%d[%d]",
+                          key, still_there[0], still_there[1])
+            gone = False
+
+        # Nothing else should have moved.
+        collateral = []
+        for t in range(NUM_TABLES):
+            for a in range(DEPTH):
+                if before[t][a] != after[t][a]:
+                    if (t, a) != (exp_t, exp_a):
+                        collateral.append((t, a, before[t][a], after[t][a]))
+        if collateral:
+            dut._log.warning("    %d unexpected slot change(s):", len(collateral))
+            for t, a, b, aft in collateral:
+                dut._log.warning("      T%d[%d]  %s -> %s", t, a,
+                                 "----" if b is None else f"{b:05X}",
+                                 "----" if aft is None else f"{aft:05X}")
+
+        delete_results.append((key, gone, len(collateral)))
+
+    # ---- modifications ---------------------------------------------------
+    dut._log.info("")
+    dut._log.info("=" * 82)
+    dut._log.info("MODIFICATIONS  (key_op = 11)")
+    dut._log.info("=" * 82)
+
+    modify_results = []
+
+    for old_key, new_key in MODIFY_KEYS:
+        exp_t, exp_a = EXPECTED_LOCATION[old_key]
+
+        await FallingEdge(dut.clk)
+        await ReadOnly()
+        before = read_tables(rams)
+        await RisingEdge(dut.clk)
+
+        present = find_key(before, old_key)
+
+        dut._log.info("")
+        dut._log.info("-" * 82)
+        dut._log.info("MODIFY %04X -> %04X   candidates: %s   expect it at T%d[%d]",
+                      old_key, new_key,
+                      ", ".join(f"T{t}[{a}]"
+                                for t, a in enumerate(hash_all(old_key))),
+                      exp_t, exp_a)
+        if present:
+            dut._log.info("    before: %04X at T%d[%d]",
+                          old_key, present[0], present[1])
+        else:
+            dut._log.info("    before: %04X NOT PRESENT - nothing to modify",
+                          old_key)
+        dut._log.info("-" * 82)
+
+        dut.key.value = old_key
+        dut.key_modify.value = new_key
+        dut.key_op.value = OP_MODIFY
+        dut.s_tvalid.value = 1
+
+        cycle = 0
+        while cycle < MAX_CYCLES:
+            await FallingEdge(dut.clk)
+            await ReadOnly()
+            accepted = safe_int(dut.s_tready) == 1
+            trace(dut, cycle)
+            await RisingEdge(dut.clk)
+            cycle += 1
+            if accepted:
+                break
+
+        dut.s_tvalid.value = 0
+        # key, key_modify and key_op all held through the compare cycle.
+
+        for _ in range(4):
+            await FallingEdge(dut.clk)
+            await ReadOnly()
+            trace(dut, cycle)
+            await RisingEdge(dut.clk)
+            cycle += 1
+
+        dut.key_op.value = OP_INSERT
+        await RisingEdge(dut.clk)
+
+        await FallingEdge(dut.clk)
+        await ReadOnly()
+        after = read_tables(rams)
+        await RisingEdge(dut.clk)
+
+        dump(dut._log, after,
+             f"tables after modifying {old_key:04X} -> {new_key:04X}  "
+             f"(occupancy {occupancy(after)}/{NUM_TABLES * DEPTH})")
+
+        # The slot must now hold the new value, at the same address, still
+        # valid. Occupancy must not change - this is a rewrite, not a delete.
+        slot = after[exp_t][exp_a]
+        ok_valid = slot is not None and (slot >> VALID_BIT) & 1 == 1
+        ok_value = slot is not None and (slot & KEY_MASK) == new_key
+        old_gone = find_key(after, old_key) is None
+
+        if ok_valid and ok_value:
+            dut._log.info("    MODIFIED  T%d[%d] now holds %04X (valid)",
+                          exp_t, exp_a, new_key)
+        else:
+            dut._log.info("    NOT MODIFIED  T%d[%d] holds %s",
+                          exp_t, exp_a,
+                          "----" if slot is None else f"{slot:05X}")
+        if not old_gone:
+            where = find_key(after, old_key)
+            dut._log.info("    old value %04X still present at T%d[%d]",
+                          old_key, where[0], where[1])
+
+        collateral = []
+        for t in range(NUM_TABLES):
+            for a in range(DEPTH):
+                if before[t][a] != after[t][a] and (t, a) != (exp_t, exp_a):
+                    collateral.append((t, a, before[t][a], after[t][a]))
+        if collateral:
+            dut._log.warning("    %d unexpected slot change(s):", len(collateral))
+            for t, a, b, aft in collateral:
+                dut._log.warning("      T%d[%d]  %s -> %s", t, a,
+                                 "----" if b is None else f"{b:05X}",
+                                 "----" if aft is None else f"{aft:05X}")
+
+        modify_results.append((old_key, new_key,
+                               ok_valid and ok_value, len(collateral)))
+
     # ---- summary ---------------------------------------------------------
     await FallingEdge(dut.clk)
     await ReadOnly()
@@ -548,8 +798,9 @@ async def test_insert_and_lookup(dut):
             missing.append(key)
 
     dut._log.info("")
-    dut._log.info("  occupancy %d of %d slots  (expected %d)",
-                  occupancy(tables), NUM_TABLES * DEPTH, EXPECTED_OCCUPANCY)
+    dut._log.info("  occupancy %d of %d slots  (expected %d after %d deletes)",
+                  occupancy(tables), NUM_TABLES * DEPTH,
+                  EXPECTED_OCCUPANCY - len(DELETE_KEYS), len(DELETE_KEYS))
 
     dut._log.info("")
     dut._log.info("  lookups:")
@@ -565,18 +816,63 @@ async def test_insert_and_lookup(dut):
                           "----" if got is None else f"{got:04X}", t, a)
             bad_lookups.append(key)
 
+    dut._log.info("")
+    dut._log.info("  deletions:")
+    bad_deletes = []
+    for key, gone, coll in delete_results:
+        t, a = EXPECTED_LOCATION[key]
+        if gone and coll == 0:
+            dut._log.info("    %04X  DELETED  (was at T%d[%d])", key, t, a)
+        elif gone:
+            dut._log.info("    %04X  DELETED  but %d other slot(s) changed",
+                          key, coll)
+            bad_deletes.append(key)
+        else:
+            dut._log.info("    %04X  NOT DELETED  (expected T%d[%d])", key, t, a)
+            bad_deletes.append(key)
+
+    dut._log.info("")
+    dut._log.info("  modifications:")
+    bad_modifies = []
+    for old_key, new_key, ok, coll in modify_results:
+        t, a = EXPECTED_LOCATION[old_key]
+        if ok and coll == 0:
+            dut._log.info("    %04X -> %04X  OK  (T%d[%d])",
+                          old_key, new_key, t, a)
+        elif ok:
+            dut._log.info("    %04X -> %04X  written, but %d other slot(s) changed",
+                          old_key, new_key, coll)
+            bad_modifies.append(old_key)
+        else:
+            dut._log.info("    %04X -> %04X  FAILED  (expected T%d[%d])",
+                          old_key, new_key, t, a)
+            bad_modifies.append(old_key)
+
     if missing:
         dut._log.warning("  %d key(s) lost: %s",
                          len(missing), ", ".join(f"{k:04X}" for k in missing))
     if bad_lookups:
         dut._log.warning("  %d lookup(s) failed: %s", len(bad_lookups),
                          ", ".join(f"{k:04X}" for k in bad_lookups))
+    if bad_deletes:
+        dut._log.warning("  %d deletion(s) failed: %s", len(bad_deletes),
+                         ", ".join(f"{k:04X}" for k in bad_deletes))
+    if bad_modifies:
+        dut._log.warning("  %d modification(s) failed: %s", len(bad_modifies),
+                         ", ".join(f"{k:04X}" for k in bad_modifies))
     if mismatches:
         dut._log.warning("  %d hop-count mismatch(es):", len(mismatches))
         for k, got, exp in mismatches:
             dut._log.warning("    %04X  got %s hops, expected %s", k, got, exp)
-    if not missing and not mismatches and not bad_lookups:
+    dut._log.info("")
+    dut._log.info("  final occupancy %d of %d  (16 inserted, %d deleted, "
+                  "%d modified in place)",
+                  occupancy(tables), NUM_TABLES * DEPTH,
+                  len(DELETE_KEYS), len(MODIFY_KEYS))
+
+    if (not missing and not mismatches and not bad_lookups
+            and not bad_deletes and not bad_modifies):
         dut._log.info("  all keys placed, all chain lengths as expected, "
-                      "all lookups hit")
+                      "all lookups hit, all deletions and modifications clean")
 
     dut._log.info("=" * 82)

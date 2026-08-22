@@ -39,7 +39,9 @@
 --
 -- -> May need a seperate module or FSM to launch a pipeline of operations eg replace: 1. lookup 2. delete 3. Insertion
 --
--- -> arbiter for write ports for different processes
+-- -> arbiter for write ports for different processes !!OR!! seperate processes into different modules entirely (an order book top level will MUX write ports)
+--    
+-- -> current modify logic only works if keys are consistent across both values
 --------------------------------------------------------------------------------
 
 library ieee;
@@ -75,8 +77,9 @@ entity order_book is
     s_undisc   : in std_logic; -- order rests with zero visible qty
     s_implied  : in std_logic; -- TMC-generated
 
-    key    : in t_key; --test vector
-    key_op : in std_logic_vector(1 downto 0); -- Key operation : 0 = INSERTION, 1 = LOOKUP, 2 = DELETION, 3 MODIFY
+    key        : in t_key; --test vector
+    key_op     : in std_logic_vector(1 downto 0); -- Key operation : 0 = INSERTION, 1 = LOOKUP, 2 = DELETION, 3 MODIFY
+    key_modify : in t_key; -- Modification key.
 
     busy : out std_logic;
 
@@ -117,7 +120,8 @@ architecture rtl of order_book is
   ------------------------------------------------------------------------------
   -- Lookup/Modify/Delete
   ------------------------------------------------------------------------------
-  signal lookup_r       : t_key                                                          := (others => '0');
+  signal lookup_r       : t_key                                                          := (others => '0'); --hold lookup/delete value
+  signal modify_r       : t_key                                                          := (others => '0'); --hold modification value
   signal looking_r      : std_logic                                                      := '0';
   signal lookup_found_r : std_logic                                                      := '0';
   signal modify_we      : std_logic                                                      := '0';
@@ -225,6 +229,7 @@ begin
 
           looking_r <= '1';
           lookup_r  <= key;
+          modify_r  <= key_modify;
           op_r      <= key_op;
 
         end if;
@@ -240,18 +245,20 @@ begin
             end if;
           end loop;
           looking_r <= '0';
-        elsif op_r = "10" then
-          -- If deletion
-          modify_we    <= '0';
+        elsif op_r = "10" or op_r = "11" then
+          -- If deletion or modify
+          modify_we    <= '1';
           modify_waddr <= hash(lookup_r, to_integer(table_reg));
-          modify_wdata <= '0' & lookup_r;
-          modify_wsel  <= std_logic_vector(table_reg);
+          modify_wdata <= '0' & lookup_r when op_r = "10" else
+            '1' & modify_r;
+          modify_wsel <= std_logic_vector(table_reg);
+          op_r        <= (others => '0');
         else
           lookup_found_r <= '0';
+          modify_we      <= '0';
           modify_waddr   <= (others => '0');
           modify_wdata   <= (others => '0');
           modify_wsel    <= (others => '0');
-          modify_we      <= '0';
         end if;
       end if;
     end if;

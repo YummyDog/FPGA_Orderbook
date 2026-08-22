@@ -44,7 +44,8 @@ entity order_book_top is
     s_implied  : in  std_logic;
 
     key        : in  t_key;                        -- test vector
-    key_op     : in  std_logic_vector(1 downto 0); -- 00 INSERT, 01 LOOKUP, 10 DELETE
+    key_op     : in  std_logic_vector(1 downto 0); -- 00 INSERT, 01 LOOKUP, 10 DELETE, 11 MODIFY
+    key_modify : in  t_key;                        -- replacement key/value, MODIFY only
 
     busy          : out std_logic;
     lookup_found  : out std_logic;   -- high when lookup_return is valid
@@ -85,6 +86,7 @@ begin
 
       key        => key,
       key_op     => key_op,
+      key_modify => key_modify,
       busy       => busy,
       lookup_found  => lookup_found,
       lookup_return => lookup_return,
