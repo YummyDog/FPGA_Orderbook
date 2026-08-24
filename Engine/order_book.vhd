@@ -53,7 +53,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 use work.ram_pkg.all;
-use work.hash_pkg.all;
+use work.hash65_pkg.all;
 use work.order_book_pkg.all;
 entity order_book is
   generic (
@@ -75,15 +75,13 @@ entity order_book is
     s_order_id : in std_logic_vector(63 downto 0);
     s_book_id  : in std_logic_vector(31 downto 0); -- unused while single-instrument
     s_side     : in std_logic; -- 0 = buy, 1 = sell
-    s_qty      : in unsigned(31 downto 0); -- absolute on ADD/REPLACE, delta on EXEC
-    s_price    : in signed(31 downto 0); -- qualified by s_px_valid
+    s_qty      : in std_logic_vector(31 downto 0); -- absolute on ADD/REPLACE, delta on EXEC
+    s_price    : in std_logic_vector(31 downto 0); -- qualified by s_px_valid
     s_px_valid : in std_logic; -- low on EXEC and DELETE
     s_undisc   : in std_logic; -- order rests with zero visible qty
     s_implied  : in std_logic; -- TMC-generated
 
-    key        : in t_key; --test vector
     key_op     : in std_logic_vector(1 downto 0); -- Key operation : 0 = INSERTION, 1 = LOOKUP, 2 = DELETION, 3 MODIFY
-    key_modify : in t_key; -- Modification key.
 
     busy : out std_logic;
 
@@ -101,7 +99,14 @@ entity order_book is
   );
 end entity order_book;
 architecture rtl of order_book is
-
+  ------------------------------------------------------------------------------
+  -- Range subtypes (C_VAL_W-1 downto 0);
+  ------------------------------------------------------------------------------
+  subtype KEY_RANGE is integer range C_SLOT_W - 2 downto C_VAL_W; --key slice
+  subtype VKEY_RANGE is integer range C_SLOT_W - 1 downto C_VAL_W; -- valid bit + key slice
+  subtype VAL_RANGE is integer range C_VAL_W - 1 downto 0; --value slice
+  subtype KEYVAL_RANGE is integer range C_SLOT_W - 2 downto 0; -- key + value slice
+  subtype ALL_RANGE is integer range C_SLOT_W - 1 downto 0; --valid bit + key + value 
   ------------------------------------------------------------------------------
   -- Handshake
   ------------------------------------------------------------------------------
@@ -114,18 +119,20 @@ architecture rtl of order_book is
   ------------------------------------------------------------------------------
   signal busy_r          : std_logic                                                      := '0';
   signal table_cnt       : unsigned(integer(ceil(log2(real(C_NUM_TABLES)))) - 1 downto 0) := (others => '0'); -- Unsigned coutner for number of tables
-  signal key_r           : t_slot                                                         := (others => '0'); -- Key reg
+  signal key_r           : t_vkey                                                         := (others => '0'); -- Key reg
   signal addr_r          : t_addr                                                         := (others => '0'); -- Addr reg
   signal insertion_we    : std_logic                                                      := '0';
   signal insertion_waddr : t_addr                                                         := (others => '0');
   signal insertion_wdata : t_slot                                                         := (others => '0');
   signal insertion_wsel  : t_sel                                                          := (others => '0');
-
+  signal key             : t_key                                                          := (others => '0');
+  signal value           : t_val                                                          := (others => '0');
+  signal value_r         : t_val                                                          := (others => '0');
   ------------------------------------------------------------------------------
   -- Lookup/Modify/Delete
   ------------------------------------------------------------------------------
   signal lookup_r       : t_key                                                          := (others => '0'); --hold lookup/delete value
-  signal modify_r       : t_key                                                          := (others => '0'); --hold modification value
+  signal modify_r       : t_val                                                          := (others => '0'); --hold modification value
   signal looking_r      : std_logic                                                      := '0';
   signal lookup_found_r : std_logic                                                      := '0';
   signal modify_we      : std_logic                                                      := '0';
@@ -136,6 +143,10 @@ architecture rtl of order_book is
   signal op_r           : std_logic_vector(1 downto 0);
 
 begin
+
+  key   <= s_order_id & s_side;
+
+  value <= s_qty & s_price & s_undisc & s_implied;
 
   s_tready <= s_tready_i;
   s_xfer   <= s_tvalid and s_tready_i;
@@ -170,6 +181,7 @@ begin
         busy_r          <= '0';
         key_r           <= (others => '0');
         addr_r          <= (others => '0');
+        value_r         <= (others => '0');
         insertion_waddr <= (others => '0');
         insertion_wdata <= (others => '0');
         insertion_wsel  <= (others => '0');
@@ -177,16 +189,18 @@ begin
       else
         if s_xfer = '1' and key_op = "00" then
           -- First Beat -> AXI handsahke complete: key saved to reg + status bit set high
-          busy_r <= '1';
-          key_r  <= '1' & key;
-          addr_r <= hash(key, 0);
-
+          busy_r  <= '1';
+          key_r   <= '1' & key; -- add valid bit
+          value_r <= value;
+          addr_r  <= hash(key, 0);
         elsif busy_r = '0' then
-          key_r  <= (others => '0');
-          addr_r <= (others => '0');
+          key_r   <= (others => '0');
+          addr_r  <= (others => '0');
+          value_r <= (others => '0');
         else
-          key_r  <= rdata(to_integer(table_cnt - 1));
-          addr_r <= hash(rdata(to_integer(table_cnt - 1))(15 downto 0), to_integer(table_cnt));
+          key_r   <= rdata(to_integer(table_cnt - 1))(VKEY_RANGE);
+          value_r <= rdata(to_integer(table_cnt - 1))(VAL_RANGE);
+          addr_r  <= hash(rdata(to_integer(table_cnt - 1))(KEY_RANGE), to_integer(table_cnt));
         end if;
         -- Both the key and addr registers are taken from the read port every cycle, except on the first cycle where the key
         -- and addr registers are loaded straight from the input key.
@@ -195,7 +209,7 @@ begin
           -- Second beat+ set write ports to write from first table -> eviction logic
           insertion_we    <= '1';
           insertion_waddr <= addr_r;
-          insertion_wdata <= key_r; --write key to table
+          insertion_wdata <= key_r & value_r; --write key to table
           insertion_wsel  <= std_logic_vector(table_cnt - 1);
           if rdata(to_integer(table_cnt - 1))(C_VALID_BIT) = '0' then
             -- EMPTY slot
@@ -235,28 +249,28 @@ begin
 
           looking_r <= '1';
           lookup_r  <= key;
-          modify_r  <= key_modify;
+          modify_r  <= value;
           op_r      <= key_op;
 
         end if;
 
-        -- !!NOTES lookup may need to be pipelined depending on no. of tables or clock speed
         -- or deletion/modification pipeline could possibly done in the cycle after lookup
         if looking_r = '1' then
           for i in 0 to C_NUM_TABLES - 1 loop
-            if rdata(i)(15 downto 0) = lookup_r then
+            if rdata(i)(KEY_RANGE) = lookup_r then
               lookup_found_r <= '1';
-              lookup_return  <= rdata(i)(15 downto 0);
+              lookup_return  <= rdata(i)(KEY_RANGE);
               table_reg      <= to_unsigned(i, table_reg'length);
             end if;
           end loop;
           looking_r <= '0';
-        elsif op_r = "10" or op_r = "11" then
+          -- note will be able to save a cycle here by asserting we based on look
+        elsif op_r = "10" or op_r = "11" then -- 
           -- If deletion or modify
           modify_we    <= '1';
           modify_waddr <= hash(lookup_r, to_integer(table_reg));
-          modify_wdata <= '0' & lookup_r when op_r = "10" else
-            '1' & modify_r;
+          modify_wdata <= (others => '0') when op_r = "10" else
+            '1' & lookup_r & value_r;
           modify_wsel <= std_logic_vector(table_reg);
           op_r        <= (others => '0');
         else
@@ -282,12 +296,12 @@ begin
   -- All table reads are set to the address of the input key anticipating a lookup (exc table 0)
 
   raddr(0) <= hash(key, 0) when busy_r = '0' else
-  hash(rdata(to_integer(table_cnt - 1))(15 downto 0), 0);
+  hash(rdata(to_integer(table_cnt - 1))(KEY_RANGE), 0);
   -- input key addr on beat 0 and data read on beats 1+ (for cases when a key is moved back to the start of the table index)
 
   g_raddr : for i in 1 to C_NUM_TABLES - 1 generate
     raddr(i) <= hash(key, i) when busy_r = '0' else
-    hash(rdata(to_integer(table_cnt - 1))(15 downto 0), i);
+    hash(rdata(to_integer(table_cnt - 1))(KEY_RANGE), i);
   end generate g_raddr;
   -- For insertion logic -> Read address for the current table is set to the address of the key in the previous table
 
@@ -295,5 +309,5 @@ begin
   waddr <= (insertion_waddr or modify_waddr);
   wdata <= (insertion_wdata or modify_wdata);
   wsel  <= (insertion_wsel or modify_wsel);
--- MUX for write ports
+  -- MUX for write ports
 end architecture rtl;

@@ -7,7 +7,7 @@
         ram_pkg.vhd         geometry, slot layout, accessors
         ram_sdp.vhd         one table
         ram_array.vhd       the four tables
-        hash_pkg.vhd        XOR-tree hashes (depends on ram_pkg)
+        hash65_pkg.vhd      XOR-tree hashes, 65-bit key (depends on ram_pkg)
         order_book_pkg.vhd  t_book_op and the command bus types
         order_book.vhd
         order_book_top.vhd  wires order_book to a real ram_array
@@ -46,7 +46,7 @@ $Sources = @(
     "ram_pkg.vhd",
     "ram_sdp.vhd",
     "ram_array.vhd",
-    "hash_pkg.vhd",
+    "hash65_pkg.vhd",
     "order_book_pkg.vhd",
     "order_book.vhd",
     "order_book_top.vhd"

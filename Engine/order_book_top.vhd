@@ -37,15 +37,13 @@ entity order_book_top is
     s_order_id : in  std_logic_vector(63 downto 0);
     s_book_id  : in  std_logic_vector(31 downto 0);
     s_side     : in  std_logic;
-    s_qty      : in  unsigned(31 downto 0);
-    s_price    : in  signed(31 downto 0);
+    s_qty      : in  std_logic_vector(31 downto 0);
+    s_price    : in  std_logic_vector(31 downto 0);
     s_px_valid : in  std_logic;
     s_undisc   : in  std_logic;
     s_implied  : in  std_logic;
 
-    key        : in  t_key;                        -- test vector
     key_op     : in  std_logic_vector(1 downto 0); -- 00 INSERT, 01 LOOKUP, 10 DELETE, 11 MODIFY
-    key_modify : in  t_key;                        -- replacement key/value, MODIFY only
 
     busy          : out std_logic;
     lookup_found  : out std_logic;   -- high when lookup_return is valid
@@ -84,9 +82,7 @@ begin
       s_undisc   => s_undisc,
       s_implied  => s_implied,
 
-      key        => key,
       key_op     => key_op,
-      key_modify => key_modify,
       busy       => busy,
       lookup_found  => lookup_found,
       lookup_return => lookup_return,

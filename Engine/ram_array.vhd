@@ -5,7 +5,9 @@
 -- Geometry comes entirely from ram_pkg, so this entity has no generics and
 -- drops straight into the engine.
 --
--- Default geometry: 4 tables x 8 slots x 25 bits = 32 slots total.
+-- Geometry comes entirely from ram_pkg's CONFIGURATION block - see the notes
+-- there on what limits each axis. Concurrent assertions below catch
+-- configurations that would take hours to elaborate or fail to synthesise.
 --
 -- READS ARE PARALLEL, WRITES ARE NOT
 --
@@ -73,6 +75,30 @@ architecture rtl of ram_array is
 begin
 
   ------------------------------------------------------------------------------
+  -- Configuration guard rails.
+  --
+  -- Elaboration-time, so a bad sweep value fails immediately rather than
+  -- after the tool has spent an hour on it.
+  ------------------------------------------------------------------------------
+  assert C_ADDR_W <= C_ADDR_W_MAX
+    report "ram_array: C_ADDR_W = " & integer'image(C_ADDR_W) &
+           " declares " & integer'image(C_DEPTH) &
+           " slots per table. Above " & integer'image(C_ADDR_W_MAX) &
+           " the array will not elaborate in reasonable time or synthesise."
+    severity failure;
+
+  assert C_NUM_TABLES <= 16
+    report "ram_array: C_NUM_TABLES = " & integer'image(C_NUM_TABLES) &
+           ". Each column needs its own physical memory - area is linear and " &
+           "load-factor gains are negligible above 4 columns."
+    severity warning;
+
+  -- Printed once at elaboration so a simulation log records what was built.
+  assert false
+    report "ram_array geometry: " & geometry_string
+    severity note;
+
+  ------------------------------------------------------------------------------
   -- Decode wsel into per-table write enables.
   --
   -- An out-of-range wsel matches no table, so the write is dropped rather than
@@ -91,8 +117,10 @@ begin
 
     u_ram : entity work.ram_sdp
       generic map (
-        G_ADDR_W => C_ADDR_W,
-        G_DATA_W => C_SLOT_W
+        G_ADDR_W  => C_ADDR_W,
+        G_DATA_W  => C_SLOT_W,
+        G_OUT_REG => C_RAM_OUT_REG,
+        G_RAM_STYLE => "auto"
       )
       port map (
         clk   => clk,
