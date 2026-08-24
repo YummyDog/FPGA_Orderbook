@@ -26,7 +26,7 @@
 --
 -- VHDL-2008
 --------------------------------------------------------------------------------
--- IMPORTANT NOTES
+-- IMPORTANT NOTES / possible improvements
 --
 -- -> Before implementation, HDL needs to be as dynamic as possible (No hardcoding values) this will help in testing.
 --    values should be added in serperate package file
@@ -42,6 +42,10 @@
 -- -> arbiter for write ports for different processes !!OR!! seperate processes into different modules entirely (an order book top level will MUX write ports)
 --    
 -- -> current modify logic only works if keys are consistent across both values
+--
+-- -> For lookup logic a counter could possibly used instead of the looking_r signal.
+--
+-- -> For insertion logic, write address port is just a delayed version of the read port (logic could be altered to remove clutter)
 --------------------------------------------------------------------------------
 
 library ieee;
@@ -217,6 +221,7 @@ begin
       if resetn = '0' then
         lookup_found_r <= '0';
         lookup_r       <= (others => '0');
+        modify_r       <= (others => '0');
         looking_r      <= '0';
         op_r           <= (others => '0');
         table_reg      <= (others => '0');
@@ -224,6 +229,7 @@ begin
         modify_wdata   <= (others => '0');
         modify_wsel    <= (others => '0');
         modify_we      <= '0';
+        lookup_return  <= (others => '0');
       else
         if s_xfer = '1' and (key_op = "01" or key_op = "10" or key_op = "11") then
 
@@ -289,5 +295,5 @@ begin
   waddr <= (insertion_waddr or modify_waddr);
   wdata <= (insertion_wdata or modify_wdata);
   wsel  <= (insertion_wsel or modify_wsel);
-
+-- MUX for write ports
 end architecture rtl;
