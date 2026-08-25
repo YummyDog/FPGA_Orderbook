@@ -37,11 +37,7 @@
 -- -> Design will msot likely shift to a key-value-store which will use a set of tables for data and a set of tables for keys.
 --    For devlopment, keys and value are identical with keys stored with a valid bit in the table
 --
--- -> May need a seperate module or FSM to launch a pipeline of operations eg replace: 1. lookup 2. delete 3. Insertion
---
 -- -> arbiter for write ports for different processes !!OR!! seperate processes into different modules entirely (an order book top level will MUX write ports)
---    
--- -> current modify logic only works if keys are consistent across both values
 --
 -- -> For lookup logic a counter could possibly used instead of the looking_r signal.
 --
@@ -264,7 +260,7 @@ begin
             end if;
           end loop;
           looking_r <= '0';
-          -- note will be able to save a cycle here by asserting we based on look
+          -- note will be able to save a cycle here by asserting we based on looking
         elsif op_r = "10" or op_r = "11" then -- 
           -- If deletion or modify
           modify_we    <= '1';
