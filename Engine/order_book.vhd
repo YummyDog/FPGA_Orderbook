@@ -42,6 +42,8 @@
 -- -> For lookup logic a counter could possibly used instead of the looking_r signal.
 --
 -- -> For insertion logic, write address port is just a delayed version of the read port (logic could be altered to remove clutter)
+--
+-- -> minor logic flaw - lookup never checks for valid bit - should be ok
 --------------------------------------------------------------------------------
 
 library ieee;
@@ -77,7 +79,7 @@ entity order_book is
     s_undisc   : in std_logic; -- order rests with zero visible qty
     s_implied  : in std_logic; -- TMC-generated
 
-    key_op     : in std_logic_vector(1 downto 0); -- Key operation : 0 = INSERTION, 1 = LOOKUP, 2 = DELETION, 3 MODIFY
+    key_op : in std_logic_vector(1 downto 0); -- Key operation : 0 = INSERTION, 1 = LOOKUP, 2 = DELETION, 3 MODIFY
 
     busy : out std_logic;
 
@@ -113,7 +115,7 @@ architecture rtl of order_book is
   ------------------------------------------------------------------------------
   -- Insertion
   ------------------------------------------------------------------------------
-  signal busy_r          : std_logic                                                      := '0';
+  signal busy_i          : std_logic                                                      := '0';
   signal table_cnt       : unsigned(integer(ceil(log2(real(C_NUM_TABLES)))) - 1 downto 0) := (others => '0'); -- Unsigned coutner for number of tables
   signal key_r           : t_vkey                                                         := (others => '0'); -- Key reg
   signal addr_r          : t_addr                                                         := (others => '0'); -- Addr reg
@@ -127,20 +129,22 @@ architecture rtl of order_book is
   ------------------------------------------------------------------------------
   -- Lookup/Modify/Delete
   ------------------------------------------------------------------------------
-  signal lookup_r       : t_key                                                          := (others => '0'); --hold lookup/delete value
-  signal modify_r       : t_val                                                          := (others => '0'); --hold modification value
-  signal looking_r      : std_logic                                                      := '0';
-  signal lookup_found_r : std_logic                                                      := '0';
-  signal modify_we      : std_logic                                                      := '0';
-  signal modify_waddr   : t_addr                                                         := (others => '0');
-  signal modify_wdata   : t_slot                                                         := (others => '0');
-  signal modify_wsel    : t_sel                                                          := (others => '0');
-  signal table_reg      : unsigned(integer(ceil(log2(real(C_NUM_TABLES)))) - 1 downto 0) := (others => '0'); -- register to hold a tables address for deletion
+  signal lookup_r       : t_key     := (others => '0'); --hold lookup/delete value
+  signal modify_r       : t_val     := (others => '0'); --hold modification value
+  signal delmod         : std_logic := '0';
+  signal looking_r      : std_logic := '0';
+  signal lookup_found_i : std_logic := '0';
+  signal modify_we      : std_logic := '0';
+  signal modify_waddr   : t_addr    := (others => '0');
+  signal modify_wdata   : t_slot    := (others => '0');
+  signal modify_wsel    : t_sel     := (others => '0');
   signal op_r           : std_logic_vector(1 downto 0);
+
+  signal raddr_i : t_addr_set := (others => (others => '0'));
 
 begin
 
-  key   <= s_order_id & s_side;
+  key <= s_order_id & s_side;
 
   value <= s_qty & s_price & s_undisc & s_implied;
 
@@ -154,7 +158,7 @@ begin
       if resetn = '0' then
         table_cnt <= (others => '0');
       else
-        if s_xfer = '1' or busy_r = '1' then
+        if s_xfer = '1' or busy_i = '1' then
           if table_cnt = C_NUM_TABLES - 1 then
             table_cnt <= (others => '0');
           else
@@ -174,7 +178,7 @@ begin
   begin
     if rising_edge(clk) then
       if resetn = '0' then
-        busy_r          <= '0';
+        busy_i          <= '0';
         key_r           <= (others => '0');
         addr_r          <= (others => '0');
         value_r         <= (others => '0');
@@ -185,11 +189,11 @@ begin
       else
         if s_xfer = '1' and key_op = "00" then
           -- First Beat -> AXI handsahke complete: key saved to reg + status bit set high
-          busy_r  <= '1';
+          busy_i  <= '1';
           key_r   <= '1' & key; -- add valid bit
           value_r <= value;
           addr_r  <= hash(key, 0);
-        elsif busy_r = '0' then
+        elsif busy_i = '0' then
           key_r   <= (others => '0');
           addr_r  <= (others => '0');
           value_r <= (others => '0');
@@ -201,7 +205,7 @@ begin
         -- Both the key and addr registers are taken from the read port every cycle, except on the first cycle where the key
         -- and addr registers are loaded straight from the input key.
 
-        if busy_r = '1' then
+        if busy_i = '1' then
           -- Second beat+ set write ports to write from first table -> eviction logic
           insertion_we    <= '1';
           insertion_waddr <= addr_r;
@@ -209,7 +213,7 @@ begin
           insertion_wsel  <= std_logic_vector(table_cnt - 1);
           if rdata(to_integer(table_cnt - 1))(C_VALID_BIT) = '0' then
             -- EMPTY slot
-            busy_r <= '0';
+            busy_i <= '0';
           end if;
         else
           insertion_we    <= '0';
@@ -229,17 +233,17 @@ begin
   begin
     if rising_edge(clk) then
       if resetn = '0' then
-        lookup_found_r <= '0';
+        lookup_found_i <= '0';
         lookup_r       <= (others => '0');
         modify_r       <= (others => '0');
         looking_r      <= '0';
         op_r           <= (others => '0');
-        table_reg      <= (others => '0');
         modify_waddr   <= (others => '0');
         modify_wdata   <= (others => '0');
         modify_wsel    <= (others => '0');
         modify_we      <= '0';
         lookup_return  <= (others => '0');
+        delmod         <= '0';
       else
         if s_xfer = '1' and (key_op = "01" or key_op = "10" or key_op = "11") then
 
@@ -248,29 +252,31 @@ begin
           modify_r  <= value;
           op_r      <= key_op;
 
+          if key_op = "10" or key_op = "11" then
+            delmod <= '1';
+          end if;
+
         end if;
 
         -- or deletion/modification pipeline could possibly done in the cycle after lookup
         if looking_r = '1' then
           for i in 0 to C_NUM_TABLES - 1 loop
             if rdata(i)(KEY_RANGE) = lookup_r then
-              lookup_found_r <= '1';
+              lookup_found_i <= '1';
               lookup_return  <= rdata(i)(KEY_RANGE);
-              table_reg      <= to_unsigned(i, table_reg'length);
+
+              modify_waddr <= raddr_i(i);
+              modify_we    <= delmod;
+              modify_wsel  <= std_logic_vector(to_unsigned(i, modify_wsel'length));
             end if;
           end loop;
-          looking_r <= '0';
-          -- note will be able to save a cycle here by asserting we based on looking
-        elsif op_r = "10" or op_r = "11" then -- 
-          -- If deletion or modify
-          modify_we    <= '1';
-          modify_waddr <= hash(lookup_r, to_integer(table_reg));
+          looking_r    <= '0';
           modify_wdata <= (others => '0') when op_r = "10" else
-            '1' & lookup_r & value_r;
-          modify_wsel <= std_logic_vector(table_reg);
-          op_r        <= (others => '0');
+            '1' & lookup_r & modify_r;
+          delmod <= '0';
+          op_r   <= (others => '0');
         else
-          lookup_found_r <= '0';
+          lookup_found_i <= '0';
           modify_we      <= '0';
           modify_waddr   <= (others => '0');
           modify_wdata   <= (others => '0');
@@ -280,24 +286,25 @@ begin
     end if;
   end process lookup;
 
-  ------------------------------------------------------------------------------
-  -- Deletion
-  ------------------------------------------------------------------------------
-  busy       <= busy_r;
-  s_tready_i <= not (busy_r or looking_r);
+  busy       <= busy_i;
+  s_tready_i <= not (busy_i or looking_r);
 
-  lookup_found <= lookup_found_r;
+  lookup_found <= lookup_found_i;
 
   -- !!NOTES
   -- All table reads are set to the address of the input key anticipating a lookup (exc table 0)
 
-  raddr(0) <= hash(key, 0) when busy_r = '0' else
+  raddr_i(0) <= hash(key, 0) when busy_i = '0' else
   hash(rdata(to_integer(table_cnt - 1))(KEY_RANGE), 0);
   -- input key addr on beat 0 and data read on beats 1+ (for cases when a key is moved back to the start of the table index)
 
-  g_raddr : for i in 1 to C_NUM_TABLES - 1 generate
-    raddr(i) <= hash(key, i) when busy_r = '0' else
+  g_raddr_i : for i in 1 to C_NUM_TABLES - 1 generate
+    raddr_i(i) <= hash(key, i) when busy_i = '0' else
     hash(rdata(to_integer(table_cnt - 1))(KEY_RANGE), i);
+  end generate g_raddr_i;
+
+  g_raddr : for i in 0 to C_NUM_TABLES - 1 generate
+    raddr(i) <= raddr_i(i);
   end generate g_raddr;
   -- For insertion logic -> Read address for the current table is set to the address of the key in the previous table
 

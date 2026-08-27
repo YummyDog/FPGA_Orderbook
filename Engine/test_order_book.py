@@ -151,6 +151,10 @@ MODIFY_IDX = [1, 14, 22]
 
 MAX_CYCLES = 80
 
+# Cycles of write-port silence before an operation is considered finished.
+# Only relevant to lookup, delete and modify, which never assert busy.
+TAIL_CYCLES = 4
+
 
 def make_order_id(n: int) -> int:
     """ASX-shaped: fixed session prefix, incrementing sequence."""
@@ -401,7 +405,7 @@ def trace(dut, cycle):
         # slot is printed in the per-operation summaries instead.
         wr = (f"T{wsel}[{waddr:2d}]<={'V' if vbit else 'x'} "
               f"0x{slot_key(wdata):0{KEY_HEX}X}")
-        observed = (wsel, waddr, slot_key(wdata), vbit)
+        observed = (cycle, wsel, waddr, slot_key(wdata), slot_val(wdata), vbit)
 
     dut._log.info(
         "cyc %2d | tv=%s tr=%s op=%s busy=%s | raddr=%s | write %s "
@@ -478,21 +482,53 @@ async def issue(dut, order_id, side, op, qty=0, price=0, undisc=0, implied=0,
 
     dut.s_tvalid.value = 0
 
-    # Follow the operation until the engine is idle again, or for a fixed
-    # window if it never asserted busy (lookup, delete, modify).
+    # Follow the operation until the engine is idle AND nothing has been
+    # written for a few cycles.
+    #
+    # A fixed window is the wrong shape here. An insert asserts busy, so busy
+    # falling is a real completion signal - but a lookup, delete or modify
+    # never does, so the only evidence the operation finished is that the
+    # write port has gone quiet. Stopping after a fixed count means a write
+    # arriving one cycle later than expected is simply never seen, and the
+    # operation looks like it did nothing.
+    quiet_for = 0
     while cycle < MAX_CYCLES:
         await FallingEdge(dut.clk)
         await ReadOnly()
+        before_n = len(writes)
         sample(cycle)
         busy = safe_int(dut.busy)
         await RisingEdge(dut.clk)
         cycle += 1
-        if busy == 0 and cycle >= settle:
+
+        if len(writes) > before_n:
+            quiet_for = 0          # a write this cycle - restart the countdown
+        else:
+            quiet_for += 1
+
+        if busy == 0 and cycle >= settle and quiet_for >= TAIL_CYCLES:
             break
 
     dut.key_op.value = OP_INSERT
     await RisingEdge(dut.clk)
     return writes, found
+
+
+def report_writes(log, writes, indent="    "):
+    """
+    Print every write seen on the bus during an operation.
+
+    This is what separates the three ways a modify or delete can fail: no
+    write at all, a write to the wrong slot, or a write of the wrong data.
+    Comparing table snapshots alone cannot tell them apart.
+    """
+    if not writes:
+        log.info("%sno write observed on the bus", indent)
+        return
+    for n, (c, t, a, k, v, vbit) in enumerate(writes):
+        log.info("%swrite %d @ cycle %d: T%d[%d]  valid=%d  key=%s",
+                 indent, n, c, t, a, vbit, fmt_key(k))
+        log.info("%s          value [%s]", indent, fmt_value(v))
 
 
 async def snapshot(dut, rams):
@@ -574,7 +610,7 @@ async def test_normal_traffic(dut):
 
         tables = await snapshot(dut, rams)
         if writes:
-            path = " -> ".join(f"T{t}[{a}]" for t, a, _, _ in writes)
+            path = " -> ".join(f"T{t}[{a}]" for _, t, a, _, _, _ in writes)
             dut._log.info("    path  : %s   (%d hop%s)",
                           path, len(writes), "" if len(writes) == 1 else "s")
         else:
@@ -670,8 +706,25 @@ async def test_normal_traffic(dut):
                       f"T{at[0]}[{at[1]}]" if at else "NOWHERE")
         dut._log.info("-" * 88)
 
-        await issue(dut, oid, side, OP_DELETE, qty=qty, price=price)
+        writes, _ = await issue(dut, oid, side, OP_DELETE,
+                                qty=qty, price=price)
         after = await snapshot(dut, rams)
+
+        report_writes(dut._log, writes)
+
+        if len(writes) != 1:
+            dut._log.info("    BUS  expected 1 write, saw %d", len(writes))
+            problems.append(f"delete {fmt_key(key)}: {len(writes)} writes")
+        elif at is not None:
+            _, wt, wa, _, _, wvalid = writes[0]
+            if (wt, wa) != at:
+                dut._log.info("    BUS  cleared T%d[%d], expected T%d[%d]",
+                              wt, wa, at[0], at[1])
+                problems.append(f"delete {fmt_key(key)}: wrong slot")
+            elif wvalid != 0:
+                dut._log.info("    BUS  valid bit still set - the slot was "
+                              "rewritten, not cleared")
+                problems.append(f"delete {fmt_key(key)}: valid still set")
 
         dump(dut._log, after,
              f"    after delete  (occupancy {occupancy(after)}/{CAPACITY})")
@@ -723,9 +776,12 @@ async def test_normal_traffic(dut):
                       fmt_value(old_val), fmt_value(new_val))
         dut._log.info("-" * 88)
 
-        await issue(dut, oid, side, OP_MODIFY,
-                    qty=new_qty, price=new_price, undisc=1, implied=0)
+        writes, _ = await issue(dut, oid, side, OP_MODIFY,
+                                qty=new_qty, price=new_price,
+                                undisc=1, implied=0)
         after = await snapshot(dut, rams)
+
+        report_writes(dut._log, writes)
 
         dump(dut._log, after,
              f"    after modify  (occupancy {occupancy(after)}/{CAPACITY})")
@@ -735,13 +791,42 @@ async def test_normal_traffic(dut):
             continue
 
         t, a = at
+
+        # Check the bus first: a modify must produce exactly one write, to the
+        # slot the key already occupies, carrying the key unchanged and the new
+        # value with the valid bit still set.
+        if len(writes) != 1:
+            dut._log.info("    BUS  expected 1 write, saw %d", len(writes))
+            problems.append(f"modify {fmt_key(key)}: {len(writes)} writes")
+        else:
+            _, wt, wa, wk, wv, wvalid = writes[0]
+            if (wt, wa) != (t, a):
+                dut._log.info("    BUS  wrote T%d[%d], expected T%d[%d] "
+                              "- wrong slot", wt, wa, t, a)
+                problems.append(f"modify {fmt_key(key)}: wrote T{wt}[{wa}]")
+            elif wvalid != 1:
+                dut._log.info("    BUS  valid bit clear - that is a delete, "
+                              "not a modify")
+            elif wk != key:
+                dut._log.info("    BUS  wrote key %s, expected %s "
+                              "- the key must not change",
+                              fmt_key(wk), fmt_key(key))
+            elif wv != new_val:
+                dut._log.info("    BUS  wrote value [%s], expected [%s]",
+                              fmt_value(wv), fmt_value(new_val))
+                if wv == 0:
+                    dut._log.info("         value is all zeros - check the "
+                                  "modify path is using the registered new "
+                                  "value and not a register owned by the "
+                                  "insert path")
+
         slot = after[t][a]
         valid = slot is not None and (slot >> VALID_BIT) & 1 == 1
         got_key = slot_key(slot)
         got_val = slot_val(slot)
 
-        # Three separate things must hold: the slot is still valid, the key is
-        # untouched, and the value is the new one.
+        # Three separate things must hold in the RAM: the slot is still valid,
+        # the key is untouched, and the value is the new one.
         if not valid:
             dut._log.info("    FAILED  T%d[%d] valid bit cleared - that is a "
                           "delete, not a modify", t, a)
