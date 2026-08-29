@@ -34,9 +34,6 @@
 -- -> First stage is getting each operation to work by themselves -> secodn stage is to get operations 
 --    working simaltneously (multi read ram module will be needed)
 --
--- -> Design will msot likely shift to a key-value-store which will use a set of tables for data and a set of tables for keys.
---    For devlopment, keys and value are identical with keys stored with a valid bit in the table
---
 -- -> arbiter for write ports for different processes !!OR!! seperate processes into different modules entirely (an order book top level will MUX write ports)
 --
 -- -> For lookup logic a counter could possibly used instead of the looking_r signal.
@@ -44,6 +41,14 @@
 -- -> For insertion logic, write address port is just a delayed version of the read port (logic could be altered to remove clutter)
 --
 -- -> minor logic flaw - lookup never checks for valid bit - should be ok
+--
+-- -> If lookups are no longer directly asked, OP_NULL can be removed from t_book_op
+--
+-- -> carry chain explanation in report ???? - + zero extra depth with < operator
+--
+-- -> EXEC into 0 qty / undiscoled stuff not implemented.
+--
+-- -> Longest path is the exec logic - needs to be altered if clock to be increased.
 --------------------------------------------------------------------------------
 
 library ieee;
@@ -79,12 +84,11 @@ entity order_book is
     s_undisc   : in std_logic; -- order rests with zero visible qty
     s_implied  : in std_logic; -- TMC-generated
 
-    key_op : in std_logic_vector(1 downto 0); -- Key operation : 0 = INSERTION, 1 = LOOKUP, 2 = DELETION, 3 MODIFY
-
     busy : out std_logic;
 
     lookup_return : out t_key     := (others => '0'); --Exact data type may shift with a KVS system
     lookup_found  : out std_logic := '0';
+    s_lookup      : in std_logic  := '0';
     -- Write port
     we    : out std_logic;
     wsel  : out t_sel := (others => '0'); -- which table
@@ -97,14 +101,6 @@ entity order_book is
   );
 end entity order_book;
 architecture rtl of order_book is
-  ------------------------------------------------------------------------------
-  -- Range subtypes (C_VAL_W-1 downto 0);
-  ------------------------------------------------------------------------------
-  subtype KEY_RANGE is integer range C_SLOT_W - 2 downto C_VAL_W; --key slice
-  subtype VKEY_RANGE is integer range C_SLOT_W - 1 downto C_VAL_W; -- valid bit + key slice
-  subtype VAL_RANGE is integer range C_VAL_W - 1 downto 0; --value slice
-  subtype KEYVAL_RANGE is integer range C_SLOT_W - 2 downto 0; -- key + value slice
-  subtype ALL_RANGE is integer range C_SLOT_W - 1 downto 0; --valid bit + key + value 
   ------------------------------------------------------------------------------
   -- Handshake
   ------------------------------------------------------------------------------
@@ -138,7 +134,7 @@ architecture rtl of order_book is
   signal modify_waddr   : t_addr    := (others => '0');
   signal modify_wdata   : t_slot    := (others => '0');
   signal modify_wsel    : t_sel     := (others => '0');
-  signal op_r           : std_logic_vector(1 downto 0);
+  signal op_r           : t_book_op;
 
   signal raddr_i : t_addr_set := (others => (others => '0'));
 
@@ -187,7 +183,7 @@ begin
         insertion_wsel  <= (others => '0');
         insertion_we    <= '0';
       else
-        if s_xfer = '1' and key_op = "00" then
+        if s_xfer = '1' and s_op = OP_ADD then
           -- First Beat -> AXI handsahke complete: key saved to reg + status bit set high
           busy_i  <= '1';
           key_r   <= '1' & key; -- add valid bit
@@ -230,6 +226,7 @@ begin
   -- LOOKUP, DELETE, MODIFY
   ------------------------------------------------------------------------------
   lookup : process (clk) is
+    variable prev_val : unsigned(C_VAL_W - 1 downto 0) := (others => '0');
   begin
     if rising_edge(clk) then
       if resetn = '0' then
@@ -237,22 +234,22 @@ begin
         lookup_r       <= (others => '0');
         modify_r       <= (others => '0');
         looking_r      <= '0';
-        op_r           <= (others => '0');
         modify_waddr   <= (others => '0');
         modify_wdata   <= (others => '0');
         modify_wsel    <= (others => '0');
         modify_we      <= '0';
         lookup_return  <= (others => '0');
         delmod         <= '0';
+        op_r           <= OP_NULL;
       else
-        if s_xfer = '1' and (key_op = "01" or key_op = "10" or key_op = "11") then
+        if s_xfer = '1' and (s_lookup = '1' or s_op = OP_DELETE or s_op = OP_REPLACE or s_op = OP_EXEC) then
 
           looking_r <= '1';
           lookup_r  <= key;
           modify_r  <= value;
-          op_r      <= key_op;
+          op_r      <= s_op;
 
-          if key_op = "10" or key_op = "11" then
+          if s_op = OP_DELETE or s_op = OP_REPLACE or s_op = OP_EXEC then
             delmod <= '1';
           end if;
 
@@ -261,20 +258,30 @@ begin
         -- or deletion/modification pipeline could possibly done in the cycle after lookup
         if looking_r = '1' then
           for i in 0 to C_NUM_TABLES - 1 loop
-            if rdata(i)(KEY_RANGE) = lookup_r then
+            if rdata(i)(KEY_RANGE) = lookup_r and rdata(i)(C_VALID_BIT) = '1' then
               lookup_found_i <= '1';
               lookup_return  <= rdata(i)(KEY_RANGE);
 
               modify_waddr <= raddr_i(i);
               modify_we    <= delmod;
               modify_wsel  <= std_logic_vector(to_unsigned(i, modify_wsel'length));
+
+              prev_val := unsigned(rdata(i)(VAL_RANGE));
             end if;
           end loop;
           looking_r    <= '0';
-          modify_wdata <= (others => '0') when op_r = "10" else
-            '1' & lookup_r & modify_r;
+          modify_wdata <= modify_func(
+            op_r,
+            lookup_r,
+            prev_val,
+            modify_r
+            );
+          -- MODIFY ORDER -> placed in order of priority for logic levels
+          -- EXEC: subtracts the executed qty from the current order only
+          -- REPLACE: replaces the whole order
+          -- DELETE: simply clears everything
           delmod <= '0';
-          op_r   <= (others => '0');
+          op_r   <= OP_NULL;
         else
           lookup_found_i <= '0';
           modify_we      <= '0';

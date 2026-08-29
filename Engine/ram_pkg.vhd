@@ -103,13 +103,13 @@ package ram_pkg is
   ------------------------------------------------------------------------------
   -- Derived
   ------------------------------------------------------------------------------
-  constant C_DEPTH    : positive := 2**C_ADDR_W;
+  constant C_DEPTH    : positive := 2 ** C_ADDR_W;
   constant C_CAPACITY : positive := C_DEPTH * C_NUM_TABLES;
 
   -- Bits needed to name one table. maximum() guards the single-table case,
   -- where log2 would give 0 and produce an illegal null vector.
   constant C_SEL_W : positive :=
-    maximum(1, natural(ceil(log2(real(C_NUM_TABLES)))));
+  maximum(1, natural(ceil(log2(real(C_NUM_TABLES)))));
 
   constant C_SLOT_W : positive := 1 + C_KEY_W + C_VAL_W;
 
@@ -137,30 +137,47 @@ package ram_pkg is
   -- index offset in the engine's FSM assumes this value, so changing it is a
   -- design change, not a knob.
   ------------------------------------------------------------------------------
-  constant C_RAM_OUT_REG   : boolean  := false;
-  constant C_READ_LATENCY  : positive := 1 + boolean'pos(C_RAM_OUT_REG);
+  constant C_RAM_OUT_REG  : boolean  := false;
+  constant C_READ_LATENCY : positive := 1 + boolean'pos(C_RAM_OUT_REG);
 
   ------------------------------------------------------------------------------
   -- Types
   ------------------------------------------------------------------------------
-  subtype t_addr is std_logic_vector(C_ADDR_W-1 downto 0);
-  subtype t_key  is std_logic_vector(C_KEY_W-1 downto 0);
-  subtype t_vkey  is std_logic_vector(C_KEY_W downto 0); --valid key
-  subtype t_slot is std_logic_vector(C_SLOT_W-1 downto 0);
-  subtype t_sel  is std_logic_vector(C_SEL_W-1 downto 0);
-
+  subtype t_addr is std_logic_vector(C_ADDR_W - 1 downto 0);
+  subtype t_key is std_logic_vector(C_KEY_W - 1 downto 0);
+  subtype t_key_u is unsigned(C_KEY_W - 1 downto 0);
+  subtype t_vkey is std_logic_vector(C_KEY_W downto 0); --valid key
+  subtype t_slot is std_logic_vector(C_SLOT_W - 1 downto 0);
+  subtype t_sel is std_logic_vector(C_SEL_W - 1 downto 0);
   -- Value type is declared at width 1 when unused, so the subtype is always
   -- legal; nothing should reference it unless C_HAS_VALUE.
-  subtype t_val is std_logic_vector( C_VAL_W -1 downto 0);
+  subtype t_val is std_logic_vector(C_VAL_W - 1 downto 0);
+  subtype t_val_u is unsigned(C_VAL_W - 1 downto 0);
+
+  ------------------------------------------------------------------------------
+  -- Range subtypes (C_VAL_W-1 downto 0);
+  ------------------------------------------------------------------------------
+  subtype KEY_RANGE is integer range C_SLOT_W - 2 downto C_VAL_W; --key slice
+  subtype VKEY_RANGE is integer range C_SLOT_W - 1 downto C_VAL_W; -- valid bit + key slice
+  subtype VAL_RANGE is integer range C_VAL_W - 1 downto 0; --value slice
+  subtype KEYVAL_RANGE is integer range C_SLOT_W - 2 downto 0; -- key + value slice
+  subtype ALL_RANGE is integer range C_SLOT_W - 1 downto 0; --valid bit + key + value 
+  subtype QTY_RANGE is integer range C_VAL_W - 1 downto C_VAL_W - 32; --qty
+  subtype NOTQTY_RANGE is integer range C_VAL_W - 33 downto 0; --not qty
 
   -- One element per table. Reads are parallel, so addresses and results both
   -- come as full sets; a counter can index either.
-  type t_addr_set is array (0 to C_NUM_TABLES-1) of t_addr;
-  type t_slot_set is array (0 to C_NUM_TABLES-1) of t_slot;
-  type t_val_set  is array (0 to C_NUM_TABLES-1) of t_val;
+  type t_addr_set is array (0 to C_NUM_TABLES - 1) of t_addr;
+  type t_slot_set is array (0 to C_NUM_TABLES - 1) of t_slot;
+  type t_val_set is array (0 to C_NUM_TABLES - 1) of t_val;
+
+  ------------------------------------------------------------------------------
+  -- Book operations
+  ------------------------------------------------------------------------------
+  type t_book_op is (OP_ADD, OP_EXEC, OP_REPLACE, OP_DELETE, OP_NULL);
 
   -- One bit per table, for hit / occupancy flags.
-  subtype t_table_flags is std_logic_vector(0 to C_NUM_TABLES-1);
+  subtype t_table_flags is std_logic_vector(0 to C_NUM_TABLES - 1);
 
   constant C_SLOT_EMPTY : t_slot := (others => '0');
 
@@ -177,16 +194,26 @@ package ram_pkg is
   -- types, so the two declarations would be homographs and illegal. On an
   -- eviction hop the insert path already holds a t_vkey, which carries its own
   -- valid bit, so concatenate directly:  wdata <= key_r & value_r;
-  function make_slot  (key : t_key; val : t_val) return t_slot;
+  function make_slot (key : t_key; val : t_val) return t_slot;
 
-  function make_vkey  (key : t_key) return t_vkey;               -- valid = '1'
-  function vkey_key   (v : t_vkey) return t_key;
-  function vkey_valid (v : t_vkey) return std_logic;
+  function make_vkey (key : t_key) return t_vkey; -- valid = '1'
+  function vkey_key (v    : t_vkey) return t_key;
+  function vkey_valid (v  : t_vkey) return std_logic;
 
   function slot_valid (s : t_slot) return std_logic;
-  function slot_key   (s : t_slot) return t_key;
-  function slot_val   (s : t_slot) return t_val;
-  function slot_vkey  (s : t_slot) return t_vkey;
+  function slot_key (s   : t_slot) return t_key;
+  function slot_val (s   : t_slot) return t_val;
+  function slot_vkey (s  : t_slot) return t_vkey;
+  function modify_func(
+    op     : t_book_op;
+    lookup : t_key;
+    prev   : t_val_u;
+    modify : t_val
+  ) return t_slot;
+  -- MODIFY ORDER -> placed in order of priority for logic levels
+  -- EXEC: subtracts the executed qty from the current order only
+  -- REPLACE: replaces the whole order
+  -- DELETE: simply clears everything
 
   -- True when the slot is occupied AND holds this key. The valid term matters:
   -- without it, uninitialised memory that happens to match reads as a hit.
@@ -196,8 +223,6 @@ package ram_pkg is
   function geometry_string return string;
 
 end package ram_pkg;
-
-
 package body ram_pkg is
 
   function make_slot (key : t_key; val : t_val) return t_slot is
@@ -212,7 +237,7 @@ package body ram_pkg is
 
   function vkey_key (v : t_vkey) return t_key is
   begin
-    return v(C_KEY_W-1 downto 0);
+    return v(C_KEY_W - 1 downto 0);
   end function;
 
   function vkey_valid (v : t_vkey) return std_logic is
@@ -253,12 +278,39 @@ package body ram_pkg is
   function geometry_string return string is
   begin
     return integer'image(C_NUM_TABLES) & " tables x " &
-           integer'image(C_DEPTH) & " slots = " &
-           integer'image(C_CAPACITY) & " capacity, key " &
-           integer'image(C_KEY_W) & "b, slot " &
-           integer'image(C_SLOT_W) & "b, value " &
-           integer'image(C_VAL_W) & "b, total " &
-           integer'image(C_TOTAL_BITS) & " bits";
+    integer'image(C_DEPTH) & " slots = " &
+    integer'image(C_CAPACITY) & " capacity, key " &
+    integer'image(C_KEY_W) & "b, slot " &
+    integer'image(C_SLOT_W) & "b, value " &
+    integer'image(C_VAL_W) & "b, total " &
+    integer'image(C_TOTAL_BITS) & " bits";
   end function;
+
+  function modify_func(
+    op     : t_book_op;
+    lookup : t_key;
+    prev   : t_val_u;
+    modify : t_val
+  ) return t_slot is
+  begin
+    if op = OP_EXEC and unsigned(modify(QTY_RANGE)) < prev(QTY_RANGE) then
+      return '1' &
+      lookup &
+      std_logic_vector(
+      unsigned(prev(QTY_RANGE)) - unsigned(modify(QTY_RANGE))
+      ) &
+      modify(NOTQTY_RANGE);
+
+    elsif op = OP_REPLACE then
+      return '1' & lookup & modify;
+
+    else
+      return (others => '0');
+    end if;
+  end function;
+  -- MODIFY ORDER -> placed in order of priority for logic levels
+  -- EXEC: subtracts the executed qty from the current order only, clears if qty matches
+  -- REPLACE: replaces the whole order
+  -- DELETE: simply clears everything
 
 end package body ram_pkg;

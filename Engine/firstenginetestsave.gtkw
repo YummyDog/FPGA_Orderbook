@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
-[*] Mon Aug 24 11:46:10 2026
+[*] Thu Aug 27 12:26:04 2026
 [*]
 [dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Engine\order_book_top.fst"
-[dumpfile_mtime] "Mon Aug 24 10:51:26 2026"
-[dumpfile_size] 7161
+[dumpfile_mtime] "Thu Aug 27 12:19:57 2026"
+[dumpfile_size] 7407
 [savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Engine\firstenginetestsave.gtkw"
-[timestart] 1448260000
+[timestart] 2378100000
 [size] 1920 1017
-[pos] -35 -35
-*-24.000000 1500940000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -113 -113
+*-26.000000 2652500000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] order_book_top.
 [treeopen] order_book_top.u_ram_arr.
 [sst_width] 303
@@ -18,7 +18,6 @@
 [sst_vpaned_height] 647
 @28
 order_book_top.u_book.clk
-order_book_top.u_book.key_op[1:0]
 [color] 1
 order_book_top.u_book.raddr[0][3:0]
 [color] 1
@@ -44,17 +43,22 @@ order_book_top.u_book.wsel[1:0]
 @28
 [color] 5
 order_book_top.u_book.waddr[3:0]
-@24
-order_book_top.u_book.table_reg[1:0]
-@28
 [color] 5
 order_book_top.u_book.we
+[color] 3
+order_book_top.u_book.s_tvalid
+@22
+[color] 3
+order_book_top.u_book.s_op
+@29
+[color] 3
+order_book_top.u_book.s_lookup
 @24
 order_book_top.u_book.table_cnt[1:0]
 @28
 order_book_top.u_book.busy
 order_book_top.u_book.lookup_found
-@23
+@22
 order_book_top.u_book.lookup_return[64:0]
 [pattern_trace] 1
 [pattern_trace] 0

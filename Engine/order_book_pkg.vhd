@@ -35,6 +35,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.ram_pkg.all;
 
 package order_book_pkg is
 
@@ -62,10 +63,7 @@ package order_book_pkg is
   constant C_EXTYPE_BIT_UNDISCLOSED  : natural := 5;   -- value 32
   constant C_EXTYPE_BIT_IMPLIED      : natural := 13;  -- value 8192
 
-  ------------------------------------------------------------------------------
-  -- Book operations
-  ------------------------------------------------------------------------------
-  type t_book_op is (OP_ADD, OP_EXEC, OP_REPLACE, OP_DELETE);
+
 
   ------------------------------------------------------------------------------
   -- Normalised command

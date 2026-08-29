@@ -42,8 +42,8 @@ entity order_book_top is
     s_px_valid : in  std_logic;
     s_undisc   : in  std_logic;
     s_implied  : in  std_logic;
+    s_lookup   : in  std_logic;                    -- 1 = probe only, no write
 
-    key_op     : in  std_logic_vector(1 downto 0); -- 00 INSERT, 01 LOOKUP, 10 DELETE, 11 MODIFY
 
     busy          : out std_logic;
     lookup_found  : out std_logic;   -- high when lookup_return is valid
@@ -81,8 +81,8 @@ begin
       s_px_valid => s_px_valid,
       s_undisc   => s_undisc,
       s_implied  => s_implied,
+      s_lookup   => s_lookup,
 
-      key_op     => key_op,
       busy       => busy,
       lookup_found  => lookup_found,
       lookup_return => lookup_return,

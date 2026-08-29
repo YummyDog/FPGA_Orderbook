@@ -1,2 +1,4 @@
 https://docs.amd.com/r/en-US/ug949-vivado-design-methodology/Introduction
 
+https://ieeexplore.ieee.org/document/10631117
+

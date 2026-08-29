@@ -36,7 +36,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
+use work.ram_pkg.all;
 use work.order_book_pkg.all;
 
 entity book_input_stage is
