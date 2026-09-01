@@ -28,9 +28,6 @@
 --------------------------------------------------------------------------------
 -- IMPORTANT NOTES / possible improvements
 --
--- -> Before implementation, HDL needs to be as dynamic as possible (No hardcoding values) this will help in testing.
---    values should be added in serperate package file
--- 
 -- -> First stage is getting each operation to work by themselves -> secodn stage is to get operations 
 --    working simaltneously (multi read ram module will be needed)
 --
@@ -49,6 +46,12 @@
 -- -> EXEC into 0 qty / undiscoled stuff not implemented.
 --
 -- -> Longest path is the exec logic - needs to be altered if clock to be increased.
+--
+-- -> Master tvalid can possibly be changed to an event signal
+--
+-- -> major cleanup needed
+--
+-- -> For master data output to price level storage only ADD and DELETE ops will be used: EXEC -> DELETE executed amount, REPLACE -> ADD new order + DELETE old order.
 --------------------------------------------------------------------------------
 
 library ieee;
@@ -86,9 +89,6 @@ entity order_book is
 
     busy : out std_logic;
 
-    lookup_return : out t_key     := (others => '0'); --Exact data type may shift with a KVS system
-    lookup_found  : out std_logic := '0';
-    s_lookup      : in std_logic  := '0';
     -- Write port
     we    : out std_logic;
     wsel  : out t_sel := (others => '0'); -- which table
@@ -97,7 +97,18 @@ entity order_book is
 
     -- Read ports
     raddr : out t_addr_set; -- one address per table
-    rdata : in t_slot_set -- all tables, valid 1 cycle after raddr
+    rdata : in t_slot_set; -- all tables, valid 1 cycle after raddr
+
+    -- Master AXI
+    m_tvalid : out std_logic := '0';
+    m_tready : in std_logic;
+
+    -- Data trf
+    m_side  : out std_logic                     := '0'; -- 0 = buy, 1 = sell
+    m_qty   : out std_logic_vector(31 downto 0) := (others => '0'); -- absolute on ADD/REPLACE, delta on EXEC
+    m_price : out std_logic_vector(31 downto 0) := (others => '0'); -- qualified by s_px_valid
+    m_op    : out t_book_op                     := OP_ADD -- ADD / EXEC / REPLACE / DELETE
+
   );
 end entity order_book;
 architecture rtl of order_book is
@@ -122,21 +133,25 @@ architecture rtl of order_book is
   signal key             : t_key                                                          := (others => '0');
   signal value           : t_val                                                          := (others => '0');
   signal value_r         : t_val                                                          := (others => '0');
+  signal evicting_r      : std_logic                                                      := '0';
   ------------------------------------------------------------------------------
   -- Lookup/Modify/Delete
   ------------------------------------------------------------------------------
-  signal lookup_r       : t_key     := (others => '0'); --hold lookup/delete value
-  signal modify_r       : t_val     := (others => '0'); --hold modification value
-  signal delmod         : std_logic := '0';
-  signal looking_r      : std_logic := '0';
-  signal lookup_found_i : std_logic := '0';
-  signal modify_we      : std_logic := '0';
-  signal modify_waddr   : t_addr    := (others => '0');
-  signal modify_wdata   : t_slot    := (others => '0');
-  signal modify_wsel    : t_sel     := (others => '0');
-  signal op_r           : t_book_op;
+  signal lookup_r     : t_key     := (others => '0'); --hold lookup/delete value
+  signal modify_r     : t_val     := (others => '0'); --hold modification value
+  signal looking_r    : std_logic := '0';
+  signal modify_we    : std_logic := '0';
+  signal modify_waddr : t_addr    := (others => '0');
+  signal modify_wdata : t_slot    := (others => '0');
+  signal modify_wsel  : t_sel     := (others => '0');
+  signal op_r         : t_book_op := OP_ADD;
+  signal lookup_store : t_val     := (others => '0');
+  signal replacing_r  : std_logic := '0'; --Replace order -> ADD and DELETION beats required.
 
   signal raddr_i : t_addr_set := (others => (others => '0'));
+
+  signal wdata_i : t_slot    := (others => '0');
+  signal we_i    : std_logic := '0';
 
 begin
 
@@ -182,6 +197,7 @@ begin
         insertion_wdata <= (others => '0');
         insertion_wsel  <= (others => '0');
         insertion_we    <= '0';
+        evicting_r      <= '0';
       else
         if s_xfer = '1' and s_op = OP_ADD then
           -- First Beat -> AXI handsahke complete: key saved to reg + status bit set high
@@ -203,6 +219,11 @@ begin
 
         if busy_i = '1' then
           -- Second beat+ set write ports to write from first table -> eviction logic
+          if insertion_we = '1' then
+            evicting_r <= '1';
+          end if;
+          -- Logic to trigger data trf to price level storage on first write cycle
+
           insertion_we    <= '1';
           insertion_waddr <= addr_r;
           insertion_wdata <= key_r & value_r; --write key to table
@@ -212,6 +233,7 @@ begin
             busy_i <= '0';
           end if;
         else
+          evicting_r      <= '0';
           insertion_we    <= '0';
           insertion_waddr <= (others => '0');
           insertion_wdata <= (others => '0');
@@ -230,42 +252,37 @@ begin
   begin
     if rising_edge(clk) then
       if resetn = '0' then
-        lookup_found_i <= '0';
-        lookup_r       <= (others => '0');
-        modify_r       <= (others => '0');
-        looking_r      <= '0';
-        modify_waddr   <= (others => '0');
-        modify_wdata   <= (others => '0');
-        modify_wsel    <= (others => '0');
-        modify_we      <= '0';
-        lookup_return  <= (others => '0');
-        delmod         <= '0';
-        op_r           <= OP_NULL;
+        lookup_r     <= (others => '0');
+        modify_r     <= (others => '0');
+        looking_r    <= '0';
+        lookup_store <= (others => '0');
+        modify_waddr <= (others => '0');
+        modify_wdata <= (others => '0');
+        modify_wsel  <= (others => '0');
+        modify_we    <= '0';
+        op_r         <= OP_ADD;
+        replacing_r  <= '0';
       else
-        if s_xfer = '1' and (s_lookup = '1' or s_op = OP_DELETE or s_op = OP_REPLACE or s_op = OP_EXEC) then
+        if s_xfer = '1' and (s_op = OP_DELETE or s_op = OP_REPLACE or s_op = OP_EXEC) then
 
           looking_r <= '1';
           lookup_r  <= key;
           modify_r  <= value;
           op_r      <= s_op;
-
-          if s_op = OP_DELETE or s_op = OP_REPLACE or s_op = OP_EXEC then
-            delmod <= '1';
-          end if;
-
+        elsif looking_r = '0' then
+          lookup_r <= (others => '0');
+          modify_r <= (others => '0');
+          op_r     <= OP_ADD;
         end if;
 
-        -- or deletion/modification pipeline could possibly done in the cycle after lookup
         if looking_r = '1' then
           for i in 0 to C_NUM_TABLES - 1 loop
             if rdata(i)(KEY_RANGE) = lookup_r and rdata(i)(C_VALID_BIT) = '1' then
-              lookup_found_i <= '1';
-              lookup_return  <= rdata(i)(KEY_RANGE);
 
               modify_waddr <= raddr_i(i);
-              modify_we    <= delmod;
+              modify_we    <= '1';
               modify_wsel  <= std_logic_vector(to_unsigned(i, modify_wsel'length));
-
+              lookup_store <= rdata(i)(VAL_RANGE);
               prev_val := unsigned(rdata(i)(VAL_RANGE));
             end if;
           end loop;
@@ -280,15 +297,20 @@ begin
           -- EXEC: subtracts the executed qty from the current order only
           -- REPLACE: replaces the whole order
           -- DELETE: simply clears everything
-          delmod <= '0';
-          op_r   <= OP_NULL;
         else
-          lookup_found_i <= '0';
-          modify_we      <= '0';
-          modify_waddr   <= (others => '0');
-          modify_wdata   <= (others => '0');
-          modify_wsel    <= (others => '0');
+          modify_we    <= '0';
+          modify_waddr <= (others => '0');
+          modify_wdata <= (others => '0');
+          modify_wsel  <= (others => '0');
         end if;
+
+        if op_r = OP_REPLACE and modify_we = '1' then
+          replacing_r <= '1';
+        else
+          replacing_r <= '0';
+        end if;
+        -- Logic to assert ADD and DELETION PLS ops for REPLACE
+
       end if;
     end if;
   end process lookup;
@@ -296,28 +318,42 @@ begin
   busy       <= busy_i;
   s_tready_i <= not (busy_i or looking_r);
 
-  lookup_found <= lookup_found_i;
-
   -- !!NOTES
-  -- All table reads are set to the address of the input key anticipating a lookup (exc table 0)
 
-  raddr_i(0) <= hash(key, 0) when busy_i = '0' else
-  hash(rdata(to_integer(table_cnt - 1))(KEY_RANGE), 0);
-  -- input key addr on beat 0 and data read on beats 1+ (for cases when a key is moved back to the start of the table index)
-
-  g_raddr_i : for i in 1 to C_NUM_TABLES - 1 generate
+  g_raddr_i : for i in 0 to C_NUM_TABLES - 1 generate
     raddr_i(i) <= hash(key, i) when busy_i = '0' else
     hash(rdata(to_integer(table_cnt - 1))(KEY_RANGE), i);
   end generate g_raddr_i;
+
+  -- All table reads are set to the address of the input key anticipating a lookup (exc table 0)
+  -- Unique piece of code -> functions as both a hash for lookups for all tables and a hash for initial insertions at table 0
 
   g_raddr : for i in 0 to C_NUM_TABLES - 1 generate
     raddr(i) <= raddr_i(i);
   end generate g_raddr;
   -- For insertion logic -> Read address for the current table is set to the address of the key in the previous table
 
-  we    <= (insertion_we or modify_we);
-  waddr <= (insertion_waddr or modify_waddr);
-  wdata <= (insertion_wdata or modify_wdata);
-  wsel  <= (insertion_wsel or modify_wsel);
+  we_i    <= (insertion_we or modify_we);
+  we      <= we_i;
+  waddr   <= (insertion_waddr or modify_waddr);
+  wdata_i <= (insertion_wdata or modify_wdata);
+  wdata   <= wdata_i;
+  wsel    <= (insertion_wsel or modify_wsel);
   -- MUX for write ports
+
+  m_side <= insertion_wdata(C_VAL_W) or lookup_r(0); --URGENT NEEDS TO BE FIXED FOR REPLACE
+
+  m_price <= insertion_wdata(PRICE_RANGE) or lookup_store(PRICE_RANGE) when op_r = OP_DELETE else
+    insertion_wdata(PRICE_RANGE) or modify_r(PRICE_RANGE);
+
+  m_qty <= insertion_wdata(QTY_RANGE) or lookup_store(QTY_RANGE) when op_r = OP_DELETE or  else 
+    insertion_wdata(QTY_RANGE) or modify_r(QTY_RANGE);
+
+  m_op <= OP_ADD when insertion_we = '1' or replacing_r = '1' else
+    OP_DELETE;
+
+  m_tvalid <= modify_we or replacing_r or (insertion_we and (not evicting_r));
+  -- Price level storage data trf (Data valid when new item is written to hashtable or any current order is modified
+  -- IMPORTANT: Deletion orders do not contain price & qty. Writing the read from RAM is needed.
+
 end architecture rtl;

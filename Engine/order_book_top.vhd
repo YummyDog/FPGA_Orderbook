@@ -42,12 +42,19 @@ entity order_book_top is
     s_px_valid : in  std_logic;
     s_undisc   : in  std_logic;
     s_implied  : in  std_logic;
-    s_lookup   : in  std_logic;                    -- 1 = probe only, no write
 
 
-    busy          : out std_logic;
-    lookup_found  : out std_logic;   -- high when lookup_return is valid
-    lookup_return : out t_key
+    busy       : out std_logic;
+
+    ----------------------------------------------------------------------------
+    -- Master: book events, one per insertion or modification
+    ----------------------------------------------------------------------------
+    m_tvalid   : out std_logic;
+    m_tready   : in  std_logic;
+    m_side     : out std_logic;
+    m_qty      : out std_logic_vector(31 downto 0);
+    m_price    : out std_logic_vector(31 downto 0);
+    m_op       : out t_book_op
   );
 end entity order_book_top;
 
@@ -81,11 +88,15 @@ begin
       s_px_valid => s_px_valid,
       s_undisc   => s_undisc,
       s_implied  => s_implied,
-      s_lookup   => s_lookup,
 
       busy       => busy,
-      lookup_found  => lookup_found,
-      lookup_return => lookup_return,
+
+      m_tvalid   => m_tvalid,
+      m_tready   => m_tready,
+      m_side     => m_side,
+      m_qty      => m_qty,
+      m_price    => m_price,
+      m_op       => m_op,
 
       we         => we,
       wsel       => wsel,

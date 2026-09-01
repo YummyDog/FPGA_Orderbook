@@ -2,8 +2,9 @@
 cocotb testbench for order_book - realistic traffic walkthrough.
 
 Drives ASX-shaped order IDs through the AXI-Stream slave interface, fills the
-tables to roughly 50%, then runs lookups, deletes, replaces and executions.
-Table contents are printed after every operation.
+tables to roughly 50%, then runs deletes, replaces and executions. Table
+contents are printed after every operation, and the book events emitted on the
+master interface are reported alongside.
 
 No assertions. This is a visibility harness - it reports what happened and
 flags anything that looks wrong, rather than failing the run.
@@ -17,10 +18,11 @@ book_input_stage emits. There is no separate key_op:
     OP_EXEC     1   probe, subtract the executed quantity from what rests
     OP_REPLACE  2   probe, then rewrite price and quantity in place
     OP_DELETE   3   probe, then clear the slot
-    OP_NULL     4   no operation - used while s_lookup probes
+    OP_NULL     4   no operation
 
-A probe-only lookup is driven by raising s_lookup with s_op at OP_NULL, since
-no ITCH message is a bare lookup.
+Each insertion or modification emits a book event on the master interface -
+side, quantity, price and the operation that produced it - which is what a
+downstream price-level structure consumes.
 
 TOPLEVEL IS order_book_top
 
@@ -104,8 +106,6 @@ FIRST_SEQ = 0x0000E5ED
 N_INSERT = CAPACITY // 2             # 32 orders
 
 # Which inserted orders each phase operates on, by index.
-LOOKUP_IDX = [3, 11, 27]
-
 # Executions. Three partial fills, then one that takes the whole resting
 # quantity - which must remove the order, since ITCH sends no Delete for an
 # order that fills completely (spec 2.6.2.4). Undisclosed orders are the
@@ -419,10 +419,8 @@ def trace(dut, cycle):
     tvalid = safe_int(dut.s_tvalid)
     tready = safe_int(dut.s_tready)
     op = read_op(dut.s_op)
-    lk = safe_int(dut.s_lookup)
-    lfound = safe_int(dut.lookup_found)
-    lret = safe_int(dut.lookup_return)
-
+    mv = safe_int(dut.m_tvalid)
+    mop = read_op(dut.m_op)
     raddr = [safe_int(dut.raddr[t]) for t in range(NUM_TABLES)]
 
     wr = "-"
@@ -434,11 +432,10 @@ def trace(dut, cycle):
         observed = (cycle, wsel, waddr, slot_key(wdata), slot_val(wdata), vbit)
 
     dut._log.info(
-        "cyc %2d | tv=%s tr=%s op=%-4s lk=%s busy=%s | raddr=%s | write %s "
-        "| found=%s ret=%s",
-        cycle, fmt(tvalid), fmt(tready), fmt_op(op), fmt(lk), fmt(busy),
-        raddr, wr, fmt(lfound),
-        "...." if lret is None else f"0x{lret & KEY_MASK:0{KEY_HEX}X}",
+        "cyc %2d | tv=%s tr=%s op=%-4s busy=%s | raddr=%s | write %s "
+        "| ev=%s %s",
+        cycle, fmt(tvalid), fmt(tready), fmt_op(op), fmt(busy),
+        raddr, wr, fmt(mv), fmt_op(mop) if mv == 1 else "",
     )
     return observed
 
@@ -464,7 +461,7 @@ def report_writes(log, writes, indent="    "):
 # Stimulus drivers
 # ---------------------------------------------------------------------------
 async def issue(dut, order_id, side, op, qty=0, price=0, undisc=0, implied=0,
-                lookup=0, settle=3, quiet=False):
+                settle=3, quiet=False):
     """
     Offer one command and wait for it to complete.
 
@@ -473,14 +470,13 @@ async def issue(dut, order_id, side, op, qty=0, price=0, undisc=0, implied=0,
     operation while its probe is in flight, and the read addresses are
     combinational off the key.
 
-    Returns (writes, probes):
+    Returns (writes, events):
         writes  (cycle, wsel, waddr, key, value, valid) per observed write
-        probes  (cycle, lookup_found, lookup_return) per cycle
+        events  (cycle, op, side, qty, price) per completed master handshake
 
-    Sampling every cycle matters. lookup_found is asserted for a single cycle,
-    so a fixed-offset sample reads zero. Completion is likewise detected by the
-    write port going quiet rather than by a cycle count: only OP_ADD asserts
-    busy, so for everything else there is no other completion signal.
+    Completion is detected by the write port going quiet rather than by a cycle
+    count: only OP_ADD asserts busy, so for everything else there is no other
+    completion signal.
     """
     dut.s_order_id.value = order_id
     dut.s_side.value = side
@@ -489,22 +485,25 @@ async def issue(dut, order_id, side, op, qty=0, price=0, undisc=0, implied=0,
     dut.s_undisc.value = undisc
     dut.s_implied.value = implied
     dut.s_op.value = op
-    dut.s_lookup.value = lookup
     dut.s_px_valid.value = 1 if op in (OP_ADD, OP_REPLACE) else 0
     dut.s_tvalid.value = 1
 
     cycle = 0
     writes = []
-    probes = []
+    events = []
 
     def sample(c):
         if not quiet:
             w = trace(dut, c)
             if w is not None:
                 writes.append(w)
-        probes.append((c,
-                       safe_int(dut.lookup_found),
-                       safe_int(dut.lookup_return)))
+        # Master handshake: a book event has been delivered this cycle.
+        if safe_int(dut.m_tvalid) == 1 and safe_int(dut.m_tready) == 1:
+            events.append((c,
+                           read_op(dut.m_op),
+                           safe_int(dut.m_side),
+                           safe_int(dut.m_qty),
+                           safe_int(dut.m_price)))
 
     while cycle < MAX_CYCLES:
         await FallingEdge(dut.clk)
@@ -537,9 +536,8 @@ async def issue(dut, order_id, side, op, qty=0, price=0, undisc=0, implied=0,
             break
 
     dut.s_op.value = OP_ADD
-    dut.s_lookup.value = 0
     await RisingEdge(dut.clk)
-    return writes, probes
+    return writes, events
 
 
 async def snapshot(dut, rams):
@@ -550,20 +548,25 @@ async def snapshot(dut, rams):
     return t
 
 
-def check_probe(log, probes, key, problems, what):
+def report_events(log, events, what, key, problems, expect=1, indent="    "):
     """
-    Every operation except ADD probes the table first. lookup_found is a
-    one-cycle pulse, so scan the window for it.
+    Print the book events delivered on the master interface.
+
+    One event per insertion or modification is the expectation; a REPLACE that
+    moves an order to a new price would legitimately produce two, so the count
+    is a parameter rather than fixed.
     """
-    for c, f, r in probes:
-        if f == 1 and r is not None and (r & KEY_MASK) == key:
-            log.info("    PROBE hit at cycle %d, returned %s", c, fmt_key(r & KEY_MASK))
-            return True
-    log.info("    PROBE never hit with the right key")
-    log.info("    window: %s",
-             ", ".join(f"c{c}:f={fmt(f)}" for c, f, _ in probes))
-    problems.append(f"{what} {fmt_key(key)}: probe missed")
-    return False
+    if not events:
+        log.info("%sno book event emitted", indent)
+        problems.append(f"{what} {fmt_key(key)}: no event")
+        return
+    for c, op, side, qty, price in events:
+        log.info("%sevent @ cycle %d: op=%s side=%s qty=%s price=%s",
+                 indent, c, fmt_op(op), fmt(side), fmt(qty),
+                 fmt(None if price is None else to_signed32(price)))
+    if len(events) != expect:
+        log.info("%sexpected %d event(s), saw %d", indent, expect, len(events))
+        problems.append(f"{what} {fmt_key(key)}: {len(events)} events")
 
 
 def check_single_write(log, writes, exp_t, exp_a, problems, what, key):
@@ -593,8 +596,8 @@ def collateral(before, after, allowed):
 @cocotb.test()
 async def test_normal_traffic(dut):
     """
-    Fill to 50%, then three lookups, three deletes, three replaces, and four
-    executions - three partial fills and one that empties the order.
+    Fill to 50%, then three deletes, three replaces, and four executions -
+    three partial fills and one that empties the order.
     """
     cocotb.start_soon(Clock(dut.clk, CLK_PERIOD_NS, unit="ns").start())
 
@@ -602,7 +605,7 @@ async def test_normal_traffic(dut):
     dut.resetn.value = 0
     dut.s_tvalid.value = 0
     dut.s_op.value = OP_ADD
-    dut.s_lookup.value = 0
+    dut.m_tready.value = 1
     dut.s_order_id.value = 0
     dut.s_book_id.value = 0
     dut.s_side.value = 0
@@ -627,11 +630,10 @@ async def test_normal_traffic(dut):
     dut._log.info("slot     : %d bits = valid(1) key(%d) value(%d)",
                   SLOT_W, KEY_W, VAL_W)
     dut._log.info("value    : qty(32) price(32) undisc(1) implied(1)")
-    dut._log.info("ops      : s_op carries t_book_op; "
-                  "s_lookup + OP_NULL probes only")
-    dut._log.info("traffic  : %d adds (%.0f%% load), then %d lookups, "
-                  "%d deletes, %d replaces, %d execs",
-                  N_INSERT, 100.0 * N_INSERT / CAPACITY, len(LOOKUP_IDX),
+    dut._log.info("ops      : s_op carries t_book_op; book events on m_*")
+    dut._log.info("traffic  : %d adds (%.0f%% load), then %d deletes, "
+                  "%d replaces, %d execs",
+                  N_INSERT, 100.0 * N_INSERT / CAPACITY,
                   len(DELETE_IDX), len(REPLACE_IDX),
                   len(EXEC_PARTIAL_IDX) + len(EXEC_FULL_IDX))
     dut._log.info("cells    : <low16 of order id><B|S>")
@@ -658,8 +660,10 @@ async def test_normal_traffic(dut):
                                 for t, a in enumerate(hash_all(key))))
         dut._log.info("-" * 88)
 
-        writes, _ = await issue(dut, oid, side, OP_ADD, qty=qty, price=price)
+        writes, events = await issue(dut, oid, side, OP_ADD,
+                                     qty=qty, price=price)
         tables = await snapshot(dut, rams)
+        report_events(dut._log, events, "add", key, problems)
 
         if writes:
             path = " -> ".join(f"T{t}[{a}]" for _, t, a, _, _, _ in writes)
@@ -693,43 +697,6 @@ async def test_normal_traffic(dut):
         problems.append(f"fill: occupancy {occupancy(tables)}, "
                         f"expected {N_INSERT}")
 
-    # ---- lookups ---------------------------------------------------------
-    #
-    # s_lookup probes without writing, with s_op held at OP_NULL so no
-    # operation is requested alongside it.
-    dut._log.info("")
-    dut._log.info("=" * 88)
-    dut._log.info("LOOKUPS  (s_lookup = 1, probe only)")
-    dut._log.info("=" * 88)
-
-    for idx in LOOKUP_IDX:
-        oid, side, qty, price = INSERTS[idx]
-        key = make_key(oid, side)
-
-        before = await snapshot(dut, rams)
-        at = find_key(before, key)
-
-        dut._log.info("")
-        dut._log.info("-" * 88)
-        dut._log.info("LOOKUP %s   (added as #%d, at %s)",
-                      fmt_key(key), idx,
-                      f"T{at[0]}[{at[1]}]" if at else "NOWHERE")
-        dut._log.info("-" * 88)
-
-        writes, probes = await issue(dut, oid, side, OP_NULL, lookup=1)
-        after = await snapshot(dut, rams)
-
-        check_probe(dut._log, probes, key, problems, "lookup")
-
-        # A lookup must not disturb the tables at all.
-        if writes:
-            report_writes(dut._log, writes)
-            dut._log.info("    BUS  a lookup must not write")
-            problems.append(f"lookup {fmt_key(key)}: {len(writes)} writes")
-        if before != after:
-            dut._log.info("    RAM  contents changed during a lookup")
-            problems.append(f"lookup {fmt_key(key)}: tables modified")
-
     # ---- OP_DELETE -------------------------------------------------------
     dut._log.info("")
     dut._log.info("=" * 88)
@@ -750,11 +717,11 @@ async def test_normal_traffic(dut):
                       f"T{at[0]}[{at[1]}]" if at else "NOWHERE")
         dut._log.info("-" * 88)
 
-        writes, probes = await issue(dut, oid, side, OP_DELETE)
+        writes, events = await issue(dut, oid, side, OP_DELETE)
         after = await snapshot(dut, rams)
 
         report_writes(dut._log, writes)
-        check_probe(dut._log, probes, key, problems, "delete")
+        report_events(dut._log, events, "delete", key, problems)
 
         if at is None:
             problems.append(f"delete {fmt_key(key)}: was not present")
@@ -813,12 +780,12 @@ async def test_normal_traffic(dut):
                       fmt_value(make_value(qty, price)), fmt_value(new_val))
         dut._log.info("-" * 88)
 
-        writes, probes = await issue(dut, oid, side, OP_REPLACE,
+        writes, events = await issue(dut, oid, side, OP_REPLACE,
                                      qty=new_qty, price=new_price, undisc=1)
         after = await snapshot(dut, rams)
 
         report_writes(dut._log, writes)
-        check_probe(dut._log, probes, key, problems, "replace")
+        report_events(dut._log, events, "replace", key, problems)
 
         if at is None:
             problems.append(f"replace {fmt_key(key)}: was not present")
@@ -892,12 +859,12 @@ async def test_normal_traffic(dut):
                       "  -> FULL FILL, order must be removed" if full else "")
         dut._log.info("-" * 88)
 
-        writes, probes = await issue(dut, oid, side, OP_EXEC,
+        writes, events = await issue(dut, oid, side, OP_EXEC,
                                      qty=exec_qty, price=price)
         after = await snapshot(dut, rams)
 
         report_writes(dut._log, writes)
-        check_probe(dut._log, probes, key, problems, "exec")
+        report_events(dut._log, events, "exec", key, problems)
 
         if at is None:
             problems.append(f"exec {fmt_key(key)}: was not present")
@@ -992,7 +959,7 @@ async def test_normal_traffic(dut):
         for p in problems:
             dut._log.warning("    %s", p)
     else:
-        dut._log.info("  all adds placed, all probes hit, all execs, replaces "
-                      "and deletes clean")
+        dut._log.info("  all adds placed, all events emitted, all execs, "
+                      "replaces and deletes clean")
 
     dut._log.info("=" * 88)
