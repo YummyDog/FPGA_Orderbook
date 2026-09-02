@@ -37,10 +37,6 @@
 --
 -- -> For insertion logic, write address port is just a delayed version of the read port (logic could be altered to remove clutter)
 --
--- -> minor logic flaw - lookup never checks for valid bit - should be ok
---
--- -> If lookups are no longer directly asked, OP_NULL can be removed from t_book_op
---
 -- -> carry chain explanation in report ???? - + zero extra depth with < operator
 --
 -- -> EXEC into 0 qty / undiscoled stuff not implemented.
@@ -146,6 +142,7 @@ architecture rtl of order_book is
   signal modify_wsel  : t_sel     := (others => '0');
   signal op_r         : t_book_op := OP_ADD;
   signal lookup_store : t_val     := (others => '0');
+  signal side_store   : std_logic := '0';
   signal replacing_r  : std_logic := '0'; --Replace order -> ADD and DELETION beats required.
 
   signal raddr_i : t_addr_set := (others => (others => '0'));
@@ -256,6 +253,7 @@ begin
         modify_r     <= (others => '0');
         looking_r    <= '0';
         lookup_store <= (others => '0');
+        side_store   <= '0';
         modify_waddr <= (others => '0');
         modify_wdata <= (others => '0');
         modify_wsel  <= (others => '0');
@@ -283,6 +281,7 @@ begin
               modify_we    <= '1';
               modify_wsel  <= std_logic_vector(to_unsigned(i, modify_wsel'length));
               lookup_store <= rdata(i)(VAL_RANGE);
+              side_store   <= rdata(i)(C_VAL_W);
               prev_val := unsigned(rdata(i)(VAL_RANGE));
             end if;
           end loop;
@@ -341,19 +340,35 @@ begin
   wsel    <= (insertion_wsel or modify_wsel);
   -- MUX for write ports
 
-  m_side <= insertion_wdata(C_VAL_W) or lookup_r(0); --URGENT NEEDS TO BE FIXED FOR REPLACE
+  m_side <= side_store when op_r = OP_DELETE or replacing_r = '1' else
+    insertion_wdata(C_VAL_W) or lookup_r(0);
 
-  m_price <= insertion_wdata(PRICE_RANGE) or lookup_store(PRICE_RANGE) when op_r = OP_DELETE else
+  m_price <= lookup_store(PRICE_RANGE) when op_r = OP_DELETE or replacing_r = '1' else
     insertion_wdata(PRICE_RANGE) or modify_r(PRICE_RANGE);
 
-  m_qty <= insertion_wdata(QTY_RANGE) or lookup_store(QTY_RANGE) when op_r = OP_DELETE or  else 
+  m_qty <= lookup_store(QTY_RANGE) when op_r = OP_DELETE or replacing_r = '1' else
     insertion_wdata(QTY_RANGE) or modify_r(QTY_RANGE);
 
-  m_op <= OP_ADD when insertion_we = '1' or replacing_r = '1' else
+  m_op <= OP_ADD when insertion_we = '1' or (op_r = OP_REPLACE and replacing_r = '0') else
     OP_DELETE;
 
   m_tvalid <= modify_we or replacing_r or (insertion_we and (not evicting_r));
-  -- Price level storage data trf (Data valid when new item is written to hashtable or any current order is modified
-  -- IMPORTANT: Deletion orders do not contain price & qty. Writing the read from RAM is needed.
+  -- Master outputs asserted based on operation being performed. 
+  -- Master outputs will be ADD or DELETE op only -> this allows the price level storage module to operate without storing order id, using Side and Qty only to write data.
+  -- As insertion and modify logic cannot operate simultaneously (FOR NOW), or gates are used to select either.
+  ------------------------------------------------------------------------------
+
+  ---------------------------------------------------------
+  -- BREAKDOWN OF master outputs (to price level storage):
+  ---------------------------------------------------------
+  -- INSERTION : Master output is just the data write to memory. signal "evicting_r" de asserts tvalid after the initial write as any eviction writes are already in the storage module.
+  --
+  -- DELETION  : Once the lookup has found the order that needs to be deleted its contents are written to "lookup_store" which is then passed to the master output.
+  --
+  -- EXECUTE   : As the execution packet ONLY contains the qty and price executed (or deleted), master output is just the value of the incoming execution message with a DELETE op
+  -- 
+  -- REPLACE   : Replace is more complex than the other operations. The original order needs to be deleted and the new order added. An ADD op is paired with the incoming message for the first master output.
+  --                The following master output is simply another DELETION (see above). This logic is controlled by the "replacing_r" signal.
+  ------------------------------------------------------------------------------
 
 end architecture rtl;

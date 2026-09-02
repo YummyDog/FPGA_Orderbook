@@ -164,6 +164,7 @@ package ram_pkg is
   subtype QTY_RANGE is integer range C_VAL_W - 1 downto C_VAL_W - 32; --qty
   subtype NOTQTY_RANGE is integer range C_VAL_W - 33 downto 0; --not qty
   subtype PRICE_RANGE is integer range C_VAL_W - 33 downto 2; --qty
+  constant SIDE_BIT : natural := C_VAL_W - 1;
   -- One element per table. Reads are parallel, so addresses and results both
   -- come as full sets; a counter can index either.
   type t_addr_set is array (0 to C_NUM_TABLES - 1) of t_addr;
