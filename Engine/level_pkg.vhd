@@ -104,11 +104,11 @@ package level_cfg_pkg is
   -- This sets the table depth almost single-handedly, since band 2 is 95% of
   -- the levels. Sizing guide, both sides and both read-port replicas included:
   --
-  --     $20  ->   2,280 levels,  0.60 Mbit
-  --     $50  ->   5,280 levels,  1.37 Mbit
-  --     $100 ->  10,280 levels,  2.68 Mbit
-  --     $250 ->  25,280 levels,  6.57 Mbit
-  --     $500 ->  50,280 levels, 13.08 Mbit
+  --     $20  ->   2,280 levels,  0.30 Mbit
+  --     $50  ->   5,280 levels,  0.69 Mbit
+  --     $100 ->  10,280 levels,  1.34 Mbit
+  --     $250 ->  25,280 levels,  3.28 Mbit
+  --     $500 ->  50,280 levels,  6.54 Mbit
   --
   -- A price at or above this is not representable. price_storage must reject it
   -- rather than let it wrap, because an unchecked price still produces a
@@ -296,20 +296,9 @@ package level_pkg is
   -- Also sets the granularity the used depth rounds up to.
   constant C_LVL_GRP_W : positive := 5;
 
-  -- Independent level tables. Two for a two-sided book. Each needs its own
-  -- physical memory since both sides are read in the same cycle to publish top
-  -- of book, so area is linear in this and cannot be shared.
+  -- Independent level tables, one per side. Each is its own physical memory,
+  -- so both sides can be read in the same cycle. Area is linear in this.
   constant C_NUM_SIDES : positive := 2;
-
-  -- Read ports per side. Each is a full replica of the memory, written
-  -- identically and read independently - the standard way to get more than one
-  -- read port out of a simple dual-port RAM.
-  --
-  -- Two is the working figure: port 0 serves the read-modify-write aggregation
-  -- path, port 1 serves the top-of-book publish path at the index the priority
-  -- encoder produced. They are needed in the same cycle at different addresses,
-  -- so sharing one port means arbitration and a stall path on bursty traffic.
-  constant C_LVL_RD_PORTS : positive := 2;
 
   -- Slot fields. Setting C_LVL_SIDE_W to 0 drops the redundant side bit.
   constant C_LVL_SIDE_W  : natural  := 1;
@@ -354,11 +343,8 @@ package level_pkg is
   constant C_LVL_SEL_W : positive :=
     maximum(1, natural(ceil(log2(real(C_NUM_SIDES)))));
 
-  -- Physical memories instantiated. Note the replication factor - this is not
-  -- C_NUM_SIDES.
-  constant C_LVL_NUM_RAMS  : positive := C_NUM_SIDES * C_LVL_RD_PORTS;
-  constant C_LVL_PHYS_BITS : natural  :=
-    C_LVL_DEPTH * C_LEVEL_W * C_LVL_NUM_RAMS;
+  -- One memory per side.
+  constant C_LVL_TOTAL_BITS : natural := C_LVL_DEPTH * C_LEVEL_W * C_NUM_SIDES;
 
   constant C_LVL_READ_LATENCY : positive := 1 + boolean'pos(C_LVL_RAM_OUT_REG);
 
@@ -413,24 +399,16 @@ package level_pkg is
 
   type t_lvl_occ_set is array (0 to C_NUM_SIDES - 1) of t_lvl_occ;
 
-  -- Read ports are indexed (side)(port). Nested rather than two-dimensional so
-  -- a whole side's set can be passed as one object.
-  type t_lvl_addr_vec is array (0 to C_LVL_RD_PORTS - 1) of t_lvl_addr;
-  type t_level_vec    is array (0 to C_LVL_RD_PORTS - 1) of t_level;
-
-  type t_lvl_addr_set is array (0 to C_NUM_SIDES - 1) of t_lvl_addr_vec;
-  type t_level_set    is array (0 to C_NUM_SIDES - 1) of t_level_vec;
+  -- One read address and one read result per side. The level within a side is
+  -- selected by the address, so the storage is (side)(level) with the second
+  -- index carried on t_lvl_addr rather than as an array dimension.
+  type t_lvl_addr_set is array (0 to C_NUM_SIDES - 1) of t_lvl_addr;
+  type t_level_set    is array (0 to C_NUM_SIDES - 1) of t_level;
 
   -- One bit per side, for per-table flags.
   subtype t_lvl_flags is std_logic_vector(0 to C_NUM_SIDES - 1);
 
   constant C_LEVEL_EMPTY : t_level := (others => '0');
-
-  -- Conventional read port assignments. Named so the aggregation and publish
-  -- paths do not open-code indices that would silently alias if C_LVL_RD_PORTS
-  -- were reduced to 1.
-  constant C_LVL_PORT_RMW     : natural := 0;
-  constant C_LVL_PORT_PUBLISH : natural := minimum(1, C_LVL_RD_PORTS - 1);
 
   ------------------------------------------------------------------------------
   -- Price <-> index map
@@ -610,9 +588,8 @@ package body level_pkg is
            integer'image(C_LVL_SIDE_W) & "b, qty " &
            integer'image(C_LVL_QTY_W) & "b, price " &
            integer'image(C_LVL_PRICE_W) & "b), " &
-           integer'image(C_LVL_RD_PORTS) & " read ports -> " &
-           integer'image(C_LVL_NUM_RAMS) & " memories, " &
-           integer'image(C_LVL_PHYS_BITS) & " physical bits, read latency " &
+           integer'image(C_NUM_SIDES) & " memories, " &
+           integer'image(C_LVL_TOTAL_BITS) & " bits, read latency " &
            integer'image(C_LVL_READ_LATENCY);
   end function;
 

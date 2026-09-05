@@ -1,0 +1,6 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1788605616" />
+    <testcase name="test_single_level_traffic" classname="test_book_PLS" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Engine\test_book_PLS.py" lineno="756" time="0.32098388671875" sim_time_ns="3014.4" ratio_time="9391.125613234455" />
+  </testsuite>
+</testsuites>

@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- level_array
 --
--- The C_NUM_SIDES price level tables, each replicated C_LVL_RD_PORTS times.
+-- The C_NUM_SIDES price level tables. One memory per side, addressed by level.
 -- Geometry comes entirely from level_pkg, so this entity has no generics and
 -- drops straight into price_storage.
 --
@@ -10,27 +10,36 @@
 -- assertions below catch configurations that would fail to synthesise, and
 -- validate the band table itself.
 --
--- WRITES ARE NOT PARALLEL, READS ARE - IN TWO DIMENSIONS
+-- WRITES ARE NOT PARALLEL, READS ARE
 --
 -- One mutation touches one level on one side, so a single write port plus wsel
--- is enough, exactly as in ram_array. Reads are the opposite: every side must
--- be readable at once to publish both halves of the top of book in the same
--- cycle, and within a side, two different addresses are needed at once.
+-- is enough, exactly as in ram_array. Reads are per-side, because both halves
+-- of the top of book have to be readable in the same cycle:
 --
---   raddr(BUY )(RMW    ) = level being aggregated   ->  rdata(BUY )(RMW    )
---   raddr(BUY )(PUBLISH) = best bid from encoder    ->  rdata(BUY )(PUBLISH)
---   raddr(SELL)(RMW    ) = level being aggregated   ->  rdata(SELL)(RMW    )
---   raddr(SELL)(PUBLISH) = best ask from encoder    ->  rdata(SELL)(PUBLISH)
+--   raddr(BUY )  ->  rdata(BUY )
+--   raddr(SELL)  ->  rdata(SELL)
 --
--- The second index is the reason this module is not just ram_array with
--- different constants. A simple dual-port RAM has one read port; more than one
--- read address per cycle means replicating the memory. Each replica of a side
--- sees the same we, waddr and wdata, so the copies are bit-identical at all
--- times and any of them may be read. This costs C_LVL_RD_PORTS times the memory
--- and no logic - no arbiter, no stall path, no extra latency.
+-- Each side is its own memory with no shared state, which is what makes the
+-- simultaneous read free. Within a side there is one read port, so the
+-- aggregation and publish paths share it - see the note at the end.
 --
--- READ LATENCY IS C_LVL_READ_LATENCY on every replica together. Addresses on
--- cycle N give data on cycle N+1 by default.
+-- wsel IS A SINGLE BIT, NOT A VECTOR
+--
+-- '0' selects side 0, '1' selects side 1 - the same encoding side carries
+-- everywhere else in the design, so price_storage's lvl_wsel and order_book's
+-- m_side wire straight in with no adapter. This differs from ram_array, whose
+-- wsel is a t_sel vector because it selects one of four hash tables, which is
+-- a genuine multi-way choice.
+--
+-- The cost is that C_NUM_SIDES is now capped at 2, and the assertion below
+-- enforces it. That is not a real restriction on a displayed book, but it does
+-- mean the geometry no longer scales by changing one constant: a third queue
+-- needs wsel widened back to t_lvl_sel and the unsigned compare restored in
+-- g_wdecode. level_pkg still declares t_lvl_sel and C_LVL_SEL_W, unused, for
+-- exactly that.
+--
+-- READ LATENCY IS C_LVL_READ_LATENCY. Addresses on cycle N give data on cycle
+-- N+1 by default.
 --
 -- READ-DURING-WRITE RETURNS OLD DATA, inherited from ram_sdp. Unlike the order
 -- table, where the engine's busy signal holds off a colliding access, this is
@@ -64,6 +73,14 @@
 -- without complaint. Left alone here so ram_sdp stays exactly as the order
 -- table needs it.
 --
+-- ONE READ PORT PER SIDE
+--
+-- The aggregation read and any top-of-book publish read contend for it.
+-- price_storage owns that choice: either it publishes from registers it already
+-- holds, or it steals cycles when no mutation is in flight. If both are ever
+-- needed in the same cycle at different addresses, the memory has to be
+-- duplicated - each copy fed identical we/waddr/wdata, read independently.
+--
 -- VHDL-2008
 --------------------------------------------------------------------------------
 
@@ -83,16 +100,21 @@ entity level_array is
     ----------------------------------------------------------------------------
     -- Write port: one side at a time, chosen by wsel. Broadcast to every
     -- replica of that side.
+    --
+    -- wsel is a SINGLE BIT, not t_lvl_sel, and carries the side directly:
+    -- '0' selects side 0, '1' selects side 1. It is the same encoding the rest
+    -- of the design uses for side on every other interface - order_book's
+    -- m_side, price_storage's s_side - so a producer wires straight in with no
+    -- vector adapter. See the note below on what this costs.
     ----------------------------------------------------------------------------
     we    : in  std_logic;
-    wsel  : in  t_lvl_sel;
+    wsel  : in  std_logic;
     waddr : in  t_lvl_addr;
     wdata : in  t_level;
 
     ----------------------------------------------------------------------------
-    -- Read ports: every side, every replica, every cycle, each with its own
-    -- address. Indexed (side)(port); use C_LVL_PORT_RMW and C_LVL_PORT_PUBLISH
-    -- rather than open-coding the second index.
+    -- Read ports: one address and one result per side, every cycle. The level
+    -- within a side is selected by the address.
     ----------------------------------------------------------------------------
     raddr : in  t_lvl_addr_set;
     rdata : out t_level_set
@@ -163,8 +185,8 @@ begin
   assert C_LVL_ADDR_W <= C_LVL_ADDR_W_MAX
     report "level_array: C_LVL_MAX_CENT = " & integer'image(C_LVL_MAX_CENT) &
            "c needs " & integer'image(C_LVL_LEVELS) & " levels and " &
-           integer'image(C_LVL_ADDR_W) & " address bits, replicated " &
-           integer'image(C_LVL_NUM_RAMS) & " times. Above " &
+           integer'image(C_LVL_ADDR_W) & " address bits, across " &
+           integer'image(C_NUM_SIDES) & " sides. Above " &
            integer'image(C_LVL_ADDR_W_MAX) &
            " the array will not elaborate in reasonable time or synthesise. " &
            "Lower the price cap."
@@ -188,17 +210,20 @@ begin
            "and will not close timing at this depth."
     severity warning;
 
-  assert C_LVL_RD_PORTS <= 4
-    report "level_array: C_LVL_RD_PORTS = " & integer'image(C_LVL_RD_PORTS) &
-           ". Each read port is a full replica of every side's memory - area " &
-           "is linear in this. Two covers the aggregation and publish paths."
-    severity warning;
-
-  assert C_NUM_SIDES <= 4
+  -- A single-bit wsel can name exactly two tables. Anything above that would
+  -- elaborate, allocate and read normally, but its write enable is tied low by
+  -- the decode below and it could never be written - a silent, permanent data
+  -- loss that no simulation of the write path would show, because the write
+  -- simply never arrives. Fatal rather than a warning for that reason.
+  --
+  -- To go wider, put wsel back to t_lvl_sel and restore the unsigned compare
+  -- in g_wdecode; level_pkg still carries the type and C_LVL_SEL_W.
+  assert C_NUM_SIDES <= 2
     report "level_array: C_NUM_SIDES = " & integer'image(C_NUM_SIDES) &
-           ". A displayed book has two sides; more implies additional queues " &
-           "that may not want to share this array's geometry."
-    severity warning;
+           ", but wsel is a single bit and can only select 2 tables. Sides " &
+           "2 and above would be allocated and readable but never writable. " &
+           "Widen wsel to t_lvl_sel to support more."
+    severity failure;
 
   -- Not fatal, but worth seeing: how much of the allocated memory the band map
   -- can actually reach. See the note on reclaiming it in the header.
@@ -218,40 +243,43 @@ begin
   ------------------------------------------------------------------------------
   -- Decode wsel into per-side write enables.
   --
-  -- An out-of-range wsel matches no side, so the write is dropped rather than
-  -- landing somewhere unintended. Reachable only when C_NUM_SIDES is not a
-  -- power of two.
+  -- wsel is one bit, so the decode is a straight equality against the side
+  -- index rather than an unsigned compare. Sides above 1 can never match and
+  -- their write enable is tied low - the assertion above rejects that
+  -- configuration outright rather than letting it build tables that are
+  -- readable but permanently unwritable.
+  --
+  -- A metavalue on wsel matches neither branch, so the write is dropped rather
+  -- than landing on a side picked by accident. Same behaviour the unsigned
+  -- compare had.
   ------------------------------------------------------------------------------
   g_wdecode : for s in 0 to C_NUM_SIDES - 1 generate
-    we_side(s) <= we when unsigned(wsel) = s else '0';
+    we_side(s) <= we when (s = 0 and wsel = '0')
+                      or (s = 1 and wsel = '1')
+                  else '0';
   end generate g_wdecode;
 
   ------------------------------------------------------------------------------
   -- The tables. Identical, independent, no shared state between sides - which
-  -- is what allows both sides to be read at once - and within a side, identical
-  -- replicas differing only in their read address.
+  -- is what allows both sides to be read in the same cycle.
   ------------------------------------------------------------------------------
   g_sides : for s in 0 to C_NUM_SIDES - 1 generate
 
-    g_ports : for p in 0 to C_LVL_RD_PORTS - 1 generate
-
-      u_ram : entity work.ram_sdp
-        generic map (
-          G_ADDR_W    => C_LVL_ADDR_W,
-          G_DATA_W    => C_LEVEL_W,
-          G_OUT_REG   => C_LVL_RAM_OUT_REG,
-          G_RAM_STYLE => C_LVL_RAM_STYLE
-        )
-        port map (
-          clk   => clk,
-          we    => we_side(s),
-          waddr => waddr,
-          wdata => wdata,
-          raddr => raddr(s)(p),
-          rdata => rdata(s)(p)
-        );
-
-    end generate g_ports;
+    u_ram : entity work.ram_sdp
+      generic map (
+        G_ADDR_W    => C_LVL_ADDR_W,
+        G_DATA_W    => C_LEVEL_W,
+        G_OUT_REG   => C_LVL_RAM_OUT_REG,
+        G_RAM_STYLE => C_LVL_RAM_STYLE
+      )
+      port map (
+        clk   => clk,
+        we    => we_side(s),
+        waddr => waddr,
+        wdata => wdata,
+        raddr => raddr(s),
+        rdata => rdata(s)
+      );
 
   end generate g_sides;
 

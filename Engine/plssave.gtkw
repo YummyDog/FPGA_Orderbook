@@ -1,0 +1,55 @@
+[*]
+[*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
+[*] Sat Sep 05 10:47:10 2026
+[*]
+[dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Engine\book_pls_top.fst"
+[dumpfile_mtime] "Sat Sep 05 10:41:41 2026"
+[dumpfile_size] 9174
+[savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\Engine\plssave.gtkw"
+[timestart] 2421500000
+[size] 1920 1017
+[pos] -165 -165
+*-25.000000 2531200000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] book_pls_top.
+[sst_width] 353
+[signals_width] 244
+[sst_expanded] 1
+[sst_vpaned_height] 647
+@24
+book_pls_top.u_pls.qty_r[31:0]
+book_pls_top.u_pls.price_r[31:0]
+book_pls_top.u_pls.s_price[31:0]
+book_pls_top.u_pls.s_qty[31:0]
+@28
+book_pls_top.u_pls.s_op
+@22
+book_pls_top.u_pls.lvl_raddr[13:0]
+@28
+book_pls_top.u_pls.lvl_we
+book_pls_top.u_pls.inserting
+@24
+book_pls_top.u_pls.s_side
+@28
+book_pls_top.u_pls.s_tvalid
+@24
+book_pls_top.u_pls.lvl_waddr[13:0]
+book_pls_top.u_pls.lvl_wdata[64:0]
+book_pls_top.u_pls.wprice[31:0]
+book_pls_top.u_pls.wqty[31:0]
+@28
+book_pls_top.u_pls.wside
+@22
+book_pls_top.lvl_rdata0[64:0]
+book_pls_top.lvl_rdata1[64:0]
+book_pls_top.u_pls.delete[64:0]
+book_pls_top.u_pls.insert[64:0]
+@24
+book_pls_top.u_pls.rqty1[31:0]
+@28
+book_pls_top.u_pls.double
+@22
+book_pls_top.u_pls.lvl_r[64:0]
+@29
+book_pls_top.u_pls.clk
+[pattern_trace] 1
+[pattern_trace] 0

@@ -48,6 +48,8 @@
 -- -> major cleanup needed
 --
 -- -> For master data output to price level storage only ADD and DELETE ops will be used: EXEC -> DELETE executed amount, REPLACE -> ADD new order + DELETE old order.
+--
+-- -> Throughput needs to be tested ie find the earliest point data can be accepted for both insertion and modify - repalce op will differentiaite them
 --------------------------------------------------------------------------------
 
 library ieee;
@@ -315,7 +317,7 @@ begin
   end process lookup;
 
   busy       <= busy_i;
-  s_tready_i <= not (busy_i or looking_r);
+  s_tready_i <= not (busy_i or looking_r or modify_we);
 
   -- !!NOTES
 

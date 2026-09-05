@@ -1,6 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1788357433" />
-    <testcase name="test_normal_traffic" classname="test_order_book" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Engine\test_order_book.py" lineno="596" time="0.2451918125152588" sim_time_ns="2752.0" ratio_time="11223.865804363828" />
+    <property name="random_seed" value="1788431993" />
+    <testcase name="test_normal_traffic" classname="test_order_book" file="C:\Users\lskje\Desktop\FPGA_Orderbook\Engine\test_order_book.py" lineno="596" time="0.3010706901550293" sim_time_ns="2752.0" ratio_time="9140.710437747766" />
   </testsuite>
 </testsuites>
