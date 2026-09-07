@@ -26,7 +26,7 @@ use work.level_pkg.all;
 entity price_storage is
   generic (
     -- Levels held per side (window, not full price space)
-    G_NUM_LEVELS : natural := 1024;
+    G_NUM_LEVELS : natural := 16384;
     -- Price units per level index
     G_TICK : natural := 1
   );
@@ -113,9 +113,6 @@ begin
     lvl_r(LVL_PRICE_RANGE);
   qty_c <= lvl_rdata(side_int)(LVL_QTY_RANGE) when double = '0' else
     lvl_r(LVL_QTY_RANGE);
-
-  delete <= side_r & std_logic_vector(unsigned(qty_c) - unsigned(qty_r)) & price_r;
-  insert <= side_r & std_logic_vector(unsigned(qty_c) + unsigned(qty_r)) & price_r;
 
   delete <= side_r & std_logic_vector(unsigned(qty_c) - unsigned(qty_r)) & price_r;
   insert <= side_r & std_logic_vector(unsigned(qty_c) + unsigned(qty_r)) & price_r;

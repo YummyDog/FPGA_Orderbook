@@ -49,7 +49,7 @@ entity ram_sdp is
     G_OUT_REG   : boolean := false;
 
     -- "auto" | "block" | "distributed" | "ultra" | "registers"
-    G_RAM_STYLE : string := "auto"
+    G_RAM_STYLE : string := "block"
   );
   port (
     clk   : in  std_logic;

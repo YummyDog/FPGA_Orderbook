@@ -76,7 +76,7 @@ package ram_pkg is
   -- two BRAM18s whatever the depth, so shallow tables waste silicon and
   -- sweeping below ~512 measures nothing. Above one tile deep the tool
   -- cascades and adds an output mux - one level per doubling - which is where
-  -- depth starts costing Fmax rather than just area.
+  -- depth starts costing Fmax rather tha
   constant C_ADDR_W : positive := 4;
 
   -- Key width. 16 during bring-up where key and payload are the same field;
