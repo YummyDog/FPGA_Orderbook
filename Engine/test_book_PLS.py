@@ -7,10 +7,27 @@ no assertions, no expected values and no pass/fail verdict beyond "the run
 completed". Reading the dumps is the verification step, and that is yours.
 
 
+THE ONE CHANGE FOR THE PIPELINED MUTATION PATH
+
+DELETE, REPLACE and EXECUTE now take an extra cycle, so everything this
+harness watches for arrives one cycle later than it used to. PIPELINE_DELAY
+shifts the observation to match, in the only two places it matters:
+
+    the quiet window   a command is considered drained after TAIL_CYCLES of
+                       silence; one more cycle is allowed before giving up, so
+                       a late event or level write is not cut off
+
+    the snapshot       one extra cycle before the tables are read, so a write
+                       issued on the last observed cycle has actually landed
+                       in the memory being dumped
+
+Set PIPELINE_DELAY to 0 for the pre-pipeline behaviour. Nothing else changed.
+
+
 THE TRAFFIC
 
-Same shape and count as test_order_book - 32 adds, 3 deletes, 3 replaces, and
-4 executions - but every message is on ONE SIDE at ONE PRICE:
+32 adds, 3 deletes, 3 replaces and 4 executions, every message on ONE SIDE at
+ONE PRICE:
 
     side   = 1  (sell)  on every message
     price  = 50000      on every message
@@ -19,8 +36,8 @@ Same shape and count as test_order_book - 32 adds, 3 deletes, 3 replaces, and
 so the only thing that distinguishes one order from another is its ID and its
 quantity. Everything lands in a single price level, which is the case that
 exercises the level table hardest: consecutive mutations to the same index,
-back to back, with the read-during-write behaviour that level_array's header
-says price_storage has to forward around.
+back to back, with the read-during-write behaviour price_storage has to
+forward around.
 
 Change SIDE, PRICE, or the quantity rules in the CONFIGURATION block below.
 
@@ -30,45 +47,31 @@ WHAT GETS PRINTED, PER MESSAGE
     1. the command issued
     2. the cycle-by-cycle bus trace while it drains
     3. any book event that came out on m_*
-    4. every write seen on either write port
+    4. every write seen on either write port, and what the level model did
+       with it
     5. the four order hash tables, as keys and again as quantities
-    6. the level memory model - every level ever written, plus the window
-    7. the price_storage bus and output state, including what the model is
-       driving back on lvl_rdata
+    6. the level memory, both sides
+    7. the price_storage bus and output state
 
-That is the whole point of this file, so it is verbose by design. Expect a
-hundred-odd lines per message across 42 messages. Redirect to a file:
+Verbose by design - a hundred-odd lines per message across 42 messages.
+Redirect it:
 
-    powershell -ExecutionPolicy Bypass -File .\book_PLS_sim.ps1 *> run.log
-
-
-WHAT THE PREVIOUS VERSION DID THAT THIS ONE DOES NOT
-
-The price-map sweep test is gone. It varied price across every band, which is
-the opposite of a single fixed price, and it worked by comparing the RTL
-against a Python mirror of the band table - a check, not a dump. Both reasons
-put it outside what this file is now for. There is ONE test here, not two.
-
-Also gone: the Python aggregation model, the px_index mirror, and the problem
-list. Nothing in this file computes what the answer should be. The only
-arithmetic left is unpacking slots into their fields for display.
+    powershell -ExecutionPolicy Bypass -File .\\book_PLS_sim.ps1 *> run.log
 
 
 TOPLEVEL IS book_PLS_top, AND THE LEVEL MEMORY IS PYTHON
 
-level_array.vhd has been taken out. price_storage's level bus comes out to the
+level_array is not in the build. price_storage's level bus comes out to the
 pins and level_ram_model.LevelRam answers it from here - one write port with a
-single-bit wsel, one read address broadcast to both sides, read latency 1,
-read-during-write returns old data. The model's header states the timing it is
-reproducing.
+single-bit wsel, one read address broadcast to both sides, read latency 1.
 
 The order table is still real memory, read through the hierarchy:
 
     u_ram_arr.g_tables[t].u_ram.ram[addr]      order slot, 132 bit
 
 so the two halves of the picture come from different places: the order tables
-are what the RTL actually holds, the level tables are what the model was told
-to hold. Both are printed after every message and the log says which is which.
+are what the RTL holds, the level tables are what the model was told to hold.
+Both are printed after every message and the log says which is which.
 
 The event bus handshake is not closed inside the toplevel - price_storage does
 not drive s_tready, so m_tready is driven here. See book_PLS_top.vhd.
@@ -91,13 +94,16 @@ CLK_PERIOD_NS = 6.4          # 156.25 MHz
 # CONFIGURATION - the stimulus
 # ===========================================================================
 
+# Extra cycles of slack for the pipelined mutation path. See the header.
+# 0 restores the original, pre-pipeline observation timing.
+PIPELINE_DELAY = 1
+
 # Every message carries these. 1 = sell.
 #
 # 50000 price units. At C_PX_PER_CENT = 10 that is 5000 cents, $50.00, which
-# sits in the top band where the tick is 10 units - so the price is on-tick and
-# px_legal would accept it. Nothing here depends on that; it is just worth
-# knowing that an off-tick price would still map to a level and the design
-# would carry on without complaint.
+# sits in the top band where the tick is 10 units - so the price is on-tick
+# and px_legal would accept it. Nothing here depends on that; an off-tick
+# price would still map to a level and the design would carry on.
 SIDE = 1
 PRICE = 50000
 
@@ -117,8 +123,7 @@ def exec_qty(i: int, old: int, full: bool) -> int:
     return old if full else old // 4
 
 
-# Which added orders each phase acts on, by index. Counts match
-# test_order_book: 3 deletes, 3 replaces, 3 partial fills, 1 full fill.
+# Which added orders each phase acts on, by index.
 DELETE_IDX = [5, 17, 30]
 REPLACE_IDX = [1, 14, 22]
 EXEC_PARTIAL_IDX = [7, 19, 25]
@@ -135,13 +140,11 @@ LVL_WRITE_MODE = "WRITE_FIRST"
 #
 # Nothing is hardcoded and nothing is computed from the price. The window
 # FOLLOWS THE DESIGN: whatever index turns up on lvl_raddr or lvl_waddr gets
-# added, along with WATCH_SPAN neighbours either side so the levels next to the
-# active one are visible too. That way the dump cannot go stale when PRICE
-# changes, and it cannot quietly miss the level if the price maps somewhere
-# other than where you expected.
+# added, along with WATCH_SPAN neighbours either side. That way the dump
+# cannot go stale when PRICE changes, and cannot quietly miss the level if the
+# price maps somewhere other than expected.
 #
-# WATCH_SEED is for indices you want shown regardless of whether the design
-# ever addresses them. Usually empty.
+# WATCH_SEED is for indices shown regardless. Usually empty.
 WATCH_SEED = set()
 WATCH_SPAN = 5
 
@@ -167,13 +170,7 @@ KEY_HEX = (KEY_W + 3) // 4
 CELL_W = 5          # "E5EDS" - low 16 bits of the order ID plus B/S
 QCELL_W = 6         # quantity cell
 
-# ---------------------------------------------------------------------------
-# Level table geometry
-#
-# Imported from level_ram_model rather than restated, so the model and the
-# harness cannot drift apart. level_array.vhd is gone; the model IS the level
-# memory now.
-# ---------------------------------------------------------------------------
+LVL_FIELD_W = 34    # column width for a formatted level slot
 
 # ---------------------------------------------------------------------------
 # t_book_op - ordinals must match the declaration order in ram_pkg
@@ -183,8 +180,8 @@ QCELL_W = 6         # quantity cell
 #
 #     type t_book_op is (OP_ADD, OP_EXEC, OP_REPLACE, OP_DELETE);
 #
-# test_order_book.py carries a fifth, OP_NULL. It never drives it, so nothing
-# breaks there, but the tuple does not describe the RTL.
+# The older test_order_book.py carries a fifth, OP_NULL. It never drives it, so
+# nothing breaks there, but the tuple does not describe the RTL.
 # ---------------------------------------------------------------------------
 OP_NAMES = ("OP_ADD", "OP_EXEC", "OP_REPLACE", "OP_DELETE")
 OP_SHORT = ("ADD", "EXEC", "REPL", "DEL")
@@ -335,14 +332,11 @@ def fmt_qcell(slot):
     return f"{d['qty']:>{QCELL_W}d}" if d else "?" * QCELL_W
 
 
-LVL_FIELD_W = 34
-
-
 # ---------------------------------------------------------------------------
 # Reaching the ORDER table contents through the hierarchy
 #
-# Only the order table. The level memory is level_ram_model.LevelRam and is
-# read by calling it, not by walking the design.
+# Only the order table. The level memory is a Python model and is read by
+# calling it, not by walking the design.
 # ---------------------------------------------------------------------------
 def _reach(parent, gen_label, index, what):
     """One RAM handle out of a generate, however the simulator names it."""
@@ -363,8 +357,8 @@ def _reach(parent, gen_label, index, what):
         f"Could not reach the {what} RAM contents through the hierarchy.\n"
         "Tried:\n  " + "\n  ".join(attempts) +
         "\n\nRun with NVC's --preserve-case (the runner already does) and "
-        "check the instance names in book_PLS_top.vhd, ram_array.vhd and "
-        "level_array.vhd match those above."
+        "check the instance names in book_PLS_top.vhd and ram_array.vhd "
+        "match those above."
     )
 
 
@@ -436,7 +430,6 @@ def dump_pls(log, dut, label=""):
     'U' on an output means price_storage is not driving it. Reported as read,
     with no interpretation.
     """
-    # Read data is what the MODEL is driving back, split one port per side.
     rdata = [safe_int(dut.lvl_rdata0), safe_int(dut.lvl_rdata1)]
 
     lines = []
@@ -458,9 +451,11 @@ def dump_pls(log, dut, label=""):
     lines.append(f"      top of book : "
                  f"tvalid={fmt(safe_int(dut.tob_tvalid))} "
                  f"valid={fmt(safe_int(dut.tob_valid))}")
-    lines.append(f"                    bid px={fmt(safe_int(dut.tob_bid_price))}"
+    lines.append(f"                    bid "
+                 f"px={fmt(safe_int(dut.tob_bid_price))}"
                  f" qty={fmt(safe_int(dut.tob_bid_qty))}")
-    lines.append(f"                    ask px={fmt(safe_int(dut.tob_ask_price))}"
+    lines.append(f"                    ask "
+                 f"px={fmt(safe_int(dut.tob_ask_price))}"
                  f" qty={fmt(safe_int(dut.tob_ask_qty))}")
     log.info("%s", "\n".join(lines))
 
@@ -546,7 +541,8 @@ async def issue(dut, order_id, side, op, qty=0, price=0, undisc=0, implied=0,
 
     Completion is detected by both write ports going quiet rather than by a
     cycle count: only OP_ADD asserts busy, so for everything else there is no
-    other completion signal.
+    other completion signal. The quiet window is TAIL_CYCLES + PIPELINE_DELAY,
+    so a pipelined mutation's late event or write is not cut off.
 
     Returns (order_writes, events, level_writes).
     """
@@ -590,18 +586,19 @@ async def issue(dut, order_id, side, op, qty=0, price=0, undisc=0, implied=0,
     while cycle < MAX_CYCLES:
         await FallingEdge(dut.clk)
         await ReadOnly()
-        before = len(order_writes) + len(level_writes)
+        before = len(order_writes) + len(level_writes) + len(events)
         sample(cycle)
         busy = safe_int(dut.busy)
         await RisingEdge(dut.clk)
         cycle += 1
 
-        if len(order_writes) + len(level_writes) > before:
+        if len(order_writes) + len(level_writes) + len(events) > before:
             quiet_for = 0
         else:
             quiet_for += 1
 
-        if busy == 0 and cycle >= settle and quiet_for >= TAIL_CYCLES:
+        if (busy == 0 and cycle >= settle
+                and quiet_for >= TAIL_CYCLES + PIPELINE_DELAY):
             break
 
     dut.s_op.value = OP_ADD
@@ -660,12 +657,11 @@ async def message(dut, rams, ram, banner, order_id, side, op,
     # turn up where it should:
     #
     #   "seen on the bus"  - lvl_we was high and this is what was on the pins
-    #   "taken/REJECTED"   - what the model then did with it
+    #   "TOOK / REJECTED"  - what the model then did with it
     #
     # A write can be seen and still not stored. The model refuses anything it
-    # cannot place - a metavalue on lvl_waddr or lvl_wdata, an address past the
-    # end - and records why rather than guessing. If the bus shows a write and
-    # the model shows a rejection, the reason line below is the answer.
+    # cannot place - a metavalue on lvl_waddr or lvl_wdata, an address past
+    # the end - and records why rather than guessing.
     if level_writes:
         for n, (c, s, a, d) in enumerate(level_writes):
             dut._log.info("    level write %d seen on the bus @cyc %d: "
@@ -707,6 +703,12 @@ async def message(dut, rams, ram, banner, order_id, side, op,
                          "sampling the same cycles")
 
     # ---- the two memories ------------------------------------------------
+    #
+    # PIPELINE_DELAY extra cycles before the snapshot, so a write issued on
+    # the last observed cycle has actually landed in the memory being read.
+    for _ in range(PIPELINE_DELAY):
+        await RisingEdge(dut.clk)
+
     await FallingEdge(dut.clk)
     await ReadOnly()
     tables = read_tables(rams)
@@ -744,8 +746,8 @@ async def reset(dut):
     dut.resetn.value = 1
     await RisingEdge(dut.clk)
 
-    # NOTE: this resets the logic, not the memories. Neither ram_sdp nor
-    # level_array resets its array - real block RAM has no reset on its
+    # NOTE: this resets the logic, not the memories. Neither ram_sdp nor the
+    # level model resets its array - real block RAM has no reset on its
     # contents, and forcing one would stop the synthesiser inferring a memory
     # at all.
 
@@ -764,9 +766,7 @@ async def test_single_level_traffic(dut):
 
     rams = find_ram_handles(dut)
 
-    # The level memory. Started after reset so the model's first sample is of
-    # a design that is already out of reset - it has no reset of its own, by
-    # design, because ram_sdp has none either.
+    # The level memory.
     ram = LevelRam(write_mode=LVL_WRITE_MODE)
     cocotb.start_soon(drive_level_ram(dut, ram))
 
@@ -798,14 +798,22 @@ async def test_single_level_traffic(dut):
     dut._log.info("              add quantities %d .. %d",
                   add_qty(0), add_qty(N_INSERT - 1))
     dut._log.info("")
+    dut._log.info("timing      : PIPELINE_DELAY=%d. Observation is shifted by "
+                  "that many cycles -", PIPELINE_DELAY)
+    dut._log.info("              a longer quiet window before a command is "
+                  "called drained, and")
+    dut._log.info("              that many extra cycles before the tables are "
+                  "read. Set it to 0")
+    dut._log.info("              for the pre-pipeline behaviour.")
+    dut._log.info("")
     dut._log.info("cells       : keys as <low16 of order id><B|S>, "
                   "'.' is an empty slot")
     dut._log.info("              this harness checks nothing - read the dumps")
     dut._log.info("=" * 100)
 
-    # What each order was last known to carry, so a delete or an exec banner
-    # can say what it is acting on. Bookkeeping for the log only - nothing is
-    # ever compared against it.
+    # What each order was last known to carry, so a delete, replace or exec
+    # banner can say what it is acting on. Bookkeeping for the log only -
+    # nothing is ever compared against it.
     qty_now = {}
 
     # ---- adds ------------------------------------------------------------

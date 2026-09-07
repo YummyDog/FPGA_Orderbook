@@ -79,14 +79,15 @@
 
     THE LOG IS THE DELIVERABLE
 
-    test_book_PLS.py prints both memories after every one of its 42 messages,
-    so a full run is several thousand lines. Redirect it:
+    test_book_PLS.py asserts nothing. It prints both memories after every one
+    of its 42 messages, so a full run is several thousand lines. Redirect it:
 
         powershell -ExecutionPolicy Bypass -File .\book_PLS_sim.ps1 *> run.log
 
-    There is one test in that file, test_single_level_traffic, so -Test has
-    nothing to select between and is left in only for consistency with
-    order_book_sim.ps1.
+    PIPELINE_DELAY in that file shifts the observation to allow for the
+    pipelined DELETE, REPLACE and EXECUTE paths - a longer quiet window
+    before a command is called drained, and an extra cycle before the tables
+    are read. Set it to 0 for the pre-pipeline timing.
 
     Usage:
         powershell -ExecutionPolicy Bypass -File .\book_PLS_sim.ps1
@@ -135,6 +136,9 @@ foreach ($s in $Sources) {
 }
 if (-not (Test-Path (Join-Path $Root "$Module.py"))) {
     throw "Missing test module: $(Join-Path $Root "$Module.py")"
+}
+if (-not (Test-Path (Join-Path $Root "level_ram_model.py"))) {
+    throw "Missing support module: $(Join-Path $Root "level_ram_model.py")"
 }
 
 # Separate build dir and results file, so this cannot collide with

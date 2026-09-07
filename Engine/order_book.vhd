@@ -41,8 +41,6 @@
 --
 -- -> EXEC into 0 qty / undiscoled stuff not implemented.
 --
--- -> Longest path is the exec logic - needs to be altered if clock to be increased.
---
 -- -> Master tvalid can possibly be changed to an event signal
 --
 -- -> major cleanup needed
@@ -50,6 +48,10 @@
 -- -> For master data output to price level storage only ADD and DELETE ops will be used: EXEC -> DELETE executed amount, REPLACE -> ADD new order + DELETE old order.
 --
 -- -> Throughput needs to be tested ie find the earliest point data can be accepted for both insertion and modify - repalce op will differentiaite them
+--
+--
+-- !!!!!PIPELINING!!!!!!
+-- pipelining modify path to meet timing on baord. - applies to all modify ops however delete/replace could possibly be reverted.
 --------------------------------------------------------------------------------
 
 library ieee;
@@ -137,6 +139,7 @@ architecture rtl of order_book is
   ------------------------------------------------------------------------------
   signal lookup_r     : t_key     := (others => '0'); --hold lookup/delete value
   signal modify_r     : t_val     := (others => '0'); --hold modification value
+  signal lookup_found : std_logic := '0'; --pipeline bit
   signal looking_r    : std_logic := '0';
   signal modify_we    : std_logic := '0';
   signal modify_waddr : t_addr    := (others => '0');
@@ -247,7 +250,6 @@ begin
   -- LOOKUP, DELETE, MODIFY
   ------------------------------------------------------------------------------
   lookup : process (clk) is
-    variable prev_val : unsigned(C_VAL_W - 1 downto 0) := (others => '0');
   begin
     if rising_edge(clk) then
       if resetn = '0' then
@@ -269,7 +271,7 @@ begin
           lookup_r  <= key;
           modify_r  <= value;
           op_r      <= s_op;
-        elsif looking_r = '0' then
+        elsif looking_r = '0' and lookup_found = '0' then
           lookup_r <= (others => '0');
           modify_r <= (others => '0');
           op_r     <= OP_ADD;
@@ -278,22 +280,26 @@ begin
         if looking_r = '1' then
           for i in 0 to C_NUM_TABLES - 1 loop
             if rdata(i)(KEY_RANGE) = lookup_r and rdata(i)(C_VALID_BIT) = '1' then
-
+              lookup_found <= '1';
               modify_waddr <= raddr_i(i);
-              modify_we    <= '1';
+
               modify_wsel  <= std_logic_vector(to_unsigned(i, modify_wsel'length));
               lookup_store <= rdata(i)(VAL_RANGE);
               side_store   <= rdata(i)(C_VAL_W);
-              prev_val := unsigned(rdata(i)(VAL_RANGE));
+          
             end if;
           end loop;
-          looking_r    <= '0';
+          looking_r <= '0';
+          -- Pipelining is necessary for timing.
+        elsif lookup_found = '1' then
+          modify_we    <= '1';
           modify_wdata <= modify_func(
             op_r,
             lookup_r,
-            prev_val,
+            unsigned(lookup_store),
             modify_r
             );
+          lookup_found <= '0';
           -- MODIFY ORDER -> placed in order of priority for logic levels
           -- EXEC: subtracts the executed qty from the current order only
           -- REPLACE: replaces the whole order
