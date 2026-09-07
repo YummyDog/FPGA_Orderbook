@@ -29,6 +29,10 @@ The three semantic rules the model encodes, and the DUT must reproduce:
   * exchange order type exists only on A/F/U, so undisclosed and implied are
     zero everywhere else
 
+The DUT takes 8 bytes per beat rather than a whole message, and emits on the
+beat carrying the last field it needs rather than on tlast. to_beats() and
+emit_beat() below model that; see the table in emit_beat.
+
 No cocotb dependency - importable standalone.
 """
 
@@ -106,8 +110,19 @@ OP_OF_TYPE = {
 # ---------------------------------------------------------------------------
 # Sizing
 # ---------------------------------------------------------------------------
-MSG_BYTES = 64            # G_MSG_BYTES, matches the parser's assembly buffer
+MSG_BYTES = 64            # parser assembly buffer, still the packing width
 QTY_MAX = 0xFFFFFFFF      # saturation value when the wire quantity exceeds 32b
+
+BEAT_BYTES = 8            # bytes per beat on the DUT's slave interface
+BUF_BEATS = 5             # beats the DUT stores, enough to reach byte 35
+
+# Last message byte decode_book_msg reads, per type. Mirrors C_LAST_AFU,
+# C_LAST_EC and C_LAST_D in book_input_stage; the emit beat follows from it.
+LAST_BYTE_READ = {
+    T_ADD: 35, T_ADD_PID: 35, T_REPLACE: 35,   # exchange order type, bytes 34-35
+    T_EXEC: 25, T_EXEC_PRICE: 25,              # quantity, bytes 18-25
+    T_DELETE: 17,                              # side, byte 17
+}
 
 # A representative ASX order book id, used as the default instrument.
 DEFAULT_BOOK_ID = 85603
@@ -133,6 +148,47 @@ def to_int(msg: bytes, nbytes: int = MSG_BYTES) -> int:
     for i, b in enumerate(msg):
         v |= b << (8 * i)
     return v
+
+
+def to_beats(msg: bytes, beat_bytes: int = BEAT_BYTES):
+    """
+    Split a message into the 64-bit beats the DUT consumes.
+
+    Byte 0 of each beat occupies the least significant lane, matching
+    msg_byte() in order_book_pkg and the lane order of the parser chain. The
+    final beat is zero-padded when the message is not a whole number of beats.
+    """
+    beats = []
+    for off in range(0, len(msg), beat_bytes):
+        chunk = msg[off:off + beat_bytes]
+        v = 0
+        for i, b in enumerate(chunk):
+            v |= b << (8 * i)
+        beats.append(v)
+    return beats
+
+
+def emit_beat(mtype: int):
+    """
+    Beat on which the DUT should emit, or None if the type never emits.
+
+    The last message byte the decode reads decides it:
+
+        type   last byte   emit beat   beats in message   beats saved
+        A      35          4           5                  0
+        F      35          4           6                  1
+        U      35          4           5                  0
+        E      25          3           7                  3
+        C      25          3           8                  4
+        D      17          2           3                  0
+    """
+    last = LAST_BYTE_READ.get(mtype)
+    return None if last is None else last // BEAT_BYTES
+
+
+def n_beats(msg: bytes, beat_bytes: int = BEAT_BYTES) -> int:
+    """Number of beats a message occupies."""
+    return (len(msg) + beat_bytes - 1) // beat_bytes
 
 
 def signed32(v: int) -> int:

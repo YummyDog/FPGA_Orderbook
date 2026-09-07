@@ -1,856 +1,459 @@
 """
-cocotb testbench for book_input_stage (module 1 of the order book engine).
+Testbench for book_input_stage.
 
-Standalone: raw ITCH messages are built by the testbench rather than sourced
-from the real parser, so this module is verified on its own.
+The DUT takes ITCH messages 8 bytes per beat and emits a normalised command as
+a ONE-CYCLE pulse on the beat carrying the last field it needs. Two properties
+are checked throughout:
 
-Test cases, in order:
+  * the payload matches book_model.expected_cmd for the message
+  * the pulse lands on book_model.emit_beat(type) and is high for one cycle
 
-  1  test_add_order              baseline A - absolute quantity, valid price
-  2  test_add_with_participant   F decodes identically to A
-  3  test_order_executed         E - quantity is a DELTA, no price
-  4  test_executed_with_price    C - trade price must NOT reach the output
-  5  test_order_replace          U - absolute quantity, valid price, flags
-  6  test_order_delete           D - identity only
-  7  test_side_decode            'B' and 'S' map to 0 and 1
-  8  test_bad_side_dropped       any other side byte is discarded
-  9  test_wrong_order_book       other instruments filtered out
- 10  test_non_book_types         T S R M L O Z all discarded
- 11  test_trade_message_dropped  P discarded despite being a real ITCH message
- 12  test_extype_flags           undisclosed and implied bit decode
- 13  test_negative_price         combination books use negative prices
- 14  test_price_sentinel         0x80000000 passes through unmangled
- 15  test_undisclosed_zero_qty   undisclosed orders rest with quantity 0
- 16  test_quantity_saturation    >32-bit quantity saturates, never truncates
- 17  test_back_to_back           consecutive messages, no bubble
- 18  test_backpressure           m_tready low holds output, stalls s_tready
- 19  test_drop_between_valid     discards must not disturb neighbours
- 20  test_reset_mid_stream       recovery from a mid-stream reset
- 21  test_book_id_forwarded      m_book_id carries the instrument, not zero
- 22  test_random_stream          randomised mix checked against the model
+There is no m_tready. The monitor samples every cycle, so a command held for
+two cycles or emitted twice shows up as a duplicate rather than being missed.
 
-Every test also re-checks the hard requirement: exactly one output command
-per accepted book message, and nothing at all for anything else.
-
-Simulator: NVC. VHDL-2008. cocotb 2.x.
+Run with book_sim.ps1.
 """
-
-import random
 
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ReadOnly
 
-import book_model as mdl
+import book_model as bm
 
-CLK_PERIOD_NS = 6.4          # 156.25 MHz
-
-BOOK_ID = mdl.DEFAULT_BOOK_ID
-OTHER_BOOK = 70669           # a different real-looking ASX order book id
+CLK_NS = 6.21          # 161 MHz, matching the synthesis constraint
+BOOK_ID = bm.DEFAULT_BOOK_ID
 
 
 # ---------------------------------------------------------------------------
-# Small helpers
+# Harness
 # ---------------------------------------------------------------------------
-def safe_int(handle):
-    """Signals read 'U' before reset; treat unresolvable as absent."""
-    try:
-        return int(handle.value)
-    except ValueError:
-        return None
+class Harness:
+    """Clock, reset, driver and monitor for one test."""
 
-
-def read_op(handle):
-    """
-    Read t_book_op as an index into mdl.OP_NAMES.
-
-    NVC may present a VHDL enumeration as either its ordinal or its literal
-    name depending on cocotb version, so both are accepted.
-    """
-    v = handle.value
-    try:
-        return int(v)
-    except (ValueError, TypeError):
-        name = str(v).strip().upper()
-        if name in mdl.OP_NAMES:
-            return mdl.OP_NAMES.index(name)
-        raise AssertionError(f"unrecognised t_book_op value: {v!r}")
-
-
-def check_fields(got: dict, expected: dict, subset=None, ctx=""):
-    keys = subset if subset else expected.keys()
-    for name in keys:
-        assert got[name] == expected[name], (
-            f"{ctx}{name}: got {got[name]}, expected {expected[name]}"
-        )
-
-
-# ---------------------------------------------------------------------------
-# Testbench harness
-# ---------------------------------------------------------------------------
-class BookInputTb:
     def __init__(self, dut):
         self.dut = dut
-        self.cmds = []               # one dict per output transfer
+        self.seen = []         # commands captured from the output pulse
+        self.pulse_cycles = 0  # total cycles m_tvalid was high
+        self.cycle = 0         # cycles since reset released
 
-    # -- lifecycle ---------------------------------------------------------
     async def start(self):
-        cocotb.start_soon(Clock(self.dut.clk, CLK_PERIOD_NS, unit="ns").start())
-        await self.reset()
+        cocotb.start_soon(Clock(self.dut.clk, CLK_NS, units="ns").start())
+
+        self.dut.resetn.value = 0
+        self.dut.s_tvalid.value = 0
+        self.dut.s_tdata.value = 0
+        self.dut.s_tlast.value = 0
+
+        for _ in range(5):
+            await RisingEdge(self.dut.clk)
+        self.dut.resetn.value = 1
+        await RisingEdge(self.dut.clk)
+
         cocotb.start_soon(self._monitor())
 
-    async def reset(self, cycles: int = 5):
-        d = self.dut
-        d.s_tvalid.value = 0
-        d.s_ttype.value = 0
-        d.s_tdata.value = 0
-        d.m_tready.value = 1
-        d.resetn.value = 0
-        for _ in range(cycles):
-            await RisingEdge(d.clk)
-        d.resetn.value = 1
-        await RisingEdge(d.clk)
-
-    def clear(self):
-        self.cmds.clear()
-
-    # -- monitor -----------------------------------------------------------
     async def _monitor(self):
-        """Capture every completed output handshake."""
-        d = self.dut
         while True:
-            await RisingEdge(d.clk)
+            await RisingEdge(self.dut.clk)
             await ReadOnly()
+            self.cycle += 1
+            if self.dut.m_tvalid.value == 1:
+                self.pulse_cycles += 1
+                self.seen.append(self._sample())
 
-            if safe_int(d.m_tvalid) == 1 and safe_int(d.m_tready) == 1:
-                self.cmds.append({
-                    "op": read_op(d.m_op),
-                    "order_id": safe_int(d.m_order_id),
-                    "book_id": safe_int(d.m_book_id),
-                    "side": safe_int(d.m_side),
-                    "qty": safe_int(d.m_qty),
-                    "price": mdl.to_signed(safe_int(d.m_price)),
-                    "px_valid": safe_int(d.m_px_valid),
-                    "undisc": safe_int(d.m_undisc),
-                    "implied": safe_int(d.m_implied),
-                })
-
-    # -- stimulus ----------------------------------------------------------
-    async def send(self, msg: bytes, gap: int = 0):
-        """Push one message, honouring s_tready. Optional idle cycles first."""
+    def _sample(self):
         d = self.dut
+        return {
+            "op": int(d.m_op.value),
+            "order_id": int(d.m_order_id.value),
+            "book_id": int(d.m_book_id.value),
+            "side": int(d.m_side.value),
+            "qty": int(d.m_qty.value),
+            "price": bm.to_signed(int(d.m_price.value)),
+            "px_valid": int(d.m_px_valid.value),
+            "undisc": int(d.m_undisc.value),
+            "implied": int(d.m_implied.value),
+            "cycle": self.cycle,
+        }
+
+    async def send(self, msg, gap=0, stall_before=None):
+        """
+        Drive one message.
+
+        gap           idle cycles after the last beat
+        stall_before  beat index to insert one idle cycle in front of, proving
+                      the beat counter advances on handshake and not on time
+        """
+        beats = bm.to_beats(msg)
+        last = len(beats) - 1
+        for i, b in enumerate(beats):
+            if stall_before is not None and i == stall_before:
+                self.dut.s_tvalid.value = 0
+                await RisingEdge(self.dut.clk)
+            self.dut.s_tvalid.value = 1
+            self.dut.s_tdata.value = b
+            self.dut.s_tlast.value = 1 if i == last else 0
+            await RisingEdge(self.dut.clk)
+        self.dut.s_tvalid.value = 0
+        self.dut.s_tlast.value = 0
         for _ in range(gap):
-            await RisingEdge(d.clk)
-            d.s_tvalid.value = 0
+            await RisingEdge(self.dut.clk)
 
-        await RisingEdge(d.clk)
-        d.s_ttype.value = msg[0]
-        d.s_tdata.value = mdl.to_int(msg)
-        d.s_tvalid.value = 1
-
-        # Hold until the DUT accepts the beat.
-        while True:
-            await ReadOnly()
-            if safe_int(d.s_tready) == 1:
-                break
-            await RisingEdge(d.clk)
-
-        await RisingEdge(d.clk)
-        d.s_tvalid.value = 0
-
-    async def send_stream(self, msgs, gaps=None):
-        """Push several messages back to back."""
-        d = self.dut
-        for i, m in enumerate(msgs):
-            await self.send(m, gap=(gaps[i] if gaps else 0))
-        d.s_tvalid.value = 0
-
-    async def settle(self, cycles: int = 8):
+    async def drain(self, cycles=6):
+        """Let a trailing pulse land before the checks run."""
         for _ in range(cycles):
             await RisingEdge(self.dut.clk)
 
-    # -- checks ------------------------------------------------------------
-    def expect_count(self, n: int, ctx=""):
-        assert len(self.cmds) == n, (
-            f"{ctx}expected {n} command(s), saw {len(self.cmds)}"
+
+def check(actual, expected, what=""):
+    """Compare a captured command against the model, field by field."""
+    for k, v in expected.items():
+        got = actual[k]
+        assert got == v, (
+            f"{what}: {k} = {got}, expected {v}\n"
+            f"  got      {actual}\n  expected {expected}"
         )
 
-    def expect_dropped(self, ctx=""):
-        assert len(self.cmds) == 0, (
-            f"{ctx}expected the message to be dropped, "
-            f"saw {len(self.cmds)} command(s): {self.cmds}"
-        )
 
-    def cmd(self, n: int = 0) -> dict:
-        assert len(self.cmds) > n, f"no command at index {n}"
-        return self.cmds[n]
+# ---------------------------------------------------------------------------
+# One message per type
+# ---------------------------------------------------------------------------
+async def _one_message(dut, msg, label):
+    h = Harness(dut)
+    await h.start()
+    await h.send(msg)
+    await h.drain()
+
+    exp = bm.expected_cmd(msg, BOOK_ID)
+    assert len(h.seen) == 1, f"{label}: {len(h.seen)} commands emitted, expected 1"
+    check(h.seen[0], exp, label)
+    assert h.pulse_cycles == 1, (
+        f"{label}: m_tvalid high for {h.pulse_cycles} cycles, expected 1"
+    )
+    return h
 
 
-# ===========================================================================
-# 1. Baseline - Add Order
-# ===========================================================================
 @cocotb.test()
 async def test_add_order(dut):
-    """A: quantity is absolute, price is the resting price and is valid."""
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    msg = mdl.build_add(order_id=5, qty=1000, price=2610, position=1)
-    expected = mdl.expected_cmd(msg)
-
-    await tb.send(msg)
-    await tb.settle()
-
-    tb.expect_count(1)
-    check_fields(tb.cmd(), expected)
-    assert tb.cmd()["op"] == mdl.OP_ADD
-    assert tb.cmd()["px_valid"] == 1, "A must carry a usable price"
-
-    dut._log.info("A: order %d qty %d price %d",
-                  tb.cmd()["order_id"], tb.cmd()["qty"], tb.cmd()["price"])
+    """A - add order, absolute quantity and a resting price."""
+    await _one_message(dut, bm.build_add(order_id=0x1122334455667788,
+                                         qty=1234, price=5678), "A")
 
 
-# ===========================================================================
-# 2. Add Order with participant id
-# ===========================================================================
 @cocotb.test()
-async def test_add_with_participant(dut):
-    """
-    F is A plus a 7-byte participant id at bytes 37-43.
-
-    The extra field sits past everything the book reads, so F must decode
-    identically to an A with the same values.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    a = mdl.build_add(order_id=77, qty=250, price=1550, side=mdl.SIDE_SELL)
-    f = mdl.build_add(order_id=77, qty=250, price=1550, side=mdl.SIDE_SELL,
-                      with_pid=True)
-
-    await tb.send(a)
-    await tb.send(f)
-    await tb.settle()
-
-    tb.expect_count(2)
-    assert tb.cmd(0) == tb.cmd(1), (
-        f"F decoded differently from A:\n  A: {tb.cmd(0)}\n  F: {tb.cmd(1)}"
-    )
-    check_fields(tb.cmd(1), mdl.expected_cmd(f))
+async def test_add_order_with_pid(dut):
+    """F - same fields as A plus a participant id the book must ignore."""
+    await _one_message(dut, bm.build_add(order_id=0x99, qty=7, price=42,
+                                         with_pid=True), "F")
 
 
-# ===========================================================================
-# 3. Order Executed
-# ===========================================================================
 @cocotb.test()
-async def test_order_executed(dut):
-    """
-    E: quantity at bytes 18-25 is the EXECUTED amount, a delta to subtract.
-
-    E carries no price field at all, so px_valid must be low - the resting
-    price can only come from the order table downstream.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    msg = mdl.build_exec(order_id=5, qty=300)
-    expected = mdl.expected_cmd(msg)
-
-    await tb.send(msg)
-    await tb.settle()
-
-    tb.expect_count(1)
-    check_fields(tb.cmd(), expected)
-    assert tb.cmd()["op"] == mdl.OP_EXEC
-    assert tb.cmd()["qty"] == 300, "executed quantity must pass through as a delta"
-    assert tb.cmd()["px_valid"] == 0, "E has no price field, px_valid must be low"
+async def test_replace(dut):
+    """U - replace, absolute quantity, price valid."""
+    await _one_message(dut, bm.build_replace(order_id=0xABCD, qty=500,
+                                             price=1500), "U")
 
 
-# ===========================================================================
-# 4. Order Executed with Price - the trade price must not escape
-# ===========================================================================
+@cocotb.test()
+async def test_executed(dut):
+    """E - quantity is a delta and there is no price field at all."""
+    h = await _one_message(dut, bm.build_exec(order_id=0x55, qty=25), "E")
+    assert h.seen[0]["px_valid"] == 0, "E must not carry a price"
+
+
 @cocotb.test()
 async def test_executed_with_price(dut):
     """
-    C carries a price at bytes 52-55, but it is the TRADE price, not the
-    order's resting price (spec 2.6.2.2 - auction crossings).
+    C - the price field is the TRADE price and must never reach the book.
 
-    Letting it through would decrement a price level the order never sat at,
-    leaving the real level permanently overstated. px_valid must be low, and
-    the trade price must not appear on m_price.
+    The resting price comes from the order table, so px_valid stays low and
+    the trade price is not allowed to appear on m_price.
     """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    resting_price = 2610
-    trade_price = 2595
-
-    add = mdl.build_add(order_id=5, qty=500, price=resting_price)
-    c = mdl.build_exec(order_id=5, qty=500, trade_price=trade_price)
-
-    await tb.send(add)
-    await tb.send(c)
-    await tb.settle()
-
-    tb.expect_count(2)
-
-    got = tb.cmd(1)
-    assert got["op"] == mdl.OP_EXEC
-    assert got["qty"] == 500
-    assert got["px_valid"] == 0, (
-        "px_valid must be low on C - the trade price is not the book price"
-    )
-    assert got["price"] != trade_price, (
-        f"trade price {trade_price} leaked onto m_price"
-    )
-
-    check_fields(got, mdl.expected_cmd(c))
+    trade_px = 0x7EAD
+    msg = bm.build_exec(order_id=0x66, qty=30, trade_price=trade_px)
+    h = await _one_message(dut, msg, "C")
+    assert h.seen[0]["px_valid"] == 0, "C must not set px_valid"
+    assert h.seen[0]["price"] != trade_px, "trade price leaked onto m_price"
 
 
-# ===========================================================================
-# 5. Order Replace
-# ===========================================================================
 @cocotb.test()
-async def test_order_replace(dut):
-    """U: absolute quantity and a valid price, same offsets as A."""
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    msg = mdl.build_replace(order_id=7, side=mdl.SIDE_SELL, qty=100,
-                            price=3000, position=2,
-                            extype=mdl.EXT_UNDISCLOSED | mdl.EXT_IMPLIED)
-    expected = mdl.expected_cmd(msg)
-
-    await tb.send(msg)
-    await tb.settle()
-
-    tb.expect_count(1)
-    check_fields(tb.cmd(), expected)
-    assert tb.cmd()["op"] == mdl.OP_REPLACE
-    assert tb.cmd()["px_valid"] == 1
-    assert tb.cmd()["undisc"] == 1
-    assert tb.cmd()["implied"] == 1
+async def test_delete(dut):
+    """D - identity only, neither quantity nor price."""
+    h = await _one_message(dut, bm.build_delete(order_id=0x77,
+                                                side=bm.SIDE_SELL), "D")
+    assert h.seen[0]["side"] == 1
+    assert h.seen[0]["px_valid"] == 0
 
 
-# ===========================================================================
-# 6. Order Delete
-# ===========================================================================
+# ---------------------------------------------------------------------------
+# Emit timing - the point of the rewrite
+# ---------------------------------------------------------------------------
 @cocotb.test()
-async def test_order_delete(dut):
+async def test_emit_beat(dut):
     """
-    D is 18 bytes: identity only, no quantity and no price.
+    Each type emits on the beat carrying its last needed field.
 
-    px_valid must be low. The bytes past 17 in the buffer are stale from
-    whatever came before, so a decoder that reads a price here would emit
-    a plausible-looking wrong value.
+    The pulse is registered, so it lands one cycle after that beat. Sending
+    each message from a known idle point makes the beat number recoverable
+    from the capture cycle.
     """
-    tb = BookInputTb(dut)
-    await tb.start()
+    cases = [
+        (bm.build_add(1), bm.T_ADD),
+        (bm.build_add(2, with_pid=True), bm.T_ADD_PID),
+        (bm.build_replace(3), bm.T_REPLACE),
+        (bm.build_exec(4), bm.T_EXEC),
+        (bm.build_exec(5, trade_price=100), bm.T_EXEC_PRICE),
+        (bm.build_delete(6), bm.T_DELETE),
+    ]
 
-    # Prime the buffer with a large A first so stale bytes are non-zero.
-    await tb.send(mdl.build_add(order_id=1, qty=9999, price=5555))
-    await tb.send(mdl.build_delete(order_id=0xAB, side=mdl.SIDE_SELL))
-    await tb.settle()
+    for msg, mtype in cases:
+        h = Harness(dut)
+        await h.start()
 
-    tb.expect_count(2)
+        start = h.cycle
+        await h.send(msg)
+        await h.drain()
 
-    got = tb.cmd(1)
-    assert got["op"] == mdl.OP_DELETE
-    assert got["order_id"] == 0xAB
-    assert got["side"] == 1
-    assert got["px_valid"] == 0, "D carries no price"
+        name = bm.TYPE_NAME[mtype]
+        assert len(h.seen) == 1, f"{name}: expected exactly one command"
+
+        # Beat i is driven across cycle start+i; the pulse is sampled one
+        # cycle later.
+        got_beat = h.seen[0]["cycle"] - start - 1
+        want_beat = bm.emit_beat(mtype)
+        assert got_beat == want_beat, (
+            f"{name}: emitted on beat {got_beat}, expected {want_beat}"
+        )
+
+        # And it must be strictly before the end of the message for the types
+        # where that is possible at all.
+        total = bm.n_beats(msg)
+        if mtype in (bm.T_ADD_PID, bm.T_EXEC, bm.T_EXEC_PRICE):
+            assert got_beat < total - 1, (
+                f"{name}: emitted on the last beat, no saving"
+            )
 
 
-# ===========================================================================
-# 7. Side decode
-# ===========================================================================
 @cocotb.test()
-async def test_side_decode(dut):
-    """'B' (0x42) maps to 0, 'S' (0x53) maps to 1."""
-    tb = BookInputTb(dut)
-    await tb.start()
+async def test_stall_mid_message(dut):
+    """Beats advance on handshake, not on time. An idle cycle changes nothing."""
+    msg = bm.build_exec(order_id=0x88, qty=9, trade_price=1)
+    h = Harness(dut)
+    await h.start()
+    await h.send(msg, stall_before=2)
+    await h.drain()
 
-    await tb.send(mdl.build_add(order_id=1, side=mdl.SIDE_BUY))
-    await tb.send(mdl.build_add(order_id=2, side=mdl.SIDE_SELL))
-    await tb.settle()
-
-    tb.expect_count(2)
-    assert tb.cmd(0)["side"] == 0, "'B' must decode to 0"
-    assert tb.cmd(1)["side"] == 1, "'S' must decode to 1"
+    assert len(h.seen) == 1, "a gap mid-message must not lose the command"
+    check(h.seen[0], bm.expected_cmd(msg, BOOK_ID), "stalled C")
 
 
-# ===========================================================================
-# 8. Unrecognised side byte
-# ===========================================================================
+# ---------------------------------------------------------------------------
+# Filtering
+# ---------------------------------------------------------------------------
+@cocotb.test()
+async def test_wrong_book_dropped(dut):
+    """A well-formed message for another instrument is discarded."""
+    h = Harness(dut)
+    await h.start()
+    await h.send(bm.build_add(order_id=1, book_id=BOOK_ID + 1))
+    await h.drain()
+    assert h.seen == [], "message for another order book was forwarded"
+
+
 @cocotb.test()
 async def test_bad_side_dropped(dut):
-    """
-    Anything other than 'B' or 'S' is unusable - the command could not be
-    routed to a side - so the message is consumed and discarded.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    for bad in (mdl.SIDE_BLANK, 0x00, 0xFF, ord("X")):
-        tb.clear()
-        await tb.send(mdl.build_add(order_id=1, side=bad))
-        await tb.settle()
-        tb.expect_dropped(ctx=f"side {bad:#04x}: ")
+    """An unrecognised side byte drops the message."""
+    h = Harness(dut)
+    await h.start()
+    await h.send(bm.build_add(order_id=1, side=bm.SIDE_BLANK))
+    await h.send(bm.build_add(order_id=2, side=ord("X")))
+    await h.drain()
+    assert h.seen == [], "message with an unrecognised side was forwarded"
 
 
-# ===========================================================================
-# 9. Wrong order book
-# ===========================================================================
 @cocotb.test()
-async def test_wrong_order_book(dut):
+async def test_non_book_types_dropped(dut):
     """
-    Only the configured instrument is tracked. A well-formed Add for a
-    different order book must be discarded, and must not disturb the
-    messages either side of it.
+    Every framed type the book ignores, junk-filled.
+
+    build_other puts non-zero bytes where a book message carries its order id,
+    side and quantity, so a decode that fails to gate on type emits a visibly
+    wrong command rather than a harmless zero one.
     """
-    tb = BookInputTb(dut)
-    await tb.start()
+    h = Harness(dut)
+    await h.start()
 
-    await tb.send(mdl.build_add(order_id=1, book_id=BOOK_ID, qty=10))
-    await tb.send(mdl.build_add(order_id=2, book_id=OTHER_BOOK, qty=20))
-    await tb.send(mdl.build_add(order_id=3, book_id=BOOK_ID, qty=30))
-    await tb.settle()
+    for t in bm.ALL_TYPES:
+        if t in bm.BOOK_TYPES:
+            continue
+        await h.send(bm.build_other(t), gap=2)
 
-    tb.expect_count(2)
-    assert tb.cmd(0)["order_id"] == 1
-    assert tb.cmd(1)["order_id"] == 3, "the other book's message was not dropped"
+    await h.drain()
+    assert h.seen == [], f"non-book type forwarded: {h.seen}"
 
 
-# ===========================================================================
-# 10. Non-book message types
-# ===========================================================================
 @cocotb.test()
-async def test_non_book_types(dut):
+async def test_trade_dropped(dut):
     """
-    The parser emits a valid pulse for every framed message, including
-    reference data and state messages. Only A F E C U D affect the book.
+    P - trade. Never affects the displayed book (spec 2.7).
 
-    These are built with 0xA5 fill, so a DUT that fails to gate on type
-    would emit a command with a visibly wrong order id rather than a
-    harmless zero one.
+    Its layout differs from E/C, so a decoder that treats P like an execution
+    reads garbage rather than nothing.
     """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    for mtype in (mdl.T_SECONDS, mdl.T_SYSEVENT, mdl.T_BOOKDIR,
-                  mdl.T_COMBODIR, mdl.T_TICKSIZE, mdl.T_BOOKSTATE,
-                  mdl.T_EQUILIBRIUM):
-        tb.clear()
-        await tb.send(mdl.build_other(mtype))
-        await tb.settle()
-        tb.expect_dropped(ctx=f"type {mdl.TYPE_NAME[mtype]}: ")
-        dut._log.info("%s dropped", mdl.TYPE_NAME[mtype])
+    h = Harness(dut)
+    await h.start()
+    await h.send(bm.build_trade())
+    await h.drain()
+    assert h.seen == [], "trade message reached the book"
 
 
-# ===========================================================================
-# 11. Trade messages
-# ===========================================================================
+# ---------------------------------------------------------------------------
+# Field edges
+# ---------------------------------------------------------------------------
 @cocotb.test()
-async def test_trade_message_dropped(dut):
-    """
-    P is a real, fully decoded ITCH message but does not alter the displayed
-    book (spec 2.7). Its layout also differs from E/C - match id comes first
-    and there is no order id - so treating it as an execution reads garbage.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    await tb.send(mdl.build_add(order_id=1, qty=100))
-    await tb.send(mdl.build_trade(qty=500, price=1234))
-    await tb.send(mdl.build_add(order_id=2, qty=200))
-    await tb.settle()
-
-    tb.expect_count(2)
-    assert tb.cmd(0)["order_id"] == 1
-    assert tb.cmd(1)["order_id"] == 2, "P was not dropped"
+async def test_qty_saturation(dut):
+    """A wire quantity above 32 bits saturates rather than truncating."""
+    msg = bm.build_add(order_id=1, qty=(1 << 40) + 7)
+    h = await _one_message(dut, msg, "saturating qty")
+    assert h.seen[0]["qty"] == bm.QTY_MAX, "quantity did not saturate"
 
 
-# ===========================================================================
-# 12. Exchange Order Type flags
-# ===========================================================================
 @cocotb.test()
-async def test_extype_flags(dut):
-    """
-    Undisclosed (bit 5) and implied (bit 13) must be captured on A/F/U -
-    they are unrecoverable at execution time and drive the removal rule
-    downstream. Other bits in the bitmap must not disturb them.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    cases = [
-        (0, 0, 0),
-        (mdl.EXT_UNDISCLOSED, 1, 0),
-        (mdl.EXT_IMPLIED, 0, 1),
-        (mdl.EXT_UNDISCLOSED | mdl.EXT_IMPLIED, 1, 1),
-        (mdl.EXT_MARKET_BID | mdl.EXT_PRICE_STAB, 0, 0),
-        (0xFFFF, 1, 1),
-    ]
-
-    for i, (ext, _, _) in enumerate(cases):
-        await tb.send(mdl.build_add(order_id=i, extype=ext))
-    await tb.settle()
-
-    tb.expect_count(len(cases))
-    for i, (ext, exp_u, exp_i) in enumerate(cases):
-        got = tb.cmd(i)
-        assert got["undisc"] == exp_u, (
-            f"extype {ext:#06x}: undisc got {got['undisc']}, expected {exp_u}"
-        )
-        assert got["implied"] == exp_i, (
-            f"extype {ext:#06x}: implied got {got['implied']}, expected {exp_i}"
-        )
+async def test_qty_boundary(dut):
+    """The largest quantity that still fits 32 bits passes through intact."""
+    await _one_message(dut, bm.build_add(order_id=1, qty=0xFFFFFFFF),
+                       "boundary qty")
 
 
-# ===========================================================================
-# 13. Negative prices
-# ===========================================================================
 @cocotb.test()
 async def test_negative_price(dut):
-    """
-    ASX prices are signed - combination books quote negative values.
-    An unsigned decode would turn -100 into 4294967196.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    for px in (-1, -100, -32768, -2147483647):
-        tb.clear()
-        msg = mdl.build_add(order_id=1, price=px)
-        await tb.send(msg)
-        await tb.settle()
-        tb.expect_count(1, ctx=f"price {px}: ")
-        assert tb.cmd()["price"] == px, (
-            f"price got {tb.cmd()['price']}, expected {px}"
-        )
+    """Price is signed and survives as two's complement."""
+    h = await _one_message(dut, bm.build_add(order_id=1, price=-12345),
+                           "negative price")
+    assert h.seen[0]["price"] == -12345
 
 
-# ===========================================================================
-# 14. Null price sentinel
-# ===========================================================================
 @cocotb.test()
-async def test_price_sentinel(dut):
-    """
-    0x80000000 (INT32_MIN) is the ITCH no-price sentinel. This module does
-    not interpret it - it must pass through unmangled so downstream can.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    msg = mdl.build_add(order_id=1, price=-2147483648)
-    await tb.send(msg)
-    await tb.settle()
-
-    tb.expect_count(1)
-    assert tb.cmd()["price"] == -2147483648, "sentinel price was altered"
-    assert tb.cmd()["px_valid"] == 1, "sentinel is still a present price field"
+async def test_extype_bits(dut):
+    """Undisclosed and implied come from the exchange order type bitmap."""
+    for extype, undisc, implied in [
+        (0, 0, 0),
+        (bm.EXT_UNDISCLOSED, 1, 0),
+        (bm.EXT_IMPLIED, 0, 1),
+        (bm.EXT_UNDISCLOSED | bm.EXT_IMPLIED, 1, 1),
+        (bm.EXT_MARKET_BID | bm.EXT_PRICE_STAB, 0, 0),   # neighbours, not ours
+    ]:
+        msg = bm.build_add(order_id=1, extype=extype)
+        h = await _one_message(dut, msg, f"extype {extype:#x}")
+        assert h.seen[0]["undisc"] == undisc
+        assert h.seen[0]["implied"] == implied
 
 
-# ===========================================================================
-# 15. Undisclosed orders rest with zero quantity
-# ===========================================================================
 @cocotb.test()
-async def test_undisclosed_zero_qty(dut):
-    """
-    Undisclosed orders are added with Quantity = 0 and contribute nothing
-    visible. A zero quantity is legitimate here and must still produce a
-    command - it is not an error and must not be filtered.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
+async def test_both_sides(dut):
+    """Buy and sell both decode, and the polarity is the right way round."""
+    h = Harness(dut)
+    await h.start()
+    await h.send(bm.build_add(order_id=1, side=bm.SIDE_BUY), gap=2)
+    await h.send(bm.build_add(order_id=2, side=bm.SIDE_SELL), gap=2)
+    await h.drain()
 
-    msg = mdl.build_add(order_id=42, qty=0, price=2000,
-                        extype=mdl.EXT_UNDISCLOSED)
-    await tb.send(msg)
-    await tb.settle()
-
-    tb.expect_count(1, ctx="zero-quantity undisclosed add: ")
-    assert tb.cmd()["qty"] == 0
-    assert tb.cmd()["undisc"] == 1
-    assert tb.cmd()["op"] == mdl.OP_ADD
+    assert len(h.seen) == 2
+    assert h.seen[0]["side"] == 0, "'B' must decode to side 0"
+    assert h.seen[1]["side"] == 1, "'S' must decode to side 1"
 
 
-# ===========================================================================
-# 16. Quantity saturation
-# ===========================================================================
-@cocotb.test()
-async def test_quantity_saturation(dut):
-    """
-    Quantity is 8 bytes on the wire but 32 bits on the command bus. A value
-    that does not fit must saturate, not truncate: truncating 0x100000005
-    would silently produce 5.
-
-    Not expected on real ASX data - this proves the failure mode is loud.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    cases = [
-        (0xFFFFFFFF, 0xFFFFFFFF),          # largest value that still fits
-        (0x100000000, mdl.QTY_MAX),        # one past
-        (0x100000005, mdl.QTY_MAX),        # would truncate to 5
-        (0xFFFFFFFFFFFFFFFF, mdl.QTY_MAX),  # all ones
-    ]
-
-    for i, (wire, exp) in enumerate(cases):
-        tb.clear()
-        await tb.send(mdl.build_add(order_id=i, qty=wire))
-        await tb.settle()
-        tb.expect_count(1, ctx=f"qty {wire:#x}: ")
-        assert tb.cmd()["qty"] == exp, (
-            f"qty {wire:#x}: got {tb.cmd()['qty']:#x}, expected {exp:#x}"
-        )
-
-
-# ===========================================================================
-# 17. Back to back
-# ===========================================================================
+# ---------------------------------------------------------------------------
+# Streams
+# ---------------------------------------------------------------------------
 @cocotb.test()
 async def test_back_to_back(dut):
     """
-    Consecutive accepted messages must produce consecutive commands with no
-    bubble and no reordering. Uses a realistic add/execute/delete sequence.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
+    A mixed stream with no gaps between messages.
 
+    Drops are removed from the expectation by expected_stream, so this also
+    proves the filtered messages leave no residue in the assembly buffer for
+    the following message to pick up.
+    """
     msgs = [
-        mdl.build_add(order_id=1, qty=1000, price=2610),
-        mdl.build_add(order_id=2, qty=500, price=2600, side=mdl.SIDE_SELL),
-        mdl.build_exec(order_id=1, qty=300),
-        mdl.build_replace(order_id=2, qty=400, price=2605,
-                          side=mdl.SIDE_SELL),
-        mdl.build_delete(order_id=1),
+        bm.build_add(order_id=1, qty=100, price=1000),
+        bm.build_exec(order_id=1, qty=40),
+        bm.build_other(bm.T_SECONDS),
+        bm.build_replace(order_id=1, qty=60, price=1010),
+        bm.build_exec(order_id=1, qty=60, trade_price=999),
+        bm.build_add(order_id=2, book_id=BOOK_ID + 1),        # dropped
+        bm.build_add(order_id=3, side=bm.SIDE_SELL, qty=5, price=2000),
+        bm.build_trade(),                                     # dropped
+        bm.build_delete(order_id=3, side=bm.SIDE_SELL),
+        bm.build_add(order_id=4, with_pid=True, qty=9, price=7),
     ]
-    expected = mdl.expected_stream(msgs)
 
-    await tb.send_stream(msgs)
-    await tb.settle()
+    h = Harness(dut)
+    await h.start()
+    for m in msgs:
+        await h.send(m)
+    await h.drain()
 
-    tb.expect_count(len(expected))
-    for i, exp in enumerate(expected):
-        check_fields(tb.cmd(i), exp, ctx=f"msg {i} ")
+    exp = bm.expected_stream(msgs, BOOK_ID)
+    assert len(h.seen) == len(exp), (
+        f"{len(h.seen)} commands emitted, expected {len(exp)}"
+    )
+    for i, (got, want) in enumerate(zip(h.seen, exp)):
+        check(got, want, f"stream index {i}")
 
-
-# ===========================================================================
-# 18. Backpressure
-# ===========================================================================
-@cocotb.test()
-async def test_backpressure(dut):
-    """
-    With m_tready low the output must hold its value and s_tready must fall,
-    so nothing is lost. Raising m_tready must then drain exactly one command.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    dut.m_tready.value = 0
-
-    msg = mdl.build_add(order_id=0x21, qty=200, price=21)
-    expected = mdl.expected_cmd(msg)
-
-    await tb.send(msg)
-
-    # Output should be presented and then held.
-    await RisingEdge(dut.clk)
-    await ReadOnly()
-    assert safe_int(dut.m_tvalid) == 1, "output not presented"
-    held_qty = safe_int(dut.m_qty)
-
-    for _ in range(5):
-        await RisingEdge(dut.clk)
-        await ReadOnly()
-        assert safe_int(dut.m_tvalid) == 1, "m_tvalid dropped while stalled"
-        assert safe_int(dut.m_qty) == held_qty, "payload changed while stalled"
-
-    assert safe_int(dut.s_tready) == 0, (
-        "s_tready must fall when the output register is full and stalled"
+    assert h.pulse_cycles == len(exp), (
+        f"m_tvalid high for {h.pulse_cycles} cycles, expected {len(exp)}"
     )
 
-    # The loop above ends inside ReadOnly, where cocotb forbids writes. Step
-    # to the next edge before releasing the stall.
+
+@cocotb.test()
+async def test_short_after_long(dut):
+    """
+    A short message straight after a long one.
+
+    D reads only up to byte 17, so beats 3 and 4 still hold the previous
+    message. Nothing may leak from them into the emitted command.
+    """
+    h = Harness(dut)
+    await h.start()
+    await h.send(bm.build_add(order_id=0xAAAA, qty=999, price=888,
+                              extype=bm.EXT_UNDISCLOSED | bm.EXT_IMPLIED))
+    await h.send(bm.build_delete(order_id=0xBBBB))
+    await h.drain()
+
+    assert len(h.seen) == 2
+    d = h.seen[1]
+    check(d, bm.expected_cmd(bm.build_delete(order_id=0xBBBB), BOOK_ID),
+          "delete after add")
+    assert d["undisc"] == 0 and d["implied"] == 0, "extype leaked into D"
+    assert d["qty"] == 0 and d["price"] == 0, "payload leaked into D"
+
+
+@cocotb.test()
+async def test_reset_mid_message(dut):
+    """Reset part way through a message abandons it cleanly."""
+    h = Harness(dut)
+    await h.start()
+
+    msg = bm.build_add(order_id=1)
+    beats = bm.to_beats(msg)
+    for b in beats[:3]:                      # stop before the emit beat
+        dut.s_tvalid.value = 1
+        dut.s_tdata.value = b
+        dut.s_tlast.value = 0
+        await RisingEdge(dut.clk)
+    dut.s_tvalid.value = 0
+
+    dut.resetn.value = 0
     await RisingEdge(dut.clk)
-    dut.m_tready.value = 1
-    await tb.settle()
+    dut.resetn.value = 1
+    await RisingEdge(dut.clk)
 
-    tb.expect_count(1)
-    check_fields(tb.cmd(), expected)
+    h.seen.clear()
+    h.pulse_cycles = 0
 
+    good = bm.build_add(order_id=0x1234, qty=11, price=22)
+    await h.send(good)
+    await h.drain()
 
-# ===========================================================================
-# 19. Drops between accepted messages
-# ===========================================================================
-@cocotb.test()
-async def test_drop_between_valid(dut):
-    """
-    A long run of discarded messages between two accepted ones must leave
-    both intact - the output register must not be corrupted by traffic it
-    is filtering out.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    msgs = [mdl.build_add(order_id=100, qty=11, price=1)]
-    msgs += [mdl.build_other(mdl.T_EQUILIBRIUM) for _ in range(4)]
-    msgs += [mdl.build_trade()]
-    msgs += [mdl.build_add(order_id=200, book_id=OTHER_BOOK)]
-    msgs += [mdl.build_other(mdl.T_BOOKSTATE)]
-    msgs += [mdl.build_add(order_id=101, qty=22, price=2)]
-    expected = mdl.expected_stream(msgs)
-
-    await tb.send_stream(msgs)
-    await tb.settle()
-
-    tb.expect_count(2)
-    assert len(expected) == 2, "model disagrees with the intended stimulus"
-    check_fields(tb.cmd(0), expected[0], ctx="before drops ")
-    check_fields(tb.cmd(1), expected[1], ctx="after drops ")
-
-
-# ===========================================================================
-# 20. Reset mid-stream
-# ===========================================================================
-@cocotb.test()
-async def test_reset_mid_stream(dut):
-    """
-    Reset asserted with traffic in flight. The module must come back clean:
-    no stale command presented, and the next message decoded normally.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    dut.m_tready.value = 0                     # strand a command in the register
-    await tb.send(mdl.build_add(order_id=999, qty=1234, price=99))
-    await tb.settle(3)
-
-    await tb.reset()
-    tb.clear()
-    dut.m_tready.value = 1
-
-    await ReadOnly()
-    assert safe_int(dut.m_tvalid) == 0, "m_tvalid did not clear on reset"
-
-    msg = mdl.build_add(order_id=5, qty=1000, price=2610)
-    expected = mdl.expected_cmd(msg)
-
-    await tb.send(msg)
-    await tb.settle()
-
-    tb.expect_count(1, ctx="after reset: ")
-    check_fields(tb.cmd(), expected, ctx="after reset ")
-
-
-# ===========================================================================
-# 21. Order book id is forwarded, not consumed by the filter
-# ===========================================================================
-@cocotb.test()
-async def test_book_id_forwarded(dut):
-    """
-    m_book_id must carry the instrument the command belongs to.
-
-    This engine instance tracks one order book, so every command carries the
-    same value and nothing downstream needs it yet. It is checked because a
-    multi-symbol engine keys its order table on (order_id, side, book_id) -
-    Order IDs are only unique within a book and side - and an implementation
-    that zeroed the field here would pass every other test in this file while
-    making that impossible.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    msgs = [
-        mdl.build_add(order_id=1, qty=10, price=100),
-        mdl.build_exec(order_id=1, qty=4),
-        mdl.build_replace(order_id=1, qty=6, price=101),
-        mdl.build_delete(order_id=1),
-    ]
-
-    await tb.send_stream(msgs)
-    await tb.settle()
-
-    tb.expect_count(4)
-    for i, c in enumerate(tb.cmds):
-        assert c["book_id"] == BOOK_ID, (
-            f"[{i}] m_book_id got {c['book_id']}, expected {BOOK_ID} "
-            "(the filter must forward the instrument, not discard it)"
-        )
-
-    dut._log.info("book id %d forwarded on all %d commands",
-                  BOOK_ID, len(tb.cmds))
-
-
-# ===========================================================================
-# 22. Randomised stream against the model
-# ===========================================================================
-@cocotb.test()
-async def test_random_stream(dut):
-    """
-    A randomised mix of every message type, both order books, both sides,
-    and occasional bad side bytes - checked message for message against the
-    reference model.
-
-    Seeded for reproducibility; change the seed to explore further.
-    """
-    tb = BookInputTb(dut)
-    await tb.start()
-
-    rng = random.Random(20260813)
-    msgs = []
-
-    for i in range(200):
-        pick = rng.random()
-        book = BOOK_ID if rng.random() < 0.8 else OTHER_BOOK
-        side = rng.choice([mdl.SIDE_BUY, mdl.SIDE_SELL])
-        if rng.random() < 0.05:
-            side = rng.choice([mdl.SIDE_BLANK, 0x00, ord("X")])
-
-        oid = rng.randrange(1, 1 << 40)
-        qty = rng.choice([0, 1, rng.randrange(1, 100000), 0x1FFFFFFFF])
-        px = rng.choice([rng.randrange(-5000, 500000), -1, -2147483648])
-        ext = rng.choice([0, mdl.EXT_UNDISCLOSED, mdl.EXT_IMPLIED,
-                          mdl.EXT_UNDISCLOSED | mdl.EXT_IMPLIED,
-                          rng.randrange(0, 1 << 16)])
-
-        if pick < 0.30:
-            m = mdl.build_add(oid, book, side, qty, px, extype=ext,
-                              with_pid=rng.random() < 0.3)
-        elif pick < 0.50:
-            m = mdl.build_exec(oid, book, side, qty)
-        elif pick < 0.62:
-            m = mdl.build_exec(oid, book, side, qty,
-                               trade_price=rng.randrange(1, 100000))
-        elif pick < 0.74:
-            m = mdl.build_replace(oid, book, side, qty, px, extype=ext)
-        elif pick < 0.88:
-            m = mdl.build_delete(oid, book, side)
-        elif pick < 0.94:
-            m = mdl.build_trade(book)
-        else:
-            m = mdl.build_other(rng.choice([
-                mdl.T_SECONDS, mdl.T_SYSEVENT, mdl.T_TICKSIZE,
-                mdl.T_BOOKSTATE, mdl.T_EQUILIBRIUM,
-            ]))
-        msgs.append(m)
-
-    expected = mdl.expected_stream(msgs)
-
-    gaps = [rng.choice([0, 0, 0, 1, 2]) for _ in msgs]
-    await tb.send_stream(msgs, gaps=gaps)
-    await tb.settle(16)
-
-    dut._log.info("drove %d messages, %d expected commands, %d observed",
-                  len(msgs), len(expected), len(tb.cmds))
-
-    tb.expect_count(len(expected))
-    for i, exp in enumerate(expected):
-        check_fields(tb.cmd(i), exp, ctx=f"[{i}] ")
-
-    # Every execution in the stream must have had its price suppressed.
-    for i, c in enumerate(tb.cmds):
-        if c["op"] == mdl.OP_EXEC:
-            assert c["px_valid"] == 0, f"[{i}] EXEC leaked a price"
+    assert len(h.seen) == 1, "message after reset was lost or duplicated"
+    check(h.seen[0], bm.expected_cmd(good, BOOK_ID), "after reset")

@@ -3,12 +3,16 @@
 --
 -- Structural top for the ASX ITCH order book engine.
 --
---   parser -> book_input_stage -> order_fifo -> order_book -> price_storage
---                                                  |              |
---                                              ram_array      level_array
+--   message beats -> book_input_stage -> order_fifo -> order_book -> price_storage
+--                                                          |              |
+--                                                      ram_array      level_array
 --
 -- Nothing but wiring lives here. Geometry comes from ram_pkg and level_pkg, so
 -- the memories take no generics.
+--
+-- The slave port is ITCH message bytes, 8 per beat, first byte in the low lane,
+-- tlast ending the message. book_input_stage emits a one-cycle pulse with no
+-- handshake; order_fifo absorbs it, since its s_tready is hardwired high.
 --
 -- price_storage does not drive its status or top-of-book outputs yet; those
 -- ports are brought out regardless so the interface does not change when it
@@ -27,7 +31,6 @@ library ieee;
 entity order_book_engine_top is
   generic (
     G_ORDER_BOOK_ID : natural  := 85603;   -- instrument this instance tracks
-    G_MSG_BYTES     : natural  := 64;      -- parser assembly buffer
     G_FIFO_DEPTH    : positive := 16;      -- commands buffered before order_book
     G_MAX_ORDERS    : natural  := 16384
   );
@@ -36,12 +39,12 @@ entity order_book_engine_top is
     resetn        : in    std_logic;
 
     ----------------------------------------------------------------------------
-    -- Slave: raw ITCH messages from the parser FIFO
+    -- Slave: ITCH message bytes, 8 per beat
     ----------------------------------------------------------------------------
     s_tvalid      : in    std_logic;
     s_tready      : out   std_logic;
-    s_ttype       : in    std_logic_vector(7 downto 0);
-    s_tdata       : in    std_logic_vector(G_MSG_BYTES * 8 - 1 downto 0);
+    s_tdata       : in    std_logic_vector(63 downto 0);
+    s_tlast       : in    std_logic;
 
     ----------------------------------------------------------------------------
     -- Price window
@@ -58,7 +61,7 @@ entity order_book_engine_top is
     m_bid_qty     : out   std_logic_vector(31 downto 0);
     m_ask_price   : out   std_logic_vector(31 downto 0);
     m_ask_qty     : out   std_logic_vector(31 downto 0);
-    m_valid     : out   std_logic_vector(1 downto 0);
+    m_valid       : out   std_logic_vector(1 downto 0);
 
     ----------------------------------------------------------------------------
     -- Status
@@ -75,9 +78,10 @@ architecture rtl of order_book_engine_top is
 
   ------------------------------------------------------------------------------
   -- book_input_stage -> order_fifo
+  --
+  -- in_tvalid is a one-cycle pulse. There is no ready in this direction.
   ------------------------------------------------------------------------------
   signal in_tvalid   : std_logic;
-  signal in_tready   : std_logic;
   signal in_op       : t_book_op;
   signal in_order_id : std_logic_vector(63 downto 0);
   signal in_book_id  : std_logic_vector(31 downto 0);
@@ -87,6 +91,8 @@ architecture rtl of order_book_engine_top is
   signal in_px_valid : std_logic;
   signal in_undisc   : std_logic;
   signal in_implied  : std_logic;
+
+  signal fifo_ready  : std_logic;   -- hardwired high inside order_fifo
 
   ------------------------------------------------------------------------------
   -- order_fifo -> order_book
@@ -114,7 +120,7 @@ architecture rtl of order_book_engine_top is
   signal ram_rdata : t_slot_set;
 
   ------------------------------------------------------------------------------
-  -- order_book -> price_storage (per-order mutation stream)
+  -- order_book -> price_storage
   ------------------------------------------------------------------------------
   signal mut_tvalid : std_logic;
   signal mut_tready : std_logic;
@@ -137,12 +143,11 @@ architecture rtl of order_book_engine_top is
 begin
 
   ------------------------------------------------------------------------------
-  -- Decode and filter
+  -- Decode and filter. Emits on the beat carrying the last field it needs.
   ------------------------------------------------------------------------------
   u_book_input_stage : entity work.book_input_stage
     generic map (
-      G_ORDER_BOOK_ID => G_ORDER_BOOK_ID,
-      G_MSG_BYTES     => G_MSG_BYTES
+      G_ORDER_BOOK_ID => G_ORDER_BOOK_ID
     )
     port map (
       clk        => clk,
@@ -150,11 +155,10 @@ begin
 
       s_tvalid   => s_tvalid,
       s_tready   => s_tready,
-      s_ttype    => s_ttype,
       s_tdata    => s_tdata,
+      s_tlast    => s_tlast,
 
       m_tvalid   => in_tvalid,
-      m_tready   => in_tready,
       m_op       => in_op,
       m_order_id => in_order_id,
       m_book_id  => in_book_id,
@@ -168,6 +172,9 @@ begin
 
   ------------------------------------------------------------------------------
   -- Elastic buffer. Also the unsigned/signed to std_logic_vector cast point.
+  --
+  -- The command pulse has nowhere to wait, so the FIFO taking it every cycle is
+  -- what makes the stage above safe. Checked rather than assumed.
   ------------------------------------------------------------------------------
   u_order_fifo : entity work.order_fifo
     generic map (
@@ -178,7 +185,7 @@ begin
       resetn     => resetn,
 
       s_tvalid   => in_tvalid,
-      s_tready   => in_tready,
+      s_tready   => fifo_ready,
       s_op       => in_op,
       s_order_id => in_order_id,
       s_book_id  => in_book_id,
@@ -204,6 +211,10 @@ begin
       full       => fifo_full,
       overflow   => fifo_overflow
     );
+
+  assert not (rising_edge(clk) and in_tvalid = '1' and fifo_ready = '0')
+    report "order_book_engine_top: command pulse dropped, order_fifo was not ready"
+    severity failure;
 
   ------------------------------------------------------------------------------
   -- Order table

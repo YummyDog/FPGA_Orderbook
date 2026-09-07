@@ -1,186 +1,228 @@
 --------------------------------------------------------------------------------
 -- book_input_stage
 --
--- Module 1 of the ASX ITCH order book engine.
+-- Decodes ASX ITCH order book messages arriving 8 bytes per beat and emits a
+-- normalised command as early as the message allows.
 --
--- Takes raw ITCH message bytes from the parser FIFO, decodes the six
--- book-affecting types for the configured order book, and emits a uniform
--- command bus. Everything else is dropped.
+-- EMIT AS SOON AS POSSIBLE
 --
--- s_tdata holds one complete ITCH message, byte 0 = message type, framed by
--- the parser. Ethernet / IPv4 / UDP / MoldUDP64 headers have already been
--- stripped upstream and are not visible here. Stream integrity (sequence
--- gaps, parser drops, truncation) is handled elsewhere.
+-- A command is emitted on the beat carrying the last field the decode needs,
+-- not on tlast. The last needed byte is 35 for A/F/U (exchange order type),
+-- 25 for E/C (quantity), and 17 for D (side), so:
 --
--- All ITCH knowledge - byte offsets, field widths, and the quantity and price
--- semantic overloads - lives in order_book_pkg.decode_book_msg. This module is
--- filter, handshake, and registers only.
+--   type   last byte   emit beat   beats in message   beats saved
+--   A      35          4           5                  0
+--   F      35          4           6                  1
+--   U      35          4           5                  0
+--   E      25          3           7                  3
+--   C      25          3           8                  4
+--   D      17          2           3                  0
 --
--- m_book_id is forwarded even though this engine instance tracks a single
--- instrument, so every command it emits carries the same value. It is on the
--- bus for multi-symbol: the order table key is (order_id, side) per book, and
--- Order IDs are only unique within a book and side, so a shared table would
--- need the instrument to disambiguate. Carrying it now costs 32 wires and no
--- logic, and avoids re-cutting the interface later. Downstream may ignore it.
+-- Trailing beats are consumed and ignored. Nothing downstream waits for them.
 --
--- Latency: 1 cycle. Output is fully registered; there is no combinational
--- path from s_tdata to any master payload signal.
+-- OUTPUT IS A ONE-CYCLE PULSE
 --
--- Throughput: one message per cycle sustained while m_tready is high. Worst
--- case input rate is one book message per 2.5 cycles (D at 18 bytes over a
--- 64-bit datapath), so this never limits the engine.
+-- m_tvalid is high for exactly one cycle per accepted message and there is no
+-- m_tready: the consumer must be able to take a command every cycle. order_fifo
+-- is, by construction - its s_tready is hardwired high. A consumer that can
+-- stall needs a holding register in front of it.
+--
+-- FRAMING
+--
+-- Beat 0 is the first beat after reset or after a tlast. The type byte is beat
+-- 0 byte 0, so no separate type port is needed. Byte i of the message sits at
+-- bits 8i+7 downto 8i of its beat, matching msg_byte() in order_book_pkg and
+-- the lane order the parser chain uses.
+--
+-- Only the first 5 beats are stored - 40 bytes, enough to cover byte 35. Stale
+-- bytes from a previous message can never be read, because a message always
+-- emits on the beat that completes the fields it needs.
 --
 -- VHDL-2008
 --------------------------------------------------------------------------------
 
 library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-use work.ram_pkg.all;
-use work.order_book_pkg.all;
+  use ieee.std_logic_1164.all;
+  use ieee.numeric_std.all;
+  use work.ram_pkg.all;
+  use work.order_book_pkg.all;
 
 entity book_input_stage is
   generic (
     -- Instrument this engine instance tracks; all other order books dropped.
     --
     -- A natural rather than a vector so it can be overridden from the
-    -- simulator command line (nvc -e -gG_ORDER_BOOK_ID=85603). ASX order book
-    -- identifiers are 4-byte numerics, so nothing is lost.
-    G_ORDER_BOOK_ID : natural := 85603;
-
-    -- Raw message buffer width. Largest book-affecting message is C at 58
-    -- bytes; defaults to the parser's 64-byte assembly buffer.
-    G_MSG_BYTES     : natural := 64
+    -- simulator command line (nvc -e -gG_ORDER_BOOK_ID=85603).
+    G_ORDER_BOOK_ID : natural := 85603
   );
   port (
-    clk        : in  std_logic;
-    resetn     : in  std_logic;
+    clk        : in    std_logic;
+    resetn     : in    std_logic;
 
     ----------------------------------------------------------------------------
-    -- Slave: raw ITCH messages from the parser FIFO
+    -- Slave: ITCH message bytes, 8 per beat, first byte in the low lane
     ----------------------------------------------------------------------------
-    s_tvalid   : in  std_logic;
-    s_tready   : out std_logic;
-    s_ttype    : in  std_logic_vector(7 downto 0);          -- also s_tdata byte 0
-    s_tdata    : in  std_logic_vector(G_MSG_BYTES*8-1 downto 0);
+    s_tvalid   : in    std_logic;
+    s_tready   : out   std_logic;                     -- tied high, never stalls
+    s_tdata    : in    std_logic_vector(63 downto 0);
+    s_tlast    : in    std_logic;                     -- ends the message
 
     ----------------------------------------------------------------------------
-    -- Master: normalised command bus
+    -- Master: normalised command. Valid for ONE cycle. No handshake.
     ----------------------------------------------------------------------------
-    m_tvalid   : out std_logic;
-    m_tready   : in  std_logic;
+    m_tvalid   : out   std_logic;
 
-    m_op       : out t_book_op;                     -- ADD / EXEC / REPLACE / DELETE
-    m_order_id : out std_logic_vector(63 downto 0);
-    m_book_id  : out std_logic_vector(31 downto 0); -- instrument, see note below
-    m_side     : out std_logic;                     -- 0 = buy, 1 = sell
-    m_qty      : out unsigned(31 downto 0);         -- absolute on ADD/REPLACE, delta on EXEC
-    m_price    : out signed(31 downto 0);           -- valid on ADD/REPLACE only
-    m_px_valid : out std_logic;
-    m_undisc   : out std_logic;                     -- exchange order type bit 5
-    m_implied  : out std_logic                      -- exchange order type bit 13
+    m_op       : out   t_book_op;                     -- ADD / EXEC / REPLACE / DELETE
+    m_order_id : out   std_logic_vector(63 downto 0);
+    m_book_id  : out   std_logic_vector(31 downto 0);
+    m_side     : out   std_logic;                     -- 0 = buy, 1 = sell
+    m_qty      : out   unsigned(31 downto 0);         -- absolute on ADD/REPLACE, delta on EXEC
+    m_price    : out   signed(31 downto 0);           -- valid on ADD/REPLACE only
+    m_px_valid : out   std_logic;
+    m_undisc   : out   std_logic;                     -- exchange order type bit 5
+    m_implied  : out   std_logic                      -- exchange order type bit 13
   );
 end entity book_input_stage;
 
-
 architecture rtl of book_input_stage is
 
-  constant C_BOOK_ID : std_logic_vector(31 downto 0)
-    := std_logic_vector(to_unsigned(G_ORDER_BOOK_ID, 32));
+  ------------------------------------------------------------------------------
+  -- Geometry
+  ------------------------------------------------------------------------------
+  constant C_BEAT_BYTES : natural := 8;
+  constant C_BEAT_W     : natural := C_BEAT_BYTES * 8;
+
+  -- Last message byte the decode reads, per type family. Taken from the field
+  -- offsets in decode_book_msg; if those change, these change with them.
+  constant C_LAST_AFU : natural := 35;   -- exchange order type, bytes 34-35
+  constant C_LAST_EC  : natural := 25;   -- quantity, bytes 18-25
+  constant C_LAST_D   : natural := 17;   -- side, byte 17
+
+  function f_beat_of (byte_idx : natural) return natural is
+  begin
+    return byte_idx / C_BEAT_BYTES;
+  end function f_beat_of;
+
+  -- Beats that must be buffered to cover the deepest field.
+  constant C_BEATS : natural := f_beat_of(C_LAST_AFU) + 1;   -- 5
+  constant C_BUF_W : natural := C_BEATS * C_BEAT_W;          -- 320
+
+  -- The beat on which each type has everything it needs.
+  function f_emit_beat (t : std_logic_vector(7 downto 0)) return natural is
+  begin
+    case t is
+      when C_TYPE_A | C_TYPE_F | C_TYPE_U => return f_beat_of(C_LAST_AFU);
+      when C_TYPE_E | C_TYPE_C            => return f_beat_of(C_LAST_EC);
+      when C_TYPE_D                       => return f_beat_of(C_LAST_D);
+      when others                         => return 0;   -- never emits
+    end case;
+  end function f_emit_beat;
+
+  constant C_BOOK_ID : std_logic_vector(31 downto 0) :=
+    std_logic_vector(to_unsigned(G_ORDER_BOOK_ID, 32));
 
   ------------------------------------------------------------------------------
-  -- Combinational decode and filter
+  -- Assembly
   ------------------------------------------------------------------------------
-  signal cmd        : t_book_cmd;
-  signal book_hit   : std_logic;
-  signal pass       : std_logic;   -- decoded, right book, usable side
+  signal buf      : std_logic_vector(C_BUF_W - 1 downto 0) := (others => '0');
+  signal msg_next : std_logic_vector(C_BUF_W - 1 downto 0);
+  signal beat     : natural range 0 to C_BEATS             := 0;
 
   ------------------------------------------------------------------------------
-  -- Handshake
+  -- Decode
   ------------------------------------------------------------------------------
-  signal s_tready_i : std_logic;
-  signal s_xfer     : std_logic;   -- slave  handshake completes this cycle
-  signal m_xfer     : std_logic;   -- master handshake completes this cycle
+  signal mtype    : std_logic_vector(7 downto 0);
+  signal cmd      : t_book_cmd;
+  signal book_hit : std_logic;
+  signal pass     : std_logic;   -- decoded, right book, usable side
+  signal emit     : std_logic;   -- this beat completes the fields we need
 
   ------------------------------------------------------------------------------
-  -- Output holding register
+  -- Output
   ------------------------------------------------------------------------------
-  signal r_tvalid   : std_logic := '0';
-  signal r_cmd      : t_book_cmd := C_BOOK_CMD_NULL;
+  signal r_tvalid : std_logic  := '0';
+  signal r_cmd    : t_book_cmd := C_BOOK_CMD_NULL;
 
 begin
+
+  -- Nothing here can stall: the buffer is overwritten in place and the output
+  -- is a pulse, so there is no state that a slow consumer could back up into.
+  s_tready <= '1';
+
+  ------------------------------------------------------------------------------
+  -- Merge the beat being presented into the stored ones. Static slices with a
+  -- compare per lane, so this is a mux rather than a variable shifter.
+  ------------------------------------------------------------------------------
+  p_merge : process (all) is
+    variable v : std_logic_vector(C_BUF_W - 1 downto 0);
+  begin
+    v := buf;
+    for k in 0 to C_BEATS - 1 loop
+      if k = beat then
+        v(C_BEAT_W * k + C_BEAT_W - 1 downto C_BEAT_W * k) := s_tdata;
+      end if;
+    end loop;
+    msg_next <= v;
+  end process p_merge;
 
   ------------------------------------------------------------------------------
   -- Decode.
   --
-  -- decode_book_msg is called unconditionally. It returns valid = '0' for
-  -- every type that does not affect the book, so no separate type check is
-  -- needed here.
+  -- decode_book_msg is called unconditionally on the merged buffer. It returns
+  -- valid = '0' for every type that does not affect the book, so no separate
+  -- type check is needed for the payload - only for the emit beat.
+  --
+  -- The type byte survives in lane 0 for the whole message, so mtype is stable
+  -- from beat 0 onwards.
   ------------------------------------------------------------------------------
-  cmd <= decode_book_msg(s_tdata, s_ttype);
+  mtype <= msg_byte(msg_next, 0);
+  cmd   <= decode_book_msg(msg_next, mtype);
 
   book_hit <= '1' when cmd.book_id = C_BOOK_ID else '0';
 
-  -- A message is forwarded only if it decoded to a book operation, belongs to
-  -- the configured instrument, and carried a recognised side byte. Anything
-  -- else is accepted from the FIFO and discarded.
+  -- Forwarded only if it decoded to a book operation, belongs to the configured
+  -- instrument, and carried a recognised side byte.
   pass <= cmd.valid and book_hit and cmd.side_ok;
 
-  ------------------------------------------------------------------------------
-  -- Handshakes.
-  --
-  -- A transfer occurs only when valid AND ready are both high on the same
-  -- clock edge. Nothing else counts as the command having been delivered.
-  --
-  -- The output register is a holding stage. Once loaded it keeps its command
-  -- until the master handshake completes - m_tvalid stays high and the payload
-  -- is frozen, however long m_tready stays low. While the register is holding
-  -- an undelivered command, s_tready is deasserted, so the upstream FIFO
-  -- cannot overwrite it.
-  --
-  -- s_tready is high when the register is empty, OR when it is being emptied
-  -- this cycle. The second term is what allows a new message to be accepted on
-  -- the same edge the old one departs, sustaining one message per cycle with
-  -- no bubble.
-  ------------------------------------------------------------------------------
-  s_tready_i <= '1' when (r_tvalid = '0') or (m_tready = '1') else '0';
-  s_tready   <= s_tready_i;
-
-  s_xfer <= s_tvalid and s_tready_i;
-  m_xfer <= r_tvalid and m_tready;
+  emit <= '1' when s_tvalid = '1'
+                and is_book_msg(mtype)
+                and beat = f_emit_beat(mtype)
+          else '0';
 
   ------------------------------------------------------------------------------
-  -- Output holding register.
+  -- Beat counter, buffer and output pulse.
   --
-  -- Three mutually exclusive outcomes each cycle:
-  --
-  --   load    a message was accepted - r_tvalid takes pass, so a message that
-  --           failed the filter clears the register instead of filling it
-  --   drain   the command was delivered and nothing replaced it
-  --   hold    neither handshake completed - the command sits here untouched
-  --
-  -- The payload is written only on a load, so a held command cannot be
-  -- disturbed by whatever the FIFO happens to be presenting.
+  -- The counter saturates at C_BEATS so a long message cannot wrap round and
+  -- hit its emit beat twice; tlast returns it to 0 for the next message.
   ------------------------------------------------------------------------------
   p_reg : process (clk) is
   begin
     if rising_edge(clk) then
       if resetn = '0' then
+        buf      <= (others => '0');
+        beat     <= 0;
         r_tvalid <= '0';
         r_cmd    <= C_BOOK_CMD_NULL;
       else
 
-        if s_xfer = '1' then
-          -- Slave handshake: s_tvalid and s_tready both high
-          r_tvalid <= pass;
-          r_cmd    <= cmd;
+        r_tvalid <= '0';   -- default, so m_tvalid is a one-cycle pulse
 
-        elsif m_xfer = '1' then
-          -- Master handshake with no replacement: register empties
-          r_tvalid <= '0';
+        if s_tvalid = '1' then
+
+          buf <= msg_next;
+
+          if s_tlast = '1' then
+            beat <= 0;
+          elsif beat < C_BEATS then
+            beat <= beat + 1;
+          end if;
+
+          if emit = '1' and pass = '1' then
+            r_tvalid <= '1';
+            r_cmd    <= cmd;
+          end if;
 
         end if;
-        -- otherwise: hold. r_tvalid and r_cmd keep their values.
 
       end if;
     end if;

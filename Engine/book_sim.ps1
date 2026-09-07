@@ -5,6 +5,7 @@
     on any other script and does not touch existing files.
 
     Compiles only what book_input_stage needs:
+        ram_pkg.vhd
         order_book_pkg.vhd
         book_input_stage.vhd
 
@@ -40,6 +41,7 @@ $RtlDir = if (Test-Path (Join-Path $Root "rtl")) { Join-Path $Root "rtl" } else 
 
 # Compile order matters: package before the entity that uses it.
 $Sources = @(
+    "ram_pkg.vhd",
     "order_book_pkg.vhd",
     "book_input_stage.vhd"
 ) | ForEach-Object { Join-Path $RtlDir $_ }
@@ -100,7 +102,7 @@ Write-Host "python   : $Python"
 Write-Host "pygpi bin: $PyBin"
 Write-Host "libpython: $LibPython"
 Write-Host "vhpi     : $VhpiLib"
-Write-Host "toplevel : $Toplevel  (standalone, raw ITCH messages driven by the testbench)"
+Write-Host "toplevel : $Toplevel  (standalone, ITCH messages driven 8 bytes per beat)"
 Write-Host "book id  : $BookId  (must match DEFAULT_BOOK_ID in book_model.py)"
 if ($Test) { Write-Host "filter   : $Test" }
 Write-Host ""
