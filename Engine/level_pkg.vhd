@@ -96,7 +96,9 @@ package level_cfg_pkg is
   --
   -- CONFIRM THIS AGAINST THE ITCH PRICE FIELD DEFINITION. It is the one
   -- constant here that cannot be derived and that silently breaks the map if
-  -- wrong: an off-by-ten makes every price fail the on-tick test.
+  -- wrong. With no legality check left, an off-by-ten does not announce
+  -- itself: every price simply lands on the wrong level, or on level 0 if it
+  -- now falls outside the bands entirely.
   constant C_PX_PER_CENT : positive := 10;
 
   -- Highest supported price, in cents, exclusive. $100.00.
@@ -419,15 +421,25 @@ package level_pkg is
   -- logic on the input path, so register it in price_storage rather than
   -- letting it merge into the RAM address path.
   --
-  -- px_legal must gate every write. An out-of-range or off-tick price still
-  -- produces a plausible-looking index, just the wrong one, and there is no
-  -- valid bit in the slot to catch it downstream.
+  -- EVERY PRICE IS ASSUMED LEGAL. There is no validity check here and none in
+  -- price_storage: whatever arrives is mapped and written. Two consequences
+  -- worth knowing, both silent:
   --
-  -- Both take an unconstrained vector so they accept a price of any width
+  --   out of range   a price matching no band falls through px_index's loop
+  --                  and returns 0, so it aggregates into level 0 - a real
+  --                  level at price 0 - rather than being rejected
+  --
+  --   off tick       the index is a truncating division by the band tick, so
+  --                  two prices inside one tick share a level and
+  --                  index_price no longer recovers which was meant
+  --
+  -- Neither can happen while the feed only carries in-range, on-tick prices.
+  -- A range and tick check belongs in price_storage if that stops holding.
+  --
+  -- px_index takes an unconstrained vector so it accepts a price of any width
   -- without the caller resizing.
   ------------------------------------------------------------------------------
   function px_index (price : std_logic_vector) return t_lvl_addr;
-  function px_legal (price : std_logic_vector) return boolean;
   function index_price (idx : t_lvl_addr) return t_lvl_price;
 
   ------------------------------------------------------------------------------
@@ -480,22 +492,6 @@ package body level_pkg is
     end loop;
 
     return std_logic_vector(i);
-  end function;
-
-  ------------------------------------------------------------------------------
-  function px_legal (price : std_logic_vector) return boolean is
-    variable p : unsigned(price'length - 1 downto 0);
-  begin
-    p := unsigned(price);
-
-    for b in 0 to C_NUM_BANDS - 1 loop
-      if p >= C_BAND_MAP(b).lo_px and p < C_BAND_MAP(b).hi_px then
-        -- In range for this band; must also sit on the band's tick.
-        return ((p - C_BAND_MAP(b).lo_px) mod C_BAND_MAP(b).tick_px) = 0;
-      end if;
-    end loop;
-
-    return false;
   end function;
 
   ------------------------------------------------------------------------------
