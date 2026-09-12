@@ -77,8 +77,8 @@ package ram_pkg is
   -- sweeping below ~512 measures nothing. Above one tile deep the tool
   -- cascades and adds an output mux - one level per doubling - which is where
   -- depth starts costing Fmax rather tha
-  constant C_ADDR_W : positive := 9;
-
+  constant C_ADDR_W : positive := 4;
+      
   -- Key width. 16 during bring-up where key and payload are the same field;
   -- 65 for the real table, being order_id(64) & side(1) - order IDs are unique
   -- only within an order book AND side.

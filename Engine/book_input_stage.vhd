@@ -1,42 +1,53 @@
 --------------------------------------------------------------------------------
 -- book_input_stage
 --
--- Decodes ASX ITCH order book messages arriving 8 bytes per beat and emits a
--- normalised command as early as the message allows.
+-- Normalises one decoded ITCH message into a book command.
 --
--- EMIT AS SOON AS POSSIBLE
+-- ============================================================================
+-- WHAT CHANGED
+-- ============================================================================
+-- This stage no longer sees message bytes. itch_parser now frames, extracts
+-- and field-decodes, and hands over a msg_fields bus in the C_FLD_* layout
+-- from itch_parser_pkg. So the beat counter, the 320-bit assembly buffer, the
+-- per-lane merge mux and the emit-beat table are all gone, and with them the
+-- rule that a message occupied three to five beats.
 --
--- A command is emitted on the beat carrying the last field the decode needs,
--- not on tlast. The last needed byte is 35 for A/F/U (exchange order type),
--- 25 for E/C (quantity), and 17 for D (side), so:
+-- What is left is pure semantics: narrow the quantity, decode the side byte,
+-- pull the two exchange-order-type bits, and decide whether the price may
+-- reach the book. One combinational level plus the output register.
 --
---   type   last byte   emit beat   beats in message   beats saved
---   A      35          4           5                  0
---   F      35          4           6                  1
---   U      35          4           5                  0
---   E      25          3           7                  3
---   C      25          3           8                  4
---   D      17          2           3                  0
+-- ============================================================================
+-- ONE MESSAGE PER CYCLE
+-- ============================================================================
+-- itch_parser can retire at most one message per cycle - the shortest in-scope
+-- type is D at 18 + 2 = 20 wire bytes, so no two can complete in one 8-byte
+-- beat - and this stage is a single register stage with no state. So it
+-- accepts a message every cycle and needs no buffering.
 --
--- Trailing beats are consumed and ignored. Nothing downstream waits for them.
+-- m_tvalid is high for exactly one cycle per accepted command and there is no
+-- m_tready: order_fifo's s_tready is hardwired high. A consumer that can stall
+-- needs a holding register in front of it.
 --
--- OUTPUT IS A ONE-CYCLE PULSE
+-- ============================================================================
+-- SEMANTIC NORMALISATION - unchanged from decode_book_msg
+-- ============================================================================
+--   * QUANTITY is absolute on A/U but an executed DELTA on E. The op field
+--     tells downstream which. Narrowed 64 -> 32 with saturation.
 --
--- m_tvalid is high for exactly one cycle per accepted message and there is no
--- m_tready: the consumer must be able to take a command every cycle. order_fifo
--- is, by construction - its s_tready is hardwired high. A consumer that can
--- stall needs a holding register in front of it.
+--   * PRICE is the order's book price on A/U. px_valid is held low on every
+--     EXEC: E carries no price field at all, so the resting price can only
+--     come from the order table.
 --
--- FRAMING
+--   * EXCHANGE ORDER TYPE exists only on A/U, so undisc and implied must be
+--     captured at add/replace time and stored in the order record. They are
+--     unrecoverable at execution time.
 --
--- Beat 0 is the first beat after reset or after a tlast. The type byte is beat
--- 0 byte 0, so no separate type port is needed. Byte i of the message sits at
--- bits 8i+7 downto 8i of its beat, matching msg_byte() in order_book_pkg and
--- the lane order the parser chain uses.
+--   * SIDE is an ASCII byte. Anything other than 'B' or 'S' drops the message
+--     and pulses stat_bad_side.
 --
--- Only the first 5 beats are stored - 40 bytes, enough to cover byte 35. Stale
--- bytes from a previous message can never be read, because a message always
--- emits on the beat that completes the fields it needs.
+-- F and C are out of scope upstream and are not accepted here either. If they
+-- are re-enabled in itch_parser, add them to f_is_scoped and to the op case -
+-- F behaves exactly like A, and C like E.
 --
 -- VHDL-2008
 --------------------------------------------------------------------------------
@@ -46,6 +57,7 @@ library ieee;
   use ieee.numeric_std.all;
   use work.ram_pkg.all;
   use work.order_book_pkg.all;
+  use work.itch_parser_pkg.all;
 
 entity book_input_stage is
   generic (
@@ -60,12 +72,11 @@ entity book_input_stage is
     resetn     : in    std_logic;
 
     ----------------------------------------------------------------------------
-    -- Slave: ITCH message bytes, 8 per beat, first byte in the low lane
+    -- Slave: one decoded message per cycle from itch_parser. No handshake.
     ----------------------------------------------------------------------------
-    s_tvalid   : in    std_logic;
-    s_tready   : out   std_logic;                     -- tied high, never stalls
-    s_tdata    : in    std_logic_vector(63 downto 0);
-    s_tlast    : in    std_logic;                     -- ends the message
+    s_valid    : in    std_logic;
+    s_type     : in    std_logic_vector(7 downto 0);
+    s_fields   : in    std_logic_vector(C_MSG_FIELDS_W - 1 downto 0);
 
     ----------------------------------------------------------------------------
     -- Master: normalised command. Valid for ONE cycle. No handshake.
@@ -80,148 +91,168 @@ entity book_input_stage is
     m_price    : out   signed(31 downto 0);           -- valid on ADD/REPLACE only
     m_px_valid : out   std_logic;
     m_undisc   : out   std_logic;                     -- exchange order type bit 5
-    m_implied  : out   std_logic                      -- exchange order type bit 13
+    m_implied  : out   std_logic;                     -- exchange order type bit 13
+
+    ----------------------------------------------------------------------------
+    -- Status pulses, may be left open
+    ----------------------------------------------------------------------------
+    stat_bad_side : out std_logic;   -- right book, unrecognised side byte
+    stat_qty_ovf  : out std_logic    -- wire quantity exceeded 32 bits
   );
 end entity book_input_stage;
 
 architecture rtl of book_input_stage is
 
   ------------------------------------------------------------------------------
-  -- Geometry
+  -- C_TYPE_* is declared in BOTH order_book_pkg and itch_parser_pkg, so with
+  -- both use clauses neither is directly visible. Bind once by selected name.
   ------------------------------------------------------------------------------
-  constant C_BEAT_BYTES : natural := 8;
-  constant C_BEAT_W     : natural := C_BEAT_BYTES * 8;
-
-  -- Last message byte the decode reads, per type family. Taken from the field
-  -- offsets in decode_book_msg; if those change, these change with them.
-  constant C_LAST_AFU : natural := 35;   -- exchange order type, bytes 34-35
-  constant C_LAST_EC  : natural := 25;   -- quantity, bytes 18-25
-  constant C_LAST_D   : natural := 17;   -- side, byte 17
-
-  function f_beat_of (byte_idx : natural) return natural is
-  begin
-    return byte_idx / C_BEAT_BYTES;
-  end function f_beat_of;
-
-  -- Beats that must be buffered to cover the deepest field.
-  constant C_BEATS : natural := f_beat_of(C_LAST_AFU) + 1;   -- 5
-  constant C_BUF_W : natural := C_BEATS * C_BEAT_W;          -- 320
-
-  -- The beat on which each type has everything it needs.
-  function f_emit_beat (t : std_logic_vector(7 downto 0)) return natural is
-  begin
-    case t is
-      when C_TYPE_A | C_TYPE_F | C_TYPE_U => return f_beat_of(C_LAST_AFU);
-      when C_TYPE_E | C_TYPE_C            => return f_beat_of(C_LAST_EC);
-      when C_TYPE_D                       => return f_beat_of(C_LAST_D);
-      when others                         => return 0;   -- never emits
-    end case;
-  end function f_emit_beat;
+  constant K_A : std_logic_vector(7 downto 0) := work.itch_parser_pkg.C_TYPE_A;
+  constant K_U : std_logic_vector(7 downto 0) := work.itch_parser_pkg.C_TYPE_U;
+  constant K_E : std_logic_vector(7 downto 0) := work.itch_parser_pkg.C_TYPE_E;
+  constant K_D : std_logic_vector(7 downto 0) := work.itch_parser_pkg.C_TYPE_D;
 
   constant C_BOOK_ID : std_logic_vector(31 downto 0) :=
     std_logic_vector(to_unsigned(G_ORDER_BOOK_ID, 32));
 
   ------------------------------------------------------------------------------
-  -- Assembly
+  -- Types this stage acts on. ADD F AND C HERE if they are re-enabled upstream.
   ------------------------------------------------------------------------------
-  signal buf      : std_logic_vector(C_BUF_W - 1 downto 0) := (others => '0');
-  signal msg_next : std_logic_vector(C_BUF_W - 1 downto 0);
-  signal beat     : natural range 0 to C_BEATS             := 0;
+  function f_is_scoped (t : std_logic_vector(7 downto 0)) return boolean is
+  begin
+    return t = K_A or t = K_U or t = K_E or t = K_D;
+  end function;
 
   ------------------------------------------------------------------------------
-  -- Decode
+  -- Field views
   ------------------------------------------------------------------------------
-  signal mtype    : std_logic_vector(7 downto 0);
-  signal cmd      : t_book_cmd;
+  signal side_b   : std_logic_vector(7 downto 0);
+  signal extype   : std_logic_vector(C_FLD_EXTYPE_W - 1 downto 0);
+  signal qty64    : std_logic_vector(63 downto 0);
+
+  signal side_c   : std_logic;
+  signal side_ok  : std_logic;
+  signal qty32    : unsigned(31 downto 0);
+  signal qty_ovf  : std_logic;
+
+  signal is_add   : std_logic;   -- A
+  signal is_rep   : std_logic;   -- U
+  signal is_exec  : std_logic;   -- E
+  signal is_del   : std_logic;   -- D
+  signal scoped   : std_logic;
+
   signal book_hit : std_logic;
-  signal pass     : std_logic;   -- decoded, right book, usable side
-  signal emit     : std_logic;   -- this beat completes the fields we need
+  signal accept_c : std_logic;
 
   ------------------------------------------------------------------------------
-  -- Output
+  -- Output registers
   ------------------------------------------------------------------------------
-  signal r_tvalid : std_logic  := '0';
-  signal r_cmd    : t_book_cmd := C_BOOK_CMD_NULL;
+  signal r_tvalid   : std_logic  := '0';
+  signal r_cmd      : t_book_cmd := C_BOOK_CMD_NULL;
+  signal r_bad_side : std_logic  := '0';
+  signal r_qty_ovf  : std_logic  := '0';
 
 begin
 
-  -- Nothing here can stall: the buffer is overwritten in place and the output
-  -- is a pulse, so there is no state that a slow consumer could back up into.
-  s_tready <= '1';
+  ------------------------------------------------------------------------------
+  -- Field extraction. All of these are plain slices of the incoming bus.
+  ------------------------------------------------------------------------------
+  side_b <= itch_side(s_fields);
+  qty64  <= itch_quantity(s_fields);
+  extype <= s_fields(C_FLD_EXTYPE_LO + C_FLD_EXTYPE_W - 1 downto C_FLD_EXTYPE_LO);
+
+  is_add  <= '1' when s_type = K_A else '0';
+  is_rep  <= '1' when s_type = K_U else '0';
+  is_exec <= '1' when s_type = K_E else '0';
+  is_del  <= '1' when s_type = K_D else '0';
+  scoped  <= '1' when f_is_scoped(s_type) else '0';
 
   ------------------------------------------------------------------------------
-  -- Merge the beat being presented into the stored ones. Static slices with a
-  -- compare per lane, so this is a mux rather than a variable shifter.
+  -- Side byte
   ------------------------------------------------------------------------------
-  p_merge : process (all) is
-    variable v : std_logic_vector(C_BUF_W - 1 downto 0);
-  begin
-    v := buf;
-    for k in 0 to C_BEATS - 1 loop
-      if k = beat then
-        v(C_BEAT_W * k + C_BEAT_W - 1 downto C_BEAT_W * k) := s_tdata;
-      end if;
-    end loop;
-    msg_next <= v;
-  end process p_merge;
+  side_c  <= '1' when side_b = C_SIDE_SELL else '0';
+  side_ok <= '1' when (side_b = C_SIDE_BUY or side_b = C_SIDE_SELL) else '0';
 
   ------------------------------------------------------------------------------
-  -- Decode.
-  --
-  -- decode_book_msg is called unconditionally on the merged buffer. It returns
-  -- valid = '0' for every type that does not affect the book, so no separate
-  -- type check is needed for the payload - only for the emit beat.
-  --
-  -- The type byte survives in lane 0 for the whole message, so mtype is stable
-  -- from beat 0 onwards.
+  -- Narrow the 64-bit wire quantity, saturating rather than truncating so an
+  -- out-of-range value cannot silently become a small one.
   ------------------------------------------------------------------------------
-  mtype <= msg_byte(msg_next, 0);
-  cmd   <= decode_book_msg(msg_next, mtype);
-
-  book_hit <= '1' when cmd.book_id = C_BOOK_ID else '0';
-
-  -- Forwarded only if it decoded to a book operation, belongs to the configured
-  -- instrument, and carried a recognised side byte.
-  pass <= cmd.valid and book_hit and cmd.side_ok;
-
-  emit <= '1' when s_tvalid = '1'
-                and is_book_msg(mtype)
-                and beat = f_emit_beat(mtype)
-          else '0';
+  qty_ovf <= '1' when qty64(63 downto 32) /= (63 downto 32 => '0') else '0';
+  qty32   <= (others => '1') when qty_ovf = '1' else unsigned(qty64(31 downto 0));
 
   ------------------------------------------------------------------------------
-  -- Beat counter, buffer and output pulse.
-  --
-  -- The counter saturates at C_BEATS so a long message cannot wrap round and
-  -- hit its emit beat twice; tlast returns it to 0 for the next message.
+  -- Filters
+  ------------------------------------------------------------------------------
+  book_hit <= '1' when itch_order_book_id(s_fields) = C_BOOK_ID else '0';
+  accept_c <= s_valid and scoped and book_hit and side_ok;
+
+  ------------------------------------------------------------------------------
+  -- Output register. The default assignment keeps m_tvalid a one-cycle pulse.
   ------------------------------------------------------------------------------
   p_reg : process (clk) is
   begin
     if rising_edge(clk) then
       if resetn = '0' then
-        buf      <= (others => '0');
-        beat     <= 0;
-        r_tvalid <= '0';
-        r_cmd    <= C_BOOK_CMD_NULL;
+        r_tvalid   <= '0';
+        r_cmd      <= C_BOOK_CMD_NULL;
+        r_bad_side <= '0';
+        r_qty_ovf  <= '0';
       else
 
-        r_tvalid <= '0';   -- default, so m_tvalid is a one-cycle pulse
+        r_tvalid   <= '0';
+        r_bad_side <= '0';
+        r_qty_ovf  <= '0';
 
-        if s_tvalid = '1' then
+        if accept_c = '1' then
 
-          buf <= msg_next;
+          r_tvalid <= '1';
 
-          if s_tlast = '1' then
-            beat <= 0;
-          elsif beat < C_BEATS then
-            beat <= beat + 1;
+          r_cmd.valid    <= '1';
+          r_cmd.order_id <= itch_order_id(s_fields);
+          r_cmd.book_id  <= itch_order_book_id(s_fields);
+          r_cmd.side     <= side_c;
+          r_cmd.side_ok  <= '1';
+          r_cmd.position <= unsigned(itch_position(s_fields));
+          r_cmd.qty      <= qty32;
+          r_cmd.qty_ovf  <= qty_ovf;
+          r_qty_ovf      <= qty_ovf;
+
+          -- Op, price visibility and the exchange-order-type bits all follow
+          -- from the type. D carries none of them.
+          if is_add = '1' then
+            r_cmd.op       <= OP_ADD;
+            r_cmd.price    <= signed(itch_price(s_fields));
+            r_cmd.px_valid <= '1';
+            r_cmd.undisc   <= extype(C_EXTYPE_BIT_UNDISCLOSED);
+            r_cmd.implied  <= extype(C_EXTYPE_BIT_IMPLIED);
+          elsif is_rep = '1' then
+            r_cmd.op       <= OP_REPLACE;
+            r_cmd.price    <= signed(itch_price(s_fields));
+            r_cmd.px_valid <= '1';
+            r_cmd.undisc   <= extype(C_EXTYPE_BIT_UNDISCLOSED);
+            r_cmd.implied  <= extype(C_EXTYPE_BIT_IMPLIED);
+          elsif is_exec = '1' then
+            r_cmd.op       <= OP_EXEC;
+            r_cmd.price    <= (others => '0');
+            r_cmd.px_valid <= '0';
+            r_cmd.undisc   <= '0';
+            r_cmd.implied  <= '0';
+          else
+            r_cmd.op       <= OP_DELETE;
+            r_cmd.qty      <= (others => '0');
+            r_cmd.qty_ovf  <= '0';
+            r_qty_ovf      <= '0';
+            r_cmd.price    <= (others => '0');
+            r_cmd.px_valid <= '0';
+            r_cmd.undisc   <= '0';
+            r_cmd.implied  <= '0';
           end if;
 
-          if emit = '1' and pass = '1' then
-            r_tvalid <= '1';
-            r_cmd    <= cmd;
-          end if;
-
+        elsif s_valid = '1' and scoped = '1' and book_hit = '1'
+              and side_ok = '0' then
+          -- Our instrument, but the side byte was not 'B' or 'S'. Dropping it
+          -- desynchronises the book, so surface it rather than swallowing it.
+          r_bad_side <= '1';
         end if;
 
       end if;
@@ -241,5 +272,8 @@ begin
   m_px_valid <= r_cmd.px_valid;
   m_undisc   <= r_cmd.undisc;
   m_implied  <= r_cmd.implied;
+
+  stat_bad_side <= r_bad_side;
+  stat_qty_ovf  <= r_qty_ovf;
 
 end architecture rtl;

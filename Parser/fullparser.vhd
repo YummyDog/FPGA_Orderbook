@@ -54,13 +54,6 @@ entity fullparser is
     s_axis_tready : out std_logic;                 -- tied high, never stalls
     s_axis_tlast  : in  std_logic;
 
-    -- AXI-Stream master ------------------------------------------------------
-    m_axis_tdata  : out std_logic_vector(63 downto 0);
-    m_axis_tkeep  : out std_logic_vector(7 downto 0);
-    m_axis_tvalid : out std_logic;
-    m_axis_tready : in  std_logic;                 -- UNUSED, parsers never stall
-    m_axis_tlast  : out std_logic;
-
     -- Per-message ITCH event -------------------------------------------------
     msg_valid     : out std_logic;
     msg_index     : out std_logic_vector(15 downto 0);
@@ -240,12 +233,6 @@ begin
       s_axis_tvalid => d_tvalid,
       s_axis_tready => d_tready,
       s_axis_tlast  => d_tlast,
-
-      m_axis_tdata  => m_axis_tdata,
-      m_axis_tkeep  => m_axis_tkeep,
-      m_axis_tvalid => m_axis_tvalid,
-      m_axis_tready => m_axis_tready,
-      m_axis_tlast  => m_axis_tlast,
 
       s_fields => d_fields,
 

@@ -4,38 +4,69 @@
 -- Stage 5 of the market-data header parser pipeline.
 --
 -- ============================================================================
--- STRUCTURE
+-- WHY THIS IS NOT THE PREVIOUS DESIGN
 -- ============================================================================
--- Raw beats are stored UNCONDITIONALLY in a rolling window, and the message is
--- selected out of that window afterwards:
+-- The old parser framed arithmetically inside a single feedback loop:
 --
---     win_r <= s_axis_tdata & win_r(0 to 7);   -- no enable, no decoder
+--     start -> mux 2 length bytes out of the view -> 18-bit add -> compare
+--           -> next start -> register
 --
--- Do everything, then select - rather than select, then do. Nothing on the
--- window path depends on framing state, so the framing loop carries only the
--- block offsets plus the current length and type. There is no byte index, no
--- per-byte buffer write, and no Seconds capture inside the loop.
+-- and did it TWICE per beat. That is a recurrence, so no amount of pipelining
+-- shortens it, and it did not close at 161 MHz on Virtex-7.
 --
--- Extraction runs in stage 2, where it is FEED-FORWARD from registers and can
--- take a further pipeline stage if it ever needs one - unlike the framing
--- loop, which cannot.
+-- Here the adder is moved OUT of the loop. Every cycle, for all eight lanes of
+-- the beat in win_r(0), the next-block offset is computed SPECULATIVELY:
+--
+--     nxt(o) = o + len(o) + 2      for o = 0 .. 7, in parallel
+--
+-- The two length bytes at lane o are a STATIC SLICE of the 16-byte view, so
+-- there is no mux in front of the adder - just eight independent 10-bit adds.
+-- The results are registered as a lookup table, and the framing recurrence
+-- degenerates to a pointer chase through registered values:
+--
+--     if rem = 0 then  (rem, lane) <= tbl(lane);   -- one 8:1 mux
+--     else             rem         <= rem - 1;     -- one 7-bit decrement
+--
+-- No adder, no length read, no compare chain. Three logic levels.
+--
+-- ============================================================================
+-- TWO FACTS THAT MAKE IT WORK - both provable from spec_msg_len
+-- ============================================================================
+-- 1. A SECOND BLOCK CAN ONLY START IN THE SAME BEAT IF THE FIRST IS 'T'.
+--    A second start needs nxt(o) <= 7, i.e. len <= 5 - o. T is the only type
+--    with len <= 5 (it is 5), which forces o = 0. So the second hop is
+--    precomputed in the speculative stage as nxt(nxt(o)) and a THIRD hop is
+--    impossible: two blocks are at least 7 wire bytes each, so the third
+--    start is at least 14 - always outside the beat.
+--
+-- 2. NO IN-SCOPE MESSAGE EVER COMPLETES IN THE BEAT IT STARTS.
+--    The shortest in-scope type is D at 18 + 2 = 20 wire bytes. So at most
+--    ONE message can be retired per beat, one command can be produced per
+--    cycle, and NO elastic buffering is needed anywhere in the chain.
+--
+-- ============================================================================
+-- SCOPE
+-- ============================================================================
+-- A, U, E and D are decoded and emitted. T is framed and its seconds value is
+-- captured, but no event is emitted. Every other type is framed (so the length
+-- chain stays correct) and discarded.
+--
+-- F and C are DELIBERATELY OUT OF SCOPE per the current requirement. They are
+-- book-affecting types: F is an Add Order carrying a participant ID and C is
+-- an Order Executed at a price differing from the display price. Re-enabling
+-- them is a one-line edit in each of f_in_scope and f_decode_scoped - both are
+-- marked. Nothing else changes, and no logic depth is added, because A/F and
+-- E/C share their byte layouts up to the fields the book needs.
 --
 -- ============================================================================
 -- LATENCY AND THROUGHPUT
 -- ============================================================================
 --   one 8-byte beat per cycle, s_axis_tready tied high
---   two cycles from message completion to msg_valid
+--   THREE cycles from the arrival of the beat that completes a message to
+--   msg_valid; book_input_stage adds one, for four to the order FIFO
+--   one message per cycle sustained
 --
--- ============================================================================
--- 'T' SECONDS MESSAGES
--- ============================================================================
--- A Seconds block is 7 bytes, smaller than one beat, so two messages can
--- complete in a single beat. T is treated as CLOCK STATE: its seconds value is
--- captured and no event is emitted. It still consumes a sequence number, so
--- msg_index advances across it.
---
--- The type byte is captured during framing rather than read back out of the
--- window, so the T decision costs one register and no select.
+-- There is no AXI-Stream master. The packet bytes stop here.
 --
 -- ============================================================================
 -- FRAMING
@@ -72,32 +103,25 @@ entity itch_parser is
     s_axis_tready  : out std_logic;                -- tied high, never stalls
     s_axis_tlast   : in  std_logic;
 
-    -- AXI-Stream master ------------------------------------------------------
-    m_axis_tdata   : out std_logic_vector(63 downto 0);
-    m_axis_tkeep   : out std_logic_vector(7 downto 0);
-    m_axis_tvalid  : out std_logic;
-    m_axis_tready  : in  std_logic;                -- UNUSED, parsers never stall
-    m_axis_tlast   : out std_logic;
-
     -- Upstream field bus -----------------------------------------------------
     s_fields       : in  std_logic_vector(C_MOLD_BUS_W-1 downto 0);
 
     -- Per-message event ------------------------------------------------------
     msg_valid      : out std_logic;
+    msg_type       : out std_logic_vector(7 downto 0);
+    msg_fields     : out std_logic_vector(C_MSG_FIELDS_W-1 downto 0);
     msg_index      : out std_logic_vector(15 downto 0);
     msg_seqnum     : out std_logic_vector(63 downto 0);
-    msg_type       : out std_logic_vector(7 downto 0);
     msg_length     : out std_logic_vector(15 downto 0);
-    msg_fields     : out std_logic_vector(C_MSG_FIELDS_W-1 downto 0);
     msg_status     : out std_logic_vector(C_MSG_STATUS_W-1 downto 0);
     pkt_fields     : out std_logic_vector(C_ITCH_PKT_W-1 downto 0);
 
-    -- Exchange clock, from the most recent Seconds message --------------------
+    -- Exchange clock, from the most recent Seconds message -------------------
     exchange_seconds : out std_logic_vector(31 downto 0);
 
-    -- Packet-level status, pulsed with the outgoing tlast --------------------
-    pkt_done           : out std_logic;
-    pkt_msg_count      : out std_logic_vector(15 downto 0)  -- as framed
+    -- Packet-level status ----------------------------------------------------
+    pkt_done         : out std_logic;
+    pkt_msg_count    : out std_logic_vector(15 downto 0)   -- as framed
   );
 end entity itch_parser;
 
@@ -113,170 +137,249 @@ architecture rtl of itch_parser is
     return d(8*n + 7 downto 8*n);
   end function;
 
-  ------------------------------------------------------------------------------
-  -- Rolling window of raw beats.
-  --
-  -- Depth 9 = 72 bytes, which always contains any decoded message: the
-  -- largest is C at 58 bytes, and a message ending at lane 0 of the newest
-  -- beat starts at most 64 bytes earlier.
-  --
-  -- win_r(0) is the NEWEST beat.
-  ------------------------------------------------------------------------------
-  constant C_WIN_BEATS : natural := 9;
-  constant C_WIN_BYTES : natural := C_WIN_BEATS * 8;   -- 72
+  type byte_t is array (natural range <>) of std_logic_vector(7 downto 0);
 
-  type win_t   is array (0 to C_WIN_BEATS-1) of std_logic_vector(63 downto 0);
-  type byte_t  is array (natural range <>) of std_logic_vector(7 downto 0);
+  ------------------------------------------------------------------------------
+  -- Big-endian field of n bytes starting at message byte i.
+  --
+  -- Written as a loop rather than a concatenation chain: byte_t, t_typ8 and
+  -- win_t all have std_logic_vector as their element type, which makes a bare
+  -- "&" between two 8-bit vectors ambiguous anywhere in this architecture.
+  ------------------------------------------------------------------------------
+  function be (buf : std_logic_vector; i : natural; n : natural)
+    return std_logic_vector is
+    variable r : std_logic_vector(8*n - 1 downto 0);
+  begin
+    for k in 0 to n-1 loop
+      r(8*(n-1-k) + 7 downto 8*(n-1-k)) := mb(buf, i + k);
+    end loop;
+    return r;
+  end function;
 
+  ------------------------------------------------------------------------------
+  -- Rolling window of raw beats. win_r(0) is the NEWEST.
+  --
+  -- Depth 12 covers the deepest read: an E message starting at lane 7 puts its
+  -- start beat at window index 8, and the readout runs six beats newer than
+  -- that. Indices are taken mod C_WIN_BEATS, so a short message harmlessly
+  -- wraps onto stale beats it never reads.
+  ------------------------------------------------------------------------------
+  constant C_WIN_BEATS : natural := 12;
+
+  type win_t is array (0 to C_WIN_BEATS-1) of std_logic_vector(63 downto 0);
   signal win_r : win_t := (others => (others => '0'));
 
   ------------------------------------------------------------------------------
-  -- Flatten the window so byte 0 is the OLDEST and byte 71 the newest.
+  -- Extraction width.
   --
-  --   flat(f) = lane (f mod 8) of win_r(8 - f/8)
-  --
-  -- So the newest beat occupies flat bytes 64..71.
+  -- The deepest byte any in-scope decode reads is 35 (exchange order type on
+  -- A/U). 40 bytes from message byte 0 covers it with margin and keeps the
+  -- rotate small.
   ------------------------------------------------------------------------------
-  function flatten (w : win_t) return byte_t is
-    variable r : byte_t(0 to C_WIN_BYTES-1);
-  begin
-    for f in 0 to C_WIN_BYTES-1 loop
-      r(f) := bsel(w((C_WIN_BEATS-1) - (f / 8)), f mod 8);
-    end loop;
-    return r;
-  end function;
+  constant C_EXT_BYTES : natural := 40;
+  constant C_EXT_W     : natural := C_EXT_BYTES * 8;
 
   ------------------------------------------------------------------------------
-  -- Two-stage extraction.
+  -- Speculative table geometry
+  ------------------------------------------------------------------------------
+  constant C_REM_W  : natural := 7;    -- beats to the next block start, 0..127
+  constant C_NXT_W  : natural := 10;   -- offset within the beat frame, 0..1023
+  constant C_LEN_W  : natural := 9;    -- length saturates here; M (261) fits
+
+  type t_typ8  is array (0 to 7) of std_logic_vector(7 downto 0);
+  type t_len16 is array (0 to 7) of unsigned(15 downto 0);
+  type t_nxt   is array (0 to 7) of unsigned(C_NXT_W-1 downto 0);
+  type t_rem   is array (0 to 7) of unsigned(C_REM_W-1 downto 0);
+  type t_l3    is array (0 to 7) of unsigned(2 downto 0);
+  type t_b4    is array (0 to 7) of unsigned(3 downto 0);
+
+  -- Registered table. Every entry describes the block that is STILL IN FLIGHT
+  -- after this beat, i.e. the second one when a 'T' was absorbed by the hop.
+  signal tb_typ    : t_typ8  := (others => (others => '0'));
+  signal tb_len    : t_len16 := (others => (others => '0'));
+  signal tb_rem    : t_rem   := (others => (others => '0'));
+  signal tb_lane   : t_l3    := (others => (others => '0'));
+  signal tb_slane  : t_l3    := (others => (others => '0'));
+  type t_secs is array (0 to 7) of std_logic_vector(31 downto 0);
+  signal tb_secs   : t_secs := (others => (others => '0'));
+  signal tb_scope  : std_logic_vector(0 to 7) := (others => '0');
+  signal tb_ist    : std_logic_vector(0 to 7) := (others => '0');
+  signal tb_lenok  : std_logic_vector(0 to 7) := (others => '0');
+  signal tb_two    : std_logic_vector(0 to 7) := (others => '0');
+
+  -- A 'T' absorbed by the hop is retired without ever getting an in-flight
+  -- record, so its seconds value is captured here instead. The hop can only
+  -- happen at lane 0 (see the proof in the header), so this is one static
+  -- slice rather than a per-lane table.
+  signal t0_hit_r  : std_logic := '0';
+  signal t0_secs_r : std_logic_vector(31 downto 0) := (others => '0');
+
+  ------------------------------------------------------------------------------
+  -- Framing-domain replicas of the sideband.
   --
-  -- A single 72:1 mux per output byte would be enormous. The offset splits
-  -- into a lane (0..7) and a beat (0..8), so it is done as an 8-way byte
-  -- rotate followed by a 9-way beat select - roughly 6 logic levels rather
-  -- than 7, and far less area.
+  -- The table registered at the end of cycle W describes the beat that was in
+  -- win_r(0) DURING W, which is win_r(1) during W+1. So tlast, tkeep and the
+  -- field bus need a two-deep delay on the same enable as the window, while
+  -- the framing valid is a plain one-cycle delay of tvalid: the window
+  -- advances one beat per valid cycle, so each beat appears as win_r(0)
+  -- exactly once and is framed exactly once.
+  ------------------------------------------------------------------------------
+  -- Framing beat X needs beat X+1 for lookahead, so the LAST beat of a packet
+  -- can only be framed once something follows it. flush_r manufactures that
+  -- one extra advance after tlast; the bytes it shifts in are garbage, but
+  -- they can only reach a block starting at lane 6 or 7 of the final beat,
+  -- which is truncated and dropped anyway.
+  signal flush_r : std_logic := '0';
+  signal adv_c   : std_logic;
+
+  signal in_beat   : unsigned(3 downto 0) := (others => '0');
+  signal k1_beat   : unsigned(3 downto 0) := (others => '0');
+  signal k1_last   : std_logic := '0';
+  signal k1_keep   : std_logic_vector(7 downto 0) := (others => '0');
+  signal k1_fields : std_logic_vector(C_MOLD_BUS_W-1 downto 0) := (others => '0');
+
+  signal fv_valid  : std_logic := '0';
+  signal fv_beat   : unsigned(3 downto 0) := (others => '0');
+  signal fv_last   : std_logic := '0';
+  signal fv_keep   : std_logic_vector(7 downto 0) := (others => '0');
+  signal fv_fields : std_logic_vector(C_MOLD_BUS_W-1 downto 0) := (others => '0');
+
+  ------------------------------------------------------------------------------
+  -- THE FRAMING RECURRENCE - the only loop in the design
   --
-  -- Both selects come from REGISTERS, and the whole thing is feed-forward.
+  --   rem / lane   the next block starts 8*rem + lane bytes into this beat
+  --   active       inside the Mold payload
+  --   armed        an in-flight block exists; fl_* describe it
   ------------------------------------------------------------------------------
-  function rot_lane (f : byte_t; lane : natural) return byte_t is
-    variable r : byte_t(0 to C_WIN_BYTES-1);
-  begin
-    for k in 0 to C_WIN_BYTES-1 loop
-      r(k) := f((k + lane) mod C_WIN_BYTES);
-    end loop;
-    return r;
-  end function;
+  signal active_r : std_logic := '0';
+  signal rem_r    : unsigned(C_REM_W-1 downto 0) := (others => '0');
+  signal lane_r   : unsigned(2 downto 0) := (others => '0');
+  signal armed_r  : std_logic := '0';
 
-  function sel_beat (f : byte_t; beat : natural) return std_logic_vector is
-    variable r : std_logic_vector(C_MSG_BUF_W-1 downto 0) := (others => '0');
-  begin
-    for k in 0 to C_MSG_BUF_BYTES-1 loop
-      r(8*k + 7 downto 8*k) := f((8*beat + k) mod C_WIN_BYTES);
-    end loop;
-    return r;
-  end function;
+  -- In-flight record, captured when the block starts.
+  signal fl_typ_r    : std_logic_vector(7 downto 0) := (others => '0');
+  signal fl_len_r    : unsigned(15 downto 0) := (others => '0');
+  signal fl_slane_r  : unsigned(2 downto 0) := (others => '0');
+  -- Window index of the block's START beat, counted rather than predicted.
+  -- Set to 1 when the block is framed and incremented every framing beat, so
+  -- at retire time win_r(fl_base_r) IS the start beat - with no correction for
+  -- the tail case and, more importantly, no arithmetic in front of the 12:1
+  -- beat mux. This is the select for the deepest datapath in the design, so it
+  -- has to arrive as a bare register output.
+  signal fl_base_r   : unsigned(3 downto 0) := (others => '0');
+  signal fl_scope_r  : std_logic := '0';
+  signal fl_lenok_r  : std_logic := '0';
+  signal fl_idx_r    : unsigned(15 downto 0) := (others => '0');
+  signal fl_seq_r    : unsigned(63 downto 0) := (others => '0');
 
-  ------------------------------------------------------------------------------
-  -- 16-byte view spanning the previous and current beat.
-  --
-  -- view(o + 8) is the byte at offset o, for o in -8 .. +7. During cycle T
-  -- win_r(0) holds beat T-1 and s_axis_tdata is beat T, so a length field
-  -- straddling a beat boundary is an ordinary read at a negative offset -
-  -- no pending state, no special case.
-  ------------------------------------------------------------------------------
-  function make_view (prev, cur : std_logic_vector(63 downto 0)) return byte_t is
-    variable v : byte_t(0 to 15);
-  begin
-    for i in 0 to 7 loop
-      v(i)     := bsel(prev, i);
-      v(i + 8) := bsel(cur, i);
-    end loop;
-    return v;
-  end function;
+  signal index_r   : unsigned(15 downto 0) := (others => '0');
+  signal seq_r     : unsigned(63 downto 0) := (others => '0');
 
   ------------------------------------------------------------------------------
-  -- Beat tracking and payload start
+  -- Retire decisions. Read by the framing process AND by the extract process,
+  -- which runs in the SAME cycle off the fl_* registers - that is where the
+  -- fourth cycle of end-to-end latency comes back.
   ------------------------------------------------------------------------------
-  signal beat_cnt : unsigned(3 downto 0) := (others => '0');
-  signal vlan_c   : std_logic;
+  signal sl_c       : unsigned(2 downto 0);
+  signal end_ok_c   : std_logic;
+  signal start_ok_c : std_logic;
+  signal surv_ok_c  : std_logic;
+  signal first_ok_c : std_logic;
+  signal ret_norm_c : std_logic;
+  signal ret_tail_c : std_logic;
+  signal load_c     : std_logic;
+  signal retire_c   : std_logic;
 
-  -- Registered at packet start so the raw s_fields route and the VLAN mux sit
-  -- OFF the head of the framing chain.
-  signal in_payload_r : std_logic := '0';
-  signal start_lane_r : unsigned(2 downto 0) := (others => '0');
+  signal vlan_c       : std_logic;
   signal first_beat_c : unsigned(3 downto 0);
   signal first_lane_c : unsigned(2 downto 0);
+  signal pay_arm_c    : std_logic;
 
   ------------------------------------------------------------------------------
-  -- ARITHMETIC FRAMING STATE - this is the only loop that cannot be pipelined
+  -- Outputs
+  ------------------------------------------------------------------------------
+  signal msg_valid_r  : std_logic := '0';
+  signal msg_type_r   : std_logic_vector(7 downto 0) := (others => '0');
+  signal msg_fields_r : std_logic_vector(C_MSG_FIELDS_W-1 downto 0) := (others => '0');
+  signal msg_index_r  : std_logic_vector(15 downto 0) := (others => '0');
+  signal msg_seq_r    : std_logic_vector(63 downto 0) := (others => '0');
+  signal msg_len_r    : std_logic_vector(15 downto 0) := (others => '0');
+  signal msg_stat_r   : std_logic_vector(C_MSG_STATUS_W-1 downto 0) := (others => '0');
+  signal pkt_fields_r : std_logic_vector(C_ITCH_PKT_W-1 downto 0) := (others => '0');
+  signal seconds_r    : std_logic_vector(31 downto 0) := (others => '0');
+  signal pkt_done_r   : std_logic := '0';
+  signal pkt_count_r  : std_logic_vector(15 downto 0) := (others => '0');
+
+  ------------------------------------------------------------------------------
+  -- Types that occupy the in-flight record and are extracted at retire time.
   --
-  -- Offsets are signed and relative to lane 0 of the CURRENT beat, so a block
-  -- that began in the previous beat simply has a negative offset. The 16-byte
-  -- view above covers -8..+7, which removes every "pending byte" special case.
+  -- T is deliberately NOT here. At 5 + 2 = 7 wire bytes it is the one type
+  -- short enough to start AND finish inside a single beat, which would break
+  -- the invariant that at most one message retires per beat - a trailing T
+  -- would be loaded in the final beat and then dropped by the packet end
+  -- before it could be retired. Seconds is captured from the speculative
+  -- table at LOAD time instead, which needs no in-flight slot at all.
   --
-  --   in_block_r  a block is in progress; end_r is its last byte
-  --   end_r       offset of the in-progress block's LAST byte
-  --   start_r     offset of the next block's first (length) byte
-  ------------------------------------------------------------------------------
-  signal in_block_r : std_logic := '0';
-  signal end_r      : signed(17 downto 0) := (others => '0');
-  signal start_r    : signed(17 downto 0) := (others => '0');
-  signal cur_len_r  : unsigned(15 downto 0) := (others => '0');
-  signal cur_type_r : std_logic_vector(7 downto 0) := (others => '0');
-  signal index_r    : unsigned(15 downto 0) := (others => '0');
-
-  ------------------------------------------------------------------------------
-  -- Stage 1 -> stage 2 handoff
+  -- Every type in here is at least 20 wire bytes, so no two can end in the
+  -- same 8-byte beat.
   --
-  -- cmp_end_lane_r is the lane of the message's LAST byte in the beat that
-  -- was current when it completed. Since stage 2 runs one cycle later and
-  -- win_r(0) then holds that beat, the message's last byte is at flat index
-  -- 64 + end_lane.
+  -- ADD F AND C HERE to bring them back into scope.
   ------------------------------------------------------------------------------
-  signal cmp_valid_r    : std_logic := '0';
-  signal cmp_is_t_r     : std_logic := '0';
-  signal cmp_type_r     : std_logic_vector(7 downto 0) := (others => '0');
-  signal cmp_len_r      : unsigned(15 downto 0) := (others => '0');
-  signal cmp_index_r    : unsigned(15 downto 0) := (others => '0');
-  signal cmp_end_lane_r : unsigned(2 downto 0) := (others => '0');
-  signal cmp_stat_r     : std_logic_vector(C_MSG_STATUS_W-1 downto 0)
-                        := (others => '0');
-  signal cmp_fields_r   : std_logic_vector(C_MOLD_BUS_W-1 downto 0)
-                        := (others => '0');
-
-  -- 'T' gets its OWN capture registers. Sharing cmp_* would let a Seconds
-  -- message completing later in the same beat overwrite the values of a real
-  -- message that already set cmp_valid_r - exactly what happens when a
-  -- 27-byte block is followed by a 7-byte Seconds block.
-  signal t_end_lane_r : unsigned(2 downto 0) := (others => '0');
-  signal t_len_r      : unsigned(15 downto 0) := (others => '0');
+  function f_in_scope (t : std_logic_vector(7 downto 0)) return boolean is
+  begin
+    return t = C_TYPE_A or t = C_TYPE_U or t = C_TYPE_E or t = C_TYPE_D;
+  end function;
 
   ------------------------------------------------------------------------------
-  -- Stage 2 outputs
+  -- Fixed-offset decode, restricted to the in-scope types.
+  --
+  -- Produces the standard C_FLD_* layout from itch_parser_pkg so the field bus
+  -- is unchanged, but only populates what A/U/E/D actually carry. MATCHID,
+  -- POWNER, PCP, PRINT and CROSS stay zero because the types that carry them
+  -- (F, C, P) are out of scope.
+  --
+  -- This is decode_msg with the out-of-scope arms removed; it exists here
+  -- rather than in the package because the extraction buffer is 40 bytes and
+  -- decode_msg indexes to byte 57 for C.
   ------------------------------------------------------------------------------
-  signal msg_valid_r   : std_logic := '0';
-  signal msg_index_r   : std_logic_vector(15 downto 0) := (others => '0');
-  signal msg_seqnum_r  : std_logic_vector(63 downto 0) := (others => '0');
-  signal msg_type_r    : std_logic_vector(7 downto 0) := (others => '0');
-  signal msg_len_out_r : std_logic_vector(15 downto 0) := (others => '0');
-  signal msg_fields_r  : std_logic_vector(C_MSG_FIELDS_W-1 downto 0)
-                       := (others => '0');
-  signal msg_stat_r    : std_logic_vector(C_MSG_STATUS_W-1 downto 0)
-                       := (others => '0');
-  signal pkt_fields_r  : std_logic_vector(C_ITCH_PKT_W-1 downto 0)
-                       := (others => '0');
-  signal seconds_r     : std_logic_vector(31 downto 0) := (others => '0');
+  function f_decode_scoped (buf : std_logic_vector;
+                            t   : std_logic_vector(7 downto 0))
+    return std_logic_vector is
+    variable f : std_logic_vector(C_MSG_FIELDS_W-1 downto 0) := (others => '0');
+  begin
+    -- Identity block, byte-identical across A, U, E and D
+    f(C_FLD_TS_NS_LO  + 31 downto C_FLD_TS_NS_LO)  := be(buf,  1, 4);
+    f(C_FLD_ORDID_LO  + 63 downto C_FLD_ORDID_LO)  := be(buf,  5, 8);
+    f(C_FLD_BOOKID_LO + 31 downto C_FLD_BOOKID_LO) := be(buf, 13, 4);
+    f(C_FLD_SIDE_LO   +  7 downto C_FLD_SIDE_LO)   := mb(buf, 17);
 
-  signal pkt_done_r  : std_logic := '0';
-  signal pkt_count_r : std_logic_vector(15 downto 0) := (others => '0');
+    case t is
 
-  ------------------------------------------------------------------------------
-  -- Data path and upstream bus, one register stage each
-  ------------------------------------------------------------------------------
-  signal s_fields_r : std_logic_vector(C_MOLD_BUS_W-1 downto 0)
-                    := (others => '0');
-  signal tdata_r    : std_logic_vector(63 downto 0) := (others => '0');
-  signal tkeep_r    : std_logic_vector(7 downto 0)  := (others => '0');
-  signal tvalid_r   : std_logic := '0';
-  signal tlast_r    : std_logic := '0';
+      -- A: Add Order (37).  U: Order Replace (36).
+      -- ADD C_TYPE_F HERE: same layout, plus owner at 37..43.
+      when C_TYPE_A | C_TYPE_U =>
+        f(C_FLD_POS_LO    + 31 downto C_FLD_POS_LO)    := be(buf, 18, 4);
+        f(C_FLD_QTY_LO    + 63 downto C_FLD_QTY_LO)    := be(buf, 22, 8);
+        f(C_FLD_PRICE_LO  + 31 downto C_FLD_PRICE_LO)  := be(buf, 30, 4);
+        f(C_FLD_EXTYPE_LO + 15 downto C_FLD_EXTYPE_LO) := be(buf, 34, 2);
+        if t = C_TYPE_A then
+          f(C_FLD_LOT_LO + 7 downto C_FLD_LOT_LO) := mb(buf, 36);
+        end if;
+
+      -- E: Order Executed (52). Quantity is an executed DELTA.
+      -- ADD C_TYPE_C HERE: same layout to byte 25, plus price at 52..55 -
+      -- which needs C_EXT_BYTES raised to 56.
+      when C_TYPE_E =>
+        f(C_FLD_QTY_LO + 63 downto C_FLD_QTY_LO) := be(buf, 18, 8);
+
+      -- D: Order Delete (18). Identity only, already assembled above.
+      when others =>
+        null;
+
+    end case;
+
+    return f;
+  end function;
 
 begin
 
@@ -285,273 +388,391 @@ begin
   ------------------------------------------------------------------------------
   s_axis_tready <= '1';
 
-  vlan_c       <= eth_vlan_present(s_fields);
-  first_beat_c <= to_unsigned(8, 4) when vlan_c = '1' else to_unsigned(7, 4);
-  first_lane_c <= to_unsigned(2, 3) when vlan_c = '1' else to_unsigned(6, 3);
+  ------------------------------------------------------------------------------
+  -- The window and the framing-domain sideband replicas. Both advance on the
+  -- same enable so the table and its tlast/tkeep stay in step.
+  ------------------------------------------------------------------------------
+  adv_c <= s_axis_tvalid or flush_r;
 
-  ------------------------------------------------------------------------------
-  -- Data path and upstream field bus
-  ------------------------------------------------------------------------------
-  p_datapath : process (clk)
-  begin
-    if rising_edge(clk) then
-      if resetn = '0' then
-        tdata_r    <= (others => '0');
-        tkeep_r    <= (others => '0');
-        tvalid_r   <= '0';
-        tlast_r    <= '0';
-        s_fields_r <= (others => '0');
-      else
-        tdata_r    <= s_axis_tdata;
-        tkeep_r    <= s_axis_tkeep;
-        tvalid_r   <= s_axis_tvalid;
-        tlast_r    <= s_axis_tlast and s_axis_tvalid;
-        s_fields_r <= s_fields;
-      end if;
-    end if;
-  end process p_datapath;
-
-  ------------------------------------------------------------------------------
-  -- The window. Unconditional shift - no enable, no decoder, no index, and
-  -- so no dependence on anything the framing loop computes.
-  ------------------------------------------------------------------------------
   p_window : process (clk)
   begin
     if rising_edge(clk) then
       if resetn = '0' then
-        win_r <= (others => (others => '0'));
-      elsif s_axis_tvalid = '1' then
-        win_r <= s_axis_tdata & win_r(0 to C_WIN_BEATS-2);
+        win_r     <= (others => (others => '0'));
+        flush_r   <= '0';
+        in_beat   <= (others => '0');
+        k1_beat   <= (others => '0');
+        k1_last   <= '0';
+        k1_keep   <= (others => '0');
+        k1_fields <= (others => '0');
+        fv_beat   <= (others => '0');
+        fv_last   <= '0';
+        fv_keep   <= (others => '0');
+        fv_fields <= (others => '0');
+        fv_valid  <= '0';
+      else
+        flush_r  <= s_axis_tvalid and s_axis_tlast;
+        fv_valid <= adv_c;
+
+        if s_axis_tvalid = '1' then
+          if s_axis_tlast = '1' then
+            in_beat <= (others => '0');
+          elsif in_beat /= 15 then
+            in_beat <= in_beat + 1;
+          end if;
+        end if;
+
+        if adv_c = '1' then
+          win_r     <= s_axis_tdata & win_r(0 to C_WIN_BEATS-2);
+          k1_beat   <= in_beat;
+          k1_last   <= s_axis_tlast;
+          k1_keep   <= s_axis_tkeep;
+          k1_fields <= s_fields;
+          fv_beat   <= k1_beat;
+          fv_last   <= k1_last;
+          fv_keep   <= k1_keep;
+          fv_fields <= k1_fields;
+        end if;
       end if;
     end if;
   end process p_window;
 
   ------------------------------------------------------------------------------
-  -- Stage 1: framing
+  -- SPECULATIVE STAGE
   --
-  -- Two arithmetic passes per beat over the 16-byte view of the previous and
-  -- current beat. The variables carry the block offsets from pass to pass
-  -- within the cycle; only in_block / end / start / len / type are registered
-  -- across beats.
+  -- Eight independent length reads and adds, then the two-hop composition.
+  -- Everything here is feed-forward from win_r(0) and the incoming beat, so it
+  -- can take a further pipeline stage if it ever needs one.
   ------------------------------------------------------------------------------
-  p_frame : process (clk)
-    variable v_view    : byte_t(0 to 15);
-    variable v_in      : std_logic;
-    variable v_end     : signed(17 downto 0);
-    variable v_start   : signed(17 downto 0);
-    variable v_len     : unsigned(15 downto 0);
-    variable v_type    : std_logic_vector(7 downto 0);
-    variable v_index   : unsigned(15 downto 0);
-    variable v_len16   : std_logic_vector(15 downto 0);
-    variable v_o       : integer;
-    variable v_lastlane: integer;
-    variable v_emitted : boolean;
-    variable v_multi   : std_logic;
-    variable v_overrun : std_logic;
-
-    -- one completion: lane, length, type
-    procedure do_complete (lane : in integer;
-                           len  : in unsigned(15 downto 0);
-                           typ  : in std_logic_vector(7 downto 0)) is
-    begin
-      if typ = C_TYPE_T then
-        -- clock state, own registers so a real message already captured in
-        -- this beat is not disturbed
-        cmp_is_t_r   <= '1';
-        t_end_lane_r <= to_unsigned(lane, 3);
-        t_len_r      <= len;
-      elsif v_emitted then
-        v_multi := '1';
-      else
-        v_emitted      := true;
-        cmp_valid_r    <= '1';
-        cmp_type_r     <= typ;
-        cmp_len_r      <= len;
-        cmp_index_r    <= v_index;
-        cmp_end_lane_r <= to_unsigned(lane, 3);
-        cmp_fields_r   <= s_fields;
-        cmp_stat_r     <= (others => '0');
-        cmp_stat_r(C_ST_DECODED) <=
-          '1' when is_decoded_type(typ) else '0';
-        cmp_stat_r(C_ST_UNKNOWN_TYPE) <=
-          '1' when spec_msg_len(typ) = 0 else '0';
-        cmp_stat_r(C_ST_LEN_MISMATCH) <=
-          '0' when to_integer(len) = spec_msg_len(typ) else '1';
-      end if;
-      v_index := v_index + 1;
-    end procedure;
-
+  p_spec : process (clk)
+    variable v_view : byte_t(0 to 15);
+    variable v_len  : t_len16;
+    variable v_typ  : t_typ8;
+    variable v_sat  : unsigned(C_LEN_W-1 downto 0);
+    variable v_nxt  : t_nxt;
+    variable v_hop  : std_logic_vector(0 to 7);
+    variable v_j    : integer range 0 to 7;
+    variable c_typ  : std_logic_vector(7 downto 0);
+    variable c_len  : unsigned(15 downto 0);
+    variable c_nxt  : unsigned(C_NXT_W-1 downto 0);
+    variable c_sl   : integer range 0 to 7;
+    variable v_p    : unsigned(C_NXT_W-1 downto 0);
   begin
     if rising_edge(clk) then
       if resetn = '0' then
-        beat_cnt     <= (others => '0');
-        in_payload_r <= '0';
-        start_lane_r <= (others => '0');
-        in_block_r   <= '0';
-        end_r        <= (others => '0');
-        start_r      <= (others => '0');
-        cur_len_r    <= (others => '0');
-        cur_type_r   <= (others => '0');
-        index_r      <= (others => '0');
-        cmp_valid_r  <= '0';
-        cmp_is_t_r   <= '0';
-        cmp_stat_r   <= (others => '0');
-        cmp_fields_r <= (others => '0');
-        t_end_lane_r <= (others => '0');
-        t_len_r      <= (others => '0');
-        pkt_done_r   <= '0';
-        pkt_count_r  <= (others => '0');
+        tb_typ    <= (others => (others => '0'));
+        tb_len    <= (others => (others => '0'));
+        tb_rem    <= (others => (others => '0'));
+        tb_lane   <= (others => (others => '0'));
+        tb_slane  <= (others => (others => '0'));
+        tb_secs   <= (others => (others => '0'));
+        tb_scope  <= (others => '0');
+        tb_ist    <= (others => '0');
+        tb_lenok  <= (others => '0');
+        tb_two    <= (others => '0');
+        t0_hit_r  <= '0';
+        t0_secs_r <= (others => '0');
+      elsif adv_c = '1' then
+
+        -- 16-byte view: the beat being framed, plus one beat of lookahead so a
+        -- length field at lane 6 or 7 is an ordinary static slice.
+        for i in 0 to 7 loop
+          v_view(i)     := bsel(win_r(0), i);
+          v_view(i + 8) := bsel(s_axis_tdata, i);
+        end loop;
+
+        ----------------------------------------------------------------------
+        -- Pass A: eight parallel speculative reads. No mux in front of the
+        -- adders - v_view(o) and v_view(o+1) are constant slices for each o.
+        ----------------------------------------------------------------------
+        for o in 0 to 7 loop
+          v_len(o)(15 downto 8) := unsigned(v_view(o));
+          v_len(o)( 7 downto 0) := unsigned(v_view(o + 1));
+          v_typ(o) := v_view(o + 2);
+
+          -- Saturate so a garbage length cannot wrap the beat counter. Real
+          -- lengths reach 261 (M), which fits in C_LEN_W.
+          if v_len(o)(15 downto C_LEN_W) /= 0 then
+            v_sat := (others => '1');
+          else
+            v_sat := unsigned(v_len(o)(C_LEN_W-1 downto 0));
+          end if;
+
+          v_nxt(o) := to_unsigned(o, C_NXT_W) + resize(v_sat, C_NXT_W)
+                    + to_unsigned(2, C_NXT_W);
+
+          if v_nxt(o) <= 7 then
+            v_hop(o) := '1';
+          else
+            v_hop(o) := '0';
+          end if;
+        end loop;
+
+        ----------------------------------------------------------------------
+        -- Pass B: compose the hop. Every entry ends up describing the block
+        -- still in flight after this beat.
+        ----------------------------------------------------------------------
+        for o in 0 to 7 loop
+          if v_hop(o) = '1' then
+            v_j    := to_integer(v_nxt(o)(2 downto 0));
+            c_typ  := v_typ(v_j);
+            c_len  := v_len(v_j);
+            c_nxt  := v_nxt(v_j);
+            c_sl   := v_j;
+          else
+            c_typ  := v_typ(o);
+            c_len  := v_len(o);
+            c_nxt  := v_nxt(o);
+            c_sl   := o;
+          end if;
+
+          -- c_nxt is where the pointer lands, in this beat's frame. It is
+          -- always >= 8: a non-hop entry did not fit in the beat, and a hopped
+          -- entry is at least 14. So the shift into the next beat's frame
+          -- never goes negative.
+          v_p  := c_nxt - to_unsigned(8, C_NXT_W);
+          tb_rem(o)  <= resize(v_p(C_NXT_W-1 downto 3), C_REM_W);
+          tb_lane(o) <= v_p(2 downto 0);
+
+          tb_typ(o)   <= c_typ;
+          tb_len(o)   <= c_len;
+          tb_slane(o) <= to_unsigned(c_sl, 3);
+          tb_two(o)   <= v_hop(o);
+
+          -- Seconds is message bytes 1..4, i.e. view(c_sl+3 .. c_sl+6). c_sl
+          -- is at most 7, so this never leaves the 16-byte view. A T that ran
+          -- past the end of the beat would be truncated and is not a message.
+          tb_secs(o)(31 downto 24) <= v_view(c_sl + 3);
+          tb_secs(o)(23 downto 16) <= v_view(c_sl + 4);
+          tb_secs(o)(15 downto  8) <= v_view(c_sl + 5);
+          tb_secs(o)( 7 downto  0) <= v_view(c_sl + 6);
+
+          if f_in_scope(c_typ) then
+            tb_scope(o) <= '1';
+          else
+            tb_scope(o) <= '0';
+          end if;
+
+          if c_typ = C_TYPE_T then
+            tb_ist(o) <= '1';
+          else
+            tb_ist(o) <= '0';
+          end if;
+
+          if to_integer(c_len) = spec_msg_len(c_typ) then
+            tb_lenok(o) <= '1';
+          else
+            tb_lenok(o) <= '0';
+          end if;
+        end loop;
+
+        ----------------------------------------------------------------------
+        -- A 'T' swallowed by the hop. Only reachable at lane 0, so the seconds
+        -- bytes (message bytes 1..4 = view 3..6) are a single static slice.
+        ----------------------------------------------------------------------
+        if v_hop(0) = '1' and v_typ(0) = C_TYPE_T then
+          t0_hit_r  <= '1';
+          t0_secs_r(31 downto 24) <= v_view(3);
+          t0_secs_r(23 downto 16) <= v_view(4);
+          t0_secs_r(15 downto  8) <= v_view(5);
+          t0_secs_r( 7 downto  0) <= v_view(6);
+        else
+          t0_hit_r <= '0';
+        end if;
+
+      end if;
+    end if;
+  end process p_spec;
+
+  ------------------------------------------------------------------------------
+  -- Payload start and end-of-packet guards
+  ------------------------------------------------------------------------------
+  vlan_c       <= eth_vlan_present(fv_fields);
+  first_beat_c <= to_unsigned(8, 4) when vlan_c = '1' else to_unsigned(7, 4);
+  first_lane_c <= to_unsigned(2, 3) when vlan_c = '1' else to_unsigned(6, 3);
+
+  -- Armed one beat early so the state is already (rem = 0, lane = first_lane)
+  -- when the first payload beat is framed. Keeping the override off the
+  -- recurrence input this way costs one 2:1 mux, not a comparator.
+  pay_arm_c <= '1' when fv_valid = '1' and active_r = '0'
+                    and fv_beat = (first_beat_c - 1)
+               else '0';
+
+  ------------------------------------------------------------------------------
+  -- End-of-packet guards.
+  --
+  -- These read fv_keep BIT BY BIT rather than decoding a highest-valid-lane and
+  -- comparing against it. tkeep is contiguous, so fv_keep(n) already answers
+  -- "is the byte at lane n real", and an 8:1 mux of registered bits replaces a
+  -- priority encoder, an increment and a 4-bit comparator.
+  --
+  -- That matters because these signals gate the framing recurrence as well as
+  -- the emit stage: anything deep here lands directly on the rem_r / lane_r
+  -- path, which is the one path in the design that has to stay shallow.
+  ------------------------------------------------------------------------------
+
+  -- Start lane of the block that SURVIVES this beat. It differs from lane_r
+  -- only when a hop absorbed a T ahead of it.
+  sl_c <= tb_slane(to_integer(lane_r));
+
+  -- The in-flight block's last byte sits at lane_r - 1. When lane_r is 0 that
+  -- is the previous beat, which is always fully populated.
+  end_ok_c <= '1' when fv_last = '0' or lane_r = 0
+              else fv_keep(to_integer(lane_r) - 1);
+
+  -- A block starts here at all: its first byte must be inside the packet.
+  -- Without this, Ethernet padding frames as a stream of zero-length blocks
+  -- and inflates pkt_msg_count.
+  start_ok_c <= '1' when fv_last = '0' else fv_keep(to_integer(lane_r));
+
+  -- ...and separately, whether the SURVIVING block exists. On the last beat a
+  -- hop can absorb a real T and leave the second block pointing past the end
+  -- of the packet, in which case only the T is there.
+  surv_ok_c <= '1' when fv_last = '0' else fv_keep(to_integer(sl_c));
+
+  ret_norm_c <= '1' when fv_valid = '1' and active_r = '1' and rem_r = 0
+                     and end_ok_c = '1'
+                else '0';
+
+  -- Tail case: the packet ends and the in-flight block finishes exactly on the
+  -- last byte, so the pointer never lands and ret_norm_c never fires.
+  ret_tail_c <= '1' when fv_valid = '1' and active_r = '1' and fv_last = '1'
+                     and rem_r = 1 and lane_r = 0 and fv_keep(7) = '1'
+                else '0';
+
+  first_ok_c <= '1' when fv_valid = '1' and active_r = '1' and rem_r = 0
+                     and start_ok_c = '1'
+                else '0';
+
+  load_c <= first_ok_c and surv_ok_c;
+
+  retire_c <= (ret_norm_c or ret_tail_c) and armed_r and fl_scope_r;
+
+  ------------------------------------------------------------------------------
+  -- THE FRAMING RECURRENCE
+  --
+  -- One 8:1 mux of registered table entries, one 7-bit decrement, one 2:1
+  -- select. Everything else in this process is off the loop.
+  ------------------------------------------------------------------------------
+  p_frame : process (clk)
+    variable v_l   : integer range 0 to 7;
+    variable v_idx : unsigned(15 downto 0);
+  begin
+    if rising_edge(clk) then
+      if resetn = '0' then
+        active_r    <= '0';
+        rem_r       <= (others => '0');
+        lane_r      <= (others => '0');
+        armed_r     <= '0';
+        fl_typ_r    <= (others => '0');
+        fl_len_r    <= (others => '0');
+        fl_slane_r  <= (others => '0');
+        fl_base_r   <= (others => '0');
+        fl_scope_r  <= '0';
+        fl_lenok_r  <= '0';
+        fl_idx_r    <= (others => '0');
+        fl_seq_r    <= (others => '0');
+        index_r     <= (others => '0');
+        seq_r       <= (others => '0');
+        pkt_done_r  <= '0';
+        pkt_count_r <= (others => '0');
       else
 
-        cmp_valid_r <= '0';
-        cmp_is_t_r  <= '0';
-        pkt_done_r  <= '0';
+        pkt_done_r <= '0';
 
-        if s_axis_tvalid = '1' then
+        if fv_valid = '1' then
 
-          v_view  := make_view(win_r(0), s_axis_tdata);
-          v_in    := in_block_r;
-          v_end   := end_r;
-          v_start := start_r;
-          v_len   := cur_len_r;
-          v_type  := cur_type_r;
-          v_index := index_r;
+          v_l   := to_integer(lane_r);
+          v_idx := index_r;
 
-          v_emitted := false;
-          v_multi   := '0';
-          v_overrun := '0';
-
-          -- highest lane carrying real data in this beat
-          v_lastlane := -1;
-          for i in 0 to 7 loop
-            if s_axis_tkeep(i) = '1' then
-              v_lastlane := i;
-            end if;
-          end loop;
-
-          --------------------------------------------------------------------
-          -- Packet / payload boundaries
-          --------------------------------------------------------------------
-          if beat_cnt = 0 then
-            v_index := (others => '0');
-            v_in    := '0';
-            v_start := to_signed(64, 18);      -- nothing until the payload
-          end if;
-
-          if s_axis_tlast = '1' then
-            in_payload_r <= '0';
-          elsif beat_cnt = first_beat_c then
-            in_payload_r <= '1';
-          end if;
-          start_lane_r <= first_lane_c;
-
-          -- first payload beat: the first block starts at start_lane
-          if beat_cnt = first_beat_c then
-            v_in    := '0';
-            v_start := signed(resize(unsigned(first_lane_c), 18));
-          end if;
-
-          if s_axis_tlast = '1' then
-            beat_cnt <= (others => '0');
-          elsif beat_cnt /= 15 then
-            beat_cnt <= beat_cnt + 1;
+          -- Age of the in-flight block, in framing beats. Saturates well above
+          -- the in-scope maximum of 8 (E starting at lane 7).
+          if fl_base_r /= 15 then
+            fl_base_r <= fl_base_r + 1;
           end if;
 
           --------------------------------------------------------------------
-          -- ARITHMETIC FRAMING
-          --
-          -- Two passes, not eight. Pass 1 retires a block already in
-          -- progress; pass 2 reads and possibly retires the next one.
-          --
-          -- Two is provably enough for ASX ITCH: a third would need two
-          -- consecutive sub-8-byte blocks, and Seconds (7 bytes) is the only
-          -- type that small. A third is detected and flagged rather than
-          -- silently mis-framed.
+          -- The pointer chase
           --------------------------------------------------------------------
-          if (in_payload_r = '1') or (beat_cnt = first_beat_c) then
+          if rem_r /= 0 then
+            rem_r <= rem_r - 1;
 
-            -- pass 1: does the in-progress block end in this beat?
-            if v_in = '1' and v_end <= 7 then
-              if to_integer(v_end) <= v_lastlane then
-                do_complete(to_integer(v_end), v_len, v_type);
-                v_in    := '0';
-                v_start := v_end + 1;
-              end if;
-            end if;
+          elsif first_ok_c = '1' then
 
-            -- pass 2: read the next block if its length and type bytes are
-            -- all inside the view, and its start byte actually arrived
-            if v_in = '0' and v_start <= 5 and v_start >= -8 then
-              v_o := to_integer(v_start);
-              if (v_o + 2) <= v_lastlane then
-                v_len16(15 downto 8) := v_view(v_o + 8);
-                v_len16(7 downto 0)  := v_view(v_o + 9);
-                v_len  := unsigned(v_len16);
-                v_type := v_view(v_o + 10);
-                v_end  := v_start + signed(resize(unsigned(v_len16), 18)) + 1;
-                v_in   := '1';
+            if surv_ok_c = '1' then
+              rem_r  <= tb_rem(v_l);
+              lane_r <= tb_lane(v_l);
 
-                if v_end <= 7 then
-                  if to_integer(v_end) <= v_lastlane then
-                    do_complete(to_integer(v_end), v_len, v_type);
-                    v_in    := '0';
-                    v_start := v_end + 1;
-                    -- a third pass would be needed here; flag it
-                    if v_start <= 5 then
-                      v_overrun := '1';
-                    end if;
-                  end if;
-                end if;
-              end if;
-            end if;
-          end if;
+              armed_r     <= '1';
+              -- 2, not 1: this value first takes effect on the beat AFTER the
+              -- one the block was framed in, and win_r(1) is the beat being
+              -- framed. So at a retire d beats later it reads 1 + d, which is
+              -- exactly the window index of the start beat.
+              fl_base_r   <= to_unsigned(2, 4);
+              fl_typ_r    <= tb_typ(v_l);
+              fl_len_r    <= tb_len(v_l);
+              fl_slane_r  <= tb_slane(v_l);
+              fl_scope_r  <= tb_scope(v_l);
+              fl_lenok_r  <= tb_lenok(v_l);
 
-          --------------------------------------------------------------------
-          -- End of packet
-          --------------------------------------------------------------------
-          if s_axis_tlast = '1' then
-            if v_in = '1' then
-              -- a block was still in progress
-              if not v_emitted then
-                v_emitted      := true;
-                cmp_valid_r    <= '1';
-                cmp_type_r     <= v_type;
-                cmp_len_r      <= v_len;
-                cmp_index_r    <= v_index;
-                cmp_end_lane_r <= to_unsigned(7, 3);
-                cmp_fields_r   <= s_fields;
-                cmp_stat_r     <= (others => '0');
-                cmp_stat_r(C_ST_MSG_TRUNCATED) <= '1';
-                cmp_stat_r(C_ST_UNKNOWN_TYPE)  <=
-                  '1' when spec_msg_len(v_type) = 0 else '0';
-                v_index := v_index + 1;
+              -- A hop absorbed a T in this same beat. That T consumed the
+              -- CURRENT sequence number, so the surviving block takes the next
+              -- one and the counters advance by two.
+              if tb_two(v_l) = '1' then
+                fl_idx_r <= index_r + 1;
+                fl_seq_r <= seq_r + 1;
+                v_idx    := index_r + 2;
+                seq_r    <= seq_r + 2;
               else
-                v_multi := '1';
+                fl_idx_r <= index_r;
+                fl_seq_r <= seq_r;
+                v_idx    := index_r + 1;
+                seq_r    <= seq_r + 1;
               end if;
+            else
+              -- Last beat, and only the hop's first block is inside the
+              -- packet. Count that one and arm nothing.
+              armed_r <= '0';
+              v_idx   := index_r + 1;
+              seq_r   <= seq_r + 1;
             end if;
+
+            index_r <= v_idx;
+
+          elsif ret_norm_c = '1' then
+            -- Retired, but the next block starts outside the packet.
+            armed_r <= '0';
+          end if;
+
+          if ret_tail_c = '1' then
+            armed_r <= '0';
+          end if;
+
+          --------------------------------------------------------------------
+          -- Payload start
+          --------------------------------------------------------------------
+          if pay_arm_c = '1' then
+            active_r <= '1';
+            armed_r  <= '0';
+            rem_r    <= (others => '0');
+            lane_r   <= first_lane_c;
+            index_r  <= (others => '0');
+            seq_r    <= unsigned(mold_sequence_num(fv_fields));
+          end if;
+
+          --------------------------------------------------------------------
+          -- End of packet. Anything still in flight ran past the packet end
+          -- and is dropped.
+          --------------------------------------------------------------------
+          if fv_last = '1' then
+            active_r    <= '0';
+            armed_r     <= '0';
+            rem_r       <= (others => '0');
+            lane_r      <= (others => '0');
             pkt_done_r  <= '1';
-            pkt_count_r <= std_logic_vector(v_index);
+            -- v_idx, not index_r: a message can be loaded in this same beat.
+            pkt_count_r <= std_logic_vector(v_idx);
           end if;
-
-          if (v_multi or v_overrun) = '1' then
-            cmp_stat_r(C_ST_MULTI_COMPLETE) <= '1';
-          end if;
-
-          --------------------------------------------------------------------
-          -- Shift the offsets into the next beat's frame of reference
-          --------------------------------------------------------------------
-          if s_axis_tlast = '1' then
-            in_block_r <= '0';
-            start_r    <= to_signed(64, 18);
-            end_r      <= (others => '0');
-          else
-            in_block_r <= v_in;
-            end_r      <= v_end   - 8;
-            start_r    <= v_start - 8;
-          end if;
-          cur_len_r  <= v_len;
-          cur_type_r <= v_type;
-          index_r    <= v_index;
 
         end if;
       end if;
@@ -559,97 +780,111 @@ begin
   end process p_frame;
 
   ------------------------------------------------------------------------------
-  -- Stage 2: extract from the window, decode, emit
+  -- EXTRACT AND DECODE
   --
-  -- Entirely feed-forward from registers. If this ever becomes the critical
-  -- path it can take a further pipeline stage - unlike the framing loop.
+  -- Runs in the SAME cycle as the recurrence, reading fl_slane_r and
+  -- fl_base_r directly rather than waiting on a handoff register.
   --
-  -- The message's last byte sits at flat index 64 + cmp_end_lane_r, because
-  -- win_r(0) now holds the beat that was current when it completed. Its first
-  -- byte is therefore at 65 + end_lane - len.
+  -- Every mux select on this chain - fl_base_r, fl_slane_r, fl_typ_r - is a
+  -- bare register output. Nothing combinational sits in front of the beat
+  -- selection, which is what keeps this path down to three mux stages.
+  --
+  -- Select-then-rotate, not rotate-then-select: seven whole beats are picked
+  -- out of the window with a 12:1 mux, and only those 56 bytes are rotated by
+  -- the start lane. That is shallower and far smaller than rotating the whole
+  -- window.
   ------------------------------------------------------------------------------
   p_emit : process (clk)
-    variable v_flat  : byte_t(0 to C_WIN_BYTES-1);
-    variable v_rot   : byte_t(0 to C_WIN_BYTES-1);
-    variable v_msg   : std_logic_vector(C_MSG_BUF_W-1 downto 0);
-    variable v_start : integer;
-    variable v_lane  : natural;
-    variable v_beat  : natural;
-    variable v_sec   : integer;
+    variable v_base : integer;
+    variable v_idx  : integer;
+    variable v_grp  : byte_t(0 to 55);
+    variable v_lin  : byte_t(0 to 41);
+    variable v_msg  : std_logic_vector(C_EXT_W-1 downto 0);
+    variable v_sl   : integer range 0 to 7;
   begin
     if rising_edge(clk) then
       if resetn = '0' then
-        msg_valid_r   <= '0';
-        msg_index_r   <= (others => '0');
-        msg_seqnum_r  <= (others => '0');
-        msg_type_r    <= (others => '0');
-        msg_len_out_r <= (others => '0');
-        msg_fields_r  <= (others => '0');
-        msg_stat_r    <= (others => '0');
-        pkt_fields_r  <= (others => '0');
-        seconds_r     <= (others => '0');
+        msg_valid_r  <= '0';
+        msg_type_r   <= (others => '0');
+        msg_fields_r <= (others => '0');
+        msg_index_r  <= (others => '0');
+        msg_seq_r    <= (others => '0');
+        msg_len_r    <= (others => '0');
+        msg_stat_r   <= (others => '0');
+        pkt_fields_r <= (others => '0');
+        seconds_r    <= (others => '0');
       else
-        msg_valid_r <= cmp_valid_r;
 
-        if (cmp_valid_r = '1') or (cmp_is_t_r = '1') then
-
-          v_flat := flatten(win_r);
-
-          ------------------------------------------------------------------
-          -- 'T' - clock state only. Just four bytes, so a small dedicated
-          -- select rather than the full message extraction.
-          --
-          -- Message byte 1 sits at flat index (64 + end_lane) - len + 2, and
-          -- byte 1 is the MOST significant of the big-endian seconds value.
-          ------------------------------------------------------------------
-          if cmp_is_t_r = '1' then
-            v_sec := 64 + to_integer(t_end_lane_r) - to_integer(t_len_r) + 2;
-            if v_sec < 0 then
-              v_sec := 0;
-            end if;
-            seconds_r <= v_flat((v_sec + 0) mod C_WIN_BYTES) &
-                         v_flat((v_sec + 1) mod C_WIN_BYTES) &
-                         v_flat((v_sec + 2) mod C_WIN_BYTES) &
-                         v_flat((v_sec + 3) mod C_WIN_BYTES);
+        -- Exchange clock. Captured when the block is FRAMED, not when it
+        -- retires: a T is short enough to be the last message in a packet and
+        -- finish inside the final beat, where there is no later beat to retire
+        -- it in. Both cases are gated on load_c so a speculative read that
+        -- framing never selects cannot corrupt the clock.
+        if first_ok_c = '1' then
+          if load_c = '1' and tb_ist(to_integer(lane_r)) = '1' then
+            -- The surviving block is a T. It sits after any T the hop
+            -- absorbed, so it is the later clock value and wins.
+            seconds_r <= tb_secs(to_integer(lane_r));
+          elsif lane_r = 0 and t0_hit_r = '1' then
+            -- Only the hop's T is inside the packet. A hop can only ever
+            -- happen at lane 0.
+            seconds_r <= t0_secs_r;
           end if;
+        end if;
 
-          ------------------------------------------------------------------
-          -- A real message: locate it in the window and decode
-          ------------------------------------------------------------------
-          if cmp_valid_r = '1' then
-            v_start := 64 + to_integer(cmp_end_lane_r)
-                          - to_integer(cmp_len_r) + 1;
-            if v_start < 0 then
-              v_start := 0;               -- longer than the window; only
-            end if;                       -- undecoded types can be
+        -- The wide payload registers run on fv_valid, NOT on retire_c.
+        --
+        -- retire_c is several levels of end-of-packet logic deep, and gating
+        -- msg_fields_r (512), pkt_fields_r (523) and the seqnum/index/length
+        -- word with it put over 1100 clock enables on one late net - which
+        -- cost more in fanout routing than the logic did. Only msg_valid_r
+        -- needs it, so only msg_valid_r gets it. Downstream already qualifies
+        -- the payload with msg_valid, so letting it carry junk on the cycles
+        -- in between is free.
+        --
+        -- fv_valid is a plain registered copy of the advance strobe, so this
+        -- enable is a register output straight to the CE pins with no logic in
+        -- between, and the datapath still stops toggling between packets.
+        if fv_valid = '1' then
 
-            v_lane := v_start mod 8;
-            v_beat := v_start / 8;
-            if v_beat > C_WIN_BEATS-1 then
-              v_beat := C_WIN_BEATS-1;
-            end if;
+          -- win_r(1) is the beat being framed and fl_base_r is how many beats
+          -- ago the block started, so win_r(fl_base_r) is its start beat. True
+          -- for the tail retire as well, which is why there is no correction
+          -- term and no logic ahead of the mux.
+          v_base := to_integer(fl_base_r);
 
-            v_rot := rot_lane(v_flat, v_lane);
-            v_msg := sel_beat(v_rot, v_beat);
+          for k in 0 to 6 loop
+            v_idx := (v_base - k) mod C_WIN_BEATS;
+            for m in 0 to 7 loop
+              v_grp(8*k + m) := bsel(win_r(v_idx), m);
+            end loop;
+          end loop;
 
-            msg_index_r   <= std_logic_vector(cmp_index_r);
-            msg_type_r    <= cmp_type_r;
-            msg_len_out_r <= std_logic_vector(cmp_len_r);
-            msg_stat_r    <= cmp_stat_r;
-            pkt_fields_r  <= cmp_fields_r;
+          v_sl := to_integer(fl_slane_r);
+          for i in 0 to 41 loop
+            v_lin(i) := v_grp(i + v_sl);
+          end loop;
 
-            msg_seqnum_r <= std_logic_vector(
-              unsigned(mold_sequence_num(cmp_fields_r)) +
-              resize(cmp_index_r, 64));
+          -- v_lin(0..1) are the Mold length prefix; message byte 0 is at 2.
+          for m in 0 to C_EXT_BYTES-1 loop
+            v_msg(8*m + 7 downto 8*m) := v_lin(m + 2);
+          end loop;
 
-            if cmp_stat_r(C_ST_DECODED) = '1' then
-              msg_fields_r <= decode_msg(v_msg, cmp_type_r);
-            else
-              msg_fields_r <= (others => '0');
-            end if;
-          end if;
+          msg_type_r   <= fl_typ_r;
+          msg_fields_r <= f_decode_scoped(v_msg, fl_typ_r);
+          msg_index_r  <= std_logic_vector(fl_idx_r);
+          msg_seq_r    <= std_logic_vector(fl_seq_r);
+          msg_len_r    <= std_logic_vector(fl_len_r);
+          pkt_fields_r <= fv_fields;
+
+          msg_stat_r                    <= (others => '0');
+          msg_stat_r(C_ST_DECODED)      <= '1';
+          msg_stat_r(C_ST_LEN_MISMATCH) <= not fl_lenok_r;
 
         end if;
+
+        -- The only register retire_c drives.
+        msg_valid_r <= retire_c;
       end if;
     end if;
   end process p_emit;
@@ -657,17 +892,12 @@ begin
   ------------------------------------------------------------------------------
   -- Outputs. All registered.
   ------------------------------------------------------------------------------
-  m_axis_tdata  <= tdata_r;
-  m_axis_tkeep  <= tkeep_r;
-  m_axis_tvalid <= tvalid_r;
-  m_axis_tlast  <= tlast_r;
-
   msg_valid  <= msg_valid_r;
-  msg_index  <= msg_index_r;
-  msg_seqnum <= msg_seqnum_r;
   msg_type   <= msg_type_r;
-  msg_length <= msg_len_out_r;
   msg_fields <= msg_fields_r;
+  msg_index  <= msg_index_r;
+  msg_seqnum <= msg_seq_r;
+  msg_length <= msg_len_r;
   msg_status <= msg_stat_r;
   pkt_fields <= pkt_fields_r;
 

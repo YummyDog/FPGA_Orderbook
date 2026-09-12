@@ -21,11 +21,30 @@ UDP inside IPv4 inside an Ethernet frame, built by asx_packets and
 book_model, sliced into 64-bit beats and clocked into s_axis_tdata. The
 command bus, the mutation bus and both memories are observed, never driven.
 
-BOTH MEMORIES ARE REAL RTL. level_array is in the build, so the level table
-is read out of the design through the hierarchy exactly like the order
-tables. There is no Python model of anything here.
+BOTH MEMORIES ARE REAL RTL. level_array is in the build. The order tables are
+read out of the design through the hierarchy; the level tables are too when
+the simulator allows it, and from a shadow of the write bus when it does not
+(see LevelShadow). There is no Python model of either memory's behaviour.
 
-The traffic is the same shape as test_book_PLS so the two logs read alike:
+
+WHAT CHANGED SINCE THE LAST VERSION
+
+itch_parser now owns framing and field extraction, and book_input_stage takes
+msg_fields directly. So the repack-and-serialise adapter in market_data_top
+is gone, and with it eng_tvalid, eng_tlast, beat_r and msg_dropped. The chain
+between msg_valid and the command pulse is now one register stage.
+
+F and C are OUT OF SCOPE in the new book_input_stage - f_is_scoped accepts
+only A, U, E and D. itch_parser still decodes F and C, so they arrive at the
+engine and are dropped there. The stimulus uses A/U/E/D throughout, and one
+phase sends an F and a C specifically to show them being dropped.
+
+Two new status outputs are surfaced: stat_bad_side and stat_qty_ovf.
+
+
+THE TRAFFIC
+
+Same shape as test_book_PLS so the two logs read alike:
 
     side   = 1  (sell)  on every message
     price  = 50000      on every message
@@ -67,7 +86,7 @@ WHAT GETS PRINTED, PER MESSAGE
     7. the level memory around whatever index the design touched, both sides
     8. the price_storage bus and output state
 
-Verbose by design - a hundred-odd lines per message across 42 messages.
+Verbose by design - a hundred-odd lines per message across 44 messages.
 Redirect it:
 
     powershell -ExecutionPolicy Bypass -File .\\market_data_sim.ps1 *> run.log
@@ -101,8 +120,9 @@ CLK_PERIOD_NS = 6.21         # 161 MHz, matching the synthesis constraint
 # Every message carries these. 1 = sell.
 #
 # 50000 price units. At C_PX_PER_CENT = 10 that is 5000 cents, $50.00, which
-# sits in the top band where the tick is 10 units - so the price is on-tick.
-# Nothing here depends on that; an off-tick price would still map to a level.
+# sits in the top band where the tick is 10 units - so the price is on-tick
+# and in range. With px_legal gone nothing checks that, so a price outside
+# the bands would silently aggregate into level 0 instead of being rejected.
 SIDE = 1
 SIDE_BYTE = bm.SIDE_SELL if SIDE else bm.SIDE_BUY
 PRICE = 50000
@@ -193,6 +213,16 @@ OP_REPLACE = OP_NAMES.index("OP_REPLACE")
 OP_DELETE = OP_NAMES.index("OP_DELETE")
 
 # ---------------------------------------------------------------------------
+# Message types the engine accepts.
+#
+# book_input_stage.f_is_scoped takes A, U, E and D only. itch_parser still
+# decodes F and C, so those reach the engine and are dropped there rather
+# than never arriving.
+# ---------------------------------------------------------------------------
+IN_SCOPE = (bm.T_ADD, bm.T_REPLACE, bm.T_EXEC, bm.T_DELETE)
+OUT_OF_SCOPE = (bm.T_ADD_PID, bm.T_EXEC_PRICE)
+
+# ---------------------------------------------------------------------------
 # Order IDs - ASX shaped, fixed session prefix and an incrementing sequence
 # ---------------------------------------------------------------------------
 SESSION_PREFIX = 0x621F1282
@@ -201,8 +231,11 @@ FIRST_SEQ = 0x0000E5ED
 N_INSERT = CAPACITY // 2             # 32 orders
 
 # How long to let a packet work through the whole chain before dumping.
-# Generous: five parser stages, the adapter, the input stage, the FIFO, the
-# cuckoo insert and then two more cycles for the level write.
+#
+# Shorter than it needed to be with the adapter in place - five parser
+# stages, then a single register in book_input_stage, the FIFO, the cuckoo
+# insert and two more cycles for the level write - but kept generous because
+# an eviction chain has no fixed length.
 DRAIN_CYCLES = 60
 
 
@@ -274,7 +307,7 @@ def frame_for(msg: bytes, **kw) -> bytes:
                            mold_msg_count=1, **kw)
 
 
-def build_multi(msgs, session: bytes = b"ASX0000001", **kw) -> bytes:
+def build_multi(msgs, **kw) -> bytes:
     """
     Several ITCH messages in one MoldUDP64 packet.
 
@@ -346,6 +379,13 @@ def fmt_op(idx):
     return OP_SHORT[idx]
 
 
+def fmt_type(t):
+    if t is None:
+        return "??"
+    name = bm.TYPE_NAME.get(t)
+    return f"{name}(0x{t:02X})" if name else f"0x{t:02X}"
+
+
 def fmt_key(key):
     if key is None:
         return f"{'....':>17} =0x{'?' * KEY_HEX}"
@@ -414,10 +454,6 @@ def fmt_level(v, width=LVL_FIELD_W):
 
 # ---------------------------------------------------------------------------
 # Reaching the memories through the hierarchy
-#
-# Both are real RTL here. The order tables live under the engine's ram_array
-# and the level tables under its level_array, each a ram_sdp inside a
-# generate.
 # ---------------------------------------------------------------------------
 def _reach(parent, gen_label, index, what):
     """One RAM handle out of a generate, however the simulator names it."""
@@ -478,6 +514,11 @@ class LevelShadow:
         self.writes = 0
         self.dropped = 0
 
+    def reset(self):
+        self.mem = [{} for _ in range(NUM_SIDES)]
+        self.writes = 0
+        self.dropped = 0
+
     def write(self, wsel, waddr, wdata):
         if wsel is None or waddr is None or wdata is None:
             self.dropped += 1
@@ -499,9 +540,7 @@ class LevelShadow:
         return s
 
 
-# Filled in by the test once it knows whether direct readback works.
 LEVEL_SHADOW = LevelShadow()
-LEVEL_RAMS = None
 
 
 def find_level_handles(dut):
@@ -528,6 +567,11 @@ def find_level_handles(dut):
             "              the design; only the printed contents come from "
             "the write bus.")
         return None
+
+
+def level_label(lvls):
+    return ("    LEVEL MEMORY (level_array)" if lvls is not None
+            else "    LEVEL MEMORY (shadow of the write bus)")
 
 
 def read_tables(rams):
@@ -591,14 +635,9 @@ def dump_orders(log, tables, label=""):
     log.info("%s", "\n".join(lines))
 
 
-def level_label(lvls):
-    return ("    LEVEL MEMORY (level_array)" if lvls is not None
-            else "    LEVEL MEMORY (shadow of the write bus)")
-
-
 def dump_levels(log, levels, label=""):
     """
-    The level memory, read out of level_array itself.
+    The level memory.
 
     Only the watched window is shown. An index the design has never touched
     still appears, as whatever the memory holds, rather than going missing.
@@ -684,12 +723,11 @@ def trace(dut, cycle, quiet=True):
     """
     e = dut.u_engine
 
-    # parser and adapter
+    # parser out, and the gate in market_data_top that decides what the
+    # engine is allowed to see
     mvalid = safe_int(dut.msg_valid_i)
     mtype = safe_int(dut.msg_type_i)
-    etv = safe_int(dut.eng_tvalid)
-    etl = safe_int(dut.eng_tlast)
-    beat = safe_int(dut.beat_r)
+    gated = safe_int(dut.eng_valid)
 
     # command pulse out of book_input_stage
     cmd_v = safe_int(e.in_tvalid)
@@ -751,21 +789,26 @@ def trace(dut, cycle, quiet=True):
                    safe_int(e.in_side), safe_int(e.in_qty),
                    safe_int(e.in_price))
 
-    interesting = (mvalid == 1 or etv == 1 or cmd_v == 1 or we == 1
-                   or ev_v == 1 or lwe == 1)
+    # A message the parser decoded but the engine never turned into a
+    # command: wrong book, unrecognised side, or a type out of scope.
+    dropped = (mvalid == 1 and gated == 1)
+
+    interesting = (mvalid == 1 or cmd_v == 1 or we == 1 or ev_v == 1
+                   or lwe == 1)
     if interesting or not quiet:
         dut._log.info(
-            "cyc %3d | msg=%s%s adapter=%s%s b%s | cmd=%s %s | order %s | "
+            "cyc %3d | msg=%s%s gate=%s | cmd=%s %s | order %s | "
             "mut=%s %s | lvl raddr=%s write %s",
             cycle,
-            fmt(mvalid), f" 0x{mtype:02X}" if mvalid == 1 and mtype else "",
-            fmt(etv), "L" if etl == 1 else " ", fmt(beat),
+            fmt(mvalid),
+            f" {fmt_type(mtype)}" if mvalid == 1 else "",
+            fmt(gated),
             fmt(cmd_v), fmt_op(cmd_op) if cmd_v == 1 else "",
             wr, fmt(ev_v), fmt_op(ev_op) if ev_v == 1 else "",
             fmt(lraddr), lw,
         )
 
-    return order_write, event, level_write, command
+    return order_write, event, level_write, command, dropped
 
 
 # ---------------------------------------------------------------------------
@@ -793,24 +836,25 @@ async def run_frame(dut, frame, gaps=None, drain=DRAIN_CYCLES):
     """
     Send one frame and watch the whole chain until it goes quiet.
 
-    Unlike test_book_PLS there is no handshake to wait on - the command bus
-    is a one-cycle pulse and price_storage takes no back-pressure - so
-    completion is a fixed drain rather than a quiet-window search. The trace
-    only prints cycles where something happened.
+    There is no handshake to wait on - the command bus is a one-cycle pulse
+    and price_storage takes no back-pressure - so completion is a fixed drain
+    rather than a quiet-window search. The trace only prints cycles where
+    something happened.
 
-    Returns (order_writes, events, level_writes, commands).
+    Returns (order_writes, events, level_writes, commands, msgs_seen).
     """
     order_writes = []
     events = []
     level_writes = []
     commands = []
+    msgs_seen = []
     cycle = 0
 
     async def sample():
         nonlocal cycle
         await FallingEdge(dut.clk)
         await ReadOnly()
-        w, ev, lw, cm = trace(dut, cycle)
+        w, ev, lw, cm, seen = trace(dut, cycle)
         if w is not None:
             order_writes.append(w)
         if ev is not None:
@@ -819,6 +863,8 @@ async def run_frame(dut, frame, gaps=None, drain=DRAIN_CYCLES):
             level_writes.append(lw)
         if cm is not None:
             commands.append(cm)
+        if seen:
+            msgs_seen.append((cycle, safe_int(dut.msg_type_i)))
         await RisingEdge(dut.clk)
         cycle += 1
 
@@ -831,11 +877,11 @@ async def run_frame(dut, frame, gaps=None, drain=DRAIN_CYCLES):
     for _ in range(drain):
         await sample()
 
-    return order_writes, events, level_writes, commands
+    return order_writes, events, level_writes, commands, msgs_seen
 
 
 async def message(dut, rams, lvls, banner, msg, order_id, op, qty=0,
-                  price=0, frame=None):
+                  price=0, frame=None, expect_drop=False):
     """
     Send one ITCH message inside one packet, then dump everything.
 
@@ -851,13 +897,24 @@ async def message(dut, rams, lvls, banner, msg, order_id, op, qty=0,
     dut._log.info("%s", banner)
     dut._log.info("    command : op=%s  key=%s  side=%d  qty=%d  price=%d",
                   fmt_op(op), fmt_key(key), SIDE, qty, price)
-    dut._log.info("    itch    : %d bytes  %s",
-                  len(msg), msg[:20].hex(" "))
+    dut._log.info("    itch    : type %s, %d bytes  %s",
+                  fmt_type(msg[0]), len(msg), msg[:20].hex(" "))
     dut._log.info("    frame   : %d bytes, %d beats  (mold seq %d)",
                   len(frame), (len(frame) + 7) // 8, _seqnum[0] - 1)
+    if expect_drop:
+        dut._log.info("    NOTE    : out of scope for book_input_stage - "
+                      "the parser decodes it, the engine drops it")
     dut._log.info("-" * 100)
 
-    order_writes, events, level_writes, commands = await run_frame(dut, frame)
+    (order_writes, events, level_writes,
+     commands, msgs_seen) = await run_frame(dut, frame)
+
+    # ---- what reached the engine's slave port ----------------------------
+    for c, t in msgs_seen:
+        dut._log.info("    parser out  : @cyc %d  type %s  (passed the "
+                      "status gate)", c, fmt_type(t))
+    if not msgs_seen:
+        dut._log.info("    parser out  : nothing passed the status gate")
 
     # ---- what book_input_stage emitted -----------------------------------
     if commands:
@@ -870,6 +927,10 @@ async def message(dut, rams, lvls, banner, msg, order_id, op, qty=0,
     else:
         dut._log.info("    command out : none - the message never became a "
                       "command")
+
+    dut._log.info("    stat        : bad_side=%s qty_ovf=%s",
+                  fmt(safe_int(dut.stat_bad_side)),
+                  fmt(safe_int(dut.stat_qty_ovf)))
 
     # ---- what came out on the mutation bus -------------------------------
     if events:
@@ -929,6 +990,10 @@ async def reset(dut):
     dut.base_price.value = 0
     dut.m_tready.value = 1
 
+    LEVEL_SHADOW.reset()
+    WATCH_LEVELS.clear()
+    WATCH_LEVELS.update(WATCH_SEED)
+
     for _ in range(5):
         await RisingEdge(dut.clk)
     dut.resetn.value = 1
@@ -937,7 +1002,9 @@ async def reset(dut):
     # NOTE: this resets the logic, not the memories. Neither ram_sdp nor
     # level_array resets its array - real block RAM has no reset on its
     # contents, and forcing one would stop the synthesiser inferring a memory
-    # at all.
+    # at all. The shadow is cleared above to match a fresh elaboration, so
+    # after a mid-run reset it and the RTL will disagree about anything
+    # written before it.
 
 
 # ===========================================================================
@@ -952,14 +1019,12 @@ async def test_single_level_traffic(dut):
     """
     await reset(dut)
 
-    global LEVEL_RAMS
     rams = find_ram_handles(dut)
     lvls = find_level_handles(dut)
-    LEVEL_RAMS = lvls
 
     dut._log.info("=" * 100)
-    dut._log.info("toplevel    : market_data_top - parser and engine, both "
-                  "memories real RTL")
+    dut._log.info("toplevel    : market_data_top - parser and engine, no "
+                  "adapter between them")
     dut._log.info("order table : %d tables x %d slots = %d capacity, "
                   "slot %d bits", NUM_TABLES, DEPTH, CAPACITY, SLOT_W)
     dut._log.info("level table : %d sides x %d slots, %d addr bits, "
@@ -975,6 +1040,10 @@ async def test_single_level_traffic(dut):
     dut._log.info("              %s -> %s port %d, book id %d",
                   pkt.ASX_SRC_IP_A, pkt.ASX_GRP_IP, pkt.ASX_DST_PORT,
                   BOOK_ID)
+    dut._log.info("in scope    : A U E D. F and C are decoded by the parser "
+                  "and dropped by")
+    dut._log.info("              book_input_stage - see the OUT OF SCOPE "
+                  "phase below")
     dut._log.info("stimulus    : side=%d, price=%d on EVERY message; "
                   "only quantity varies", SIDE, PRICE)
     dut._log.info("              %d adds, %d deletes, %d replaces, %d execs "
@@ -1068,6 +1137,34 @@ async def test_single_level_traffic(dut):
                       msg, oid, OP_EXEC, qty=take, price=price)
         qty_now[i] = max(0, qty_now[i] - take)
 
+    # ---- out of scope ----------------------------------------------------
+    #
+    # F is an add with a participant id and C is an execution with a trade
+    # price. itch_parser decodes both, so msg_valid fires and the fields are
+    # populated - but f_is_scoped rejects them, so no command is emitted and
+    # neither memory moves. The order tables either side of this phase should
+    # be identical.
+    dut._log.info("")
+    dut._log.info("=" * 100)
+    dut._log.info("OUT OF SCOPE   -   F and C reach the engine and are "
+                  "dropped by book_input_stage")
+    dut._log.info("=" * 100)
+
+    oid_f = make_order_id(0xF00)
+    await message(dut, rams, lvls,
+                  "F        add with participant id - out of scope",
+                  bm.build_add(order_id=oid_f, book_id=BOOK_ID,
+                               side=SIDE_BYTE, qty=4242, price=PRICE,
+                               with_pid=True),
+                  oid_f, OP_ADD, qty=4242, price=PRICE, expect_drop=True)
+
+    oid_c = INSERTS[0][0]
+    await message(dut, rams, lvls,
+                  "C        execution with trade price - out of scope",
+                  bm.build_exec(order_id=oid_c, book_id=BOOK_ID,
+                                side=SIDE_BYTE, qty=10, trade_price=99999),
+                  oid_c, OP_EXEC, qty=10, price=PRICE, expect_drop=True)
+
     # ---- final state -----------------------------------------------------
     await FallingEdge(dut.clk)
     await ReadOnly()
@@ -1089,10 +1186,14 @@ async def test_single_level_traffic(dut):
                 if s is not None and (s >> VALID_BIT) & 1)
         dut._log.info("    T%d  %2d/%2d  %s", t, n, DEPTH, "#" * n)
     dut._log.info("")
-    dut._log.info("  fifo: full=%s overflow=%s   adapter: msg_dropped=%s",
+    dut._log.info("  fifo: full=%s overflow=%s   "
+                  "input stage: bad_side=%s qty_ovf=%s",
                   fmt(safe_int(dut.fifo_full)),
                   fmt(safe_int(dut.fifo_overflow)),
-                  fmt(safe_int(dut.msg_dropped)))
+                  fmt(safe_int(dut.stat_bad_side)),
+                  fmt(safe_int(dut.stat_qty_ovf)))
+    dut._log.info("  level writes seen on the bus: %d",
+                  LEVEL_SHADOW.writes)
     dut._log.info("=" * 100)
 
 
@@ -1103,17 +1204,17 @@ async def test_multi_message_packet(dut):
 
     The per-message test gives the chain a whole packet gap between messages.
     This one does not: four messages arrive back to back inside a single
-    frame, so the parser emits msg_valid four times in quick succession and
-    the adapter, the input stage and the FIFO have to keep up. If the FIFO is
-    going to overflow or the adapter is going to drop a message, it happens
-    here.
+    frame, so the parser retires msg_valid four times in quick succession and
+    the input stage and FIFO have to keep up.
+
+    book_input_stage has no buffering - it is one register stage and accepts
+    a message every cycle - so the pressure lands on order_fifo. If it is
+    going to overflow, it happens here.
     """
     await reset(dut)
 
-    global LEVEL_RAMS
     rams = find_ram_handles(dut)
     lvls = find_level_handles(dut)
-    LEVEL_RAMS = lvls
 
     base = 0x900
     msgs = [
@@ -1133,13 +1234,18 @@ async def test_multi_message_packet(dut):
                   len(msgs), len(frame), (len(frame) + 7) // 8)
     for n, m in enumerate(msgs):
         dut._log.info("    msg %d: type %s  %d bytes",
-                      n, chr(m[0]), len(m))
+                      n, fmt_type(m[0]), len(m))
     dut._log.info("=" * 100)
 
-    order_writes, events, level_writes, commands = await run_frame(
-        dut, frame, drain=DRAIN_CYCLES * 2)
+    (order_writes, events, level_writes,
+     commands, msgs_seen) = await run_frame(dut, frame,
+                                            drain=DRAIN_CYCLES * 2)
 
     dut._log.info("")
+    dut._log.info("    messages through the gate : %d of %d",
+                  len(msgs_seen), len(msgs))
+    for c, t in msgs_seen:
+        dut._log.info("        @cyc %d  %s", c, fmt_type(t))
     dut._log.info("    commands out : %d   mutations : %d",
                   len(commands), len(events))
     dut._log.info("    order writes : %d   level writes : %d",
@@ -1152,8 +1258,10 @@ async def test_multi_message_packet(dut):
     dump_orders(dut._log, tables, "    ORDER TABLES")
     dump_levels(dut._log, levels, level_label(lvls))
     dump_pls(dut._log, dut, "    PRICE STORAGE")
-    dut._log.info("    fifo: full=%s overflow=%s   adapter: msg_dropped=%s",
+    dut._log.info("    fifo: full=%s overflow=%s   "
+                  "input stage: bad_side=%s qty_ovf=%s",
                   fmt(safe_int(dut.fifo_full)),
                   fmt(safe_int(dut.fifo_overflow)),
-                  fmt(safe_int(dut.msg_dropped)))
+                  fmt(safe_int(dut.stat_bad_side)),
+                  fmt(safe_int(dut.stat_qty_ovf)))
     await RisingEdge(dut.clk)

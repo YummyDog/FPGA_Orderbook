@@ -3,16 +3,22 @@
 --
 -- Structural top for the ASX ITCH order book engine.
 --
---   message beats -> book_input_stage -> order_fifo -> order_book -> price_storage
---                                                          |              |
---                                                      ram_array      level_array
+--   msg_fields -> book_input_stage -> order_fifo -> order_book -> price_storage
+--                                                       |              |
+--                                                   ram_array      level_array
 --
 -- Nothing but wiring lives here. Geometry comes from ram_pkg and level_pkg, so
 -- the memories take no generics.
 --
--- The slave port is ITCH message bytes, 8 per beat, first byte in the low lane,
--- tlast ending the message. book_input_stage emits a one-cycle pulse with no
--- handshake; order_fifo absorbs it, since its s_tready is hardwired high.
+-- The slave port is one decoded message per cycle in the C_FLD_* layout from
+-- itch_parser_pkg - no beats, no assembly, no handshake. book_input_stage
+-- normalises it and emits a one-cycle command pulse; order_fifo absorbs that,
+-- since its s_tready is hardwired high.
+--
+-- Note the dependency direction: the engine now uses itch_parser_pkg, for
+-- C_MSG_FIELDS_W and the field offsets. That is the price of deleting the
+-- second decoder - the message layout is defined in exactly one place and the
+-- engine reads it from there.
 --
 -- price_storage does not drive its status or top-of-book outputs yet; those
 -- ports are brought out regardless so the interface does not change when it
@@ -27,6 +33,7 @@ library ieee;
   use work.ram_pkg.all;
   use work.order_book_pkg.all;
   use work.level_pkg.all;
+  use work.itch_parser_pkg.all;
 
 entity order_book_engine_top is
   generic (
@@ -39,12 +46,11 @@ entity order_book_engine_top is
     resetn        : in    std_logic;
 
     ----------------------------------------------------------------------------
-    -- Slave: ITCH message bytes, 8 per beat
+    -- Slave: one decoded message per cycle from itch_parser. No handshake.
     ----------------------------------------------------------------------------
-    s_tvalid      : in    std_logic;
-    s_tready      : out   std_logic;
-    s_tdata       : in    std_logic_vector(63 downto 0);
-    s_tlast       : in    std_logic;
+    s_valid       : in    std_logic;
+    s_type        : in    std_logic_vector(7 downto 0);
+    s_fields      : in    std_logic_vector(C_MSG_FIELDS_W - 1 downto 0);
 
     ----------------------------------------------------------------------------
     -- Price window
@@ -70,7 +76,9 @@ entity order_book_engine_top is
     level_busy    : out   std_logic;
     oor           : out   std_logic;
     fifo_full     : out   std_logic;
-    fifo_overflow : out   std_logic
+    fifo_overflow : out   std_logic;
+    stat_bad_side : out   std_logic;   -- right book, unrecognised side byte
+    stat_qty_ovf  : out   std_logic    -- wire quantity exceeded 32 bits
   );
 end entity order_book_engine_top;
 
@@ -143,31 +151,33 @@ architecture rtl of order_book_engine_top is
 begin
 
   ------------------------------------------------------------------------------
-  -- Decode and filter. Emits on the beat carrying the last field it needs.
+  -- Normalise and filter. One combinational level plus the output register.
   ------------------------------------------------------------------------------
   u_book_input_stage : entity work.book_input_stage
     generic map (
       G_ORDER_BOOK_ID => G_ORDER_BOOK_ID
     )
     port map (
-      clk        => clk,
-      resetn     => resetn,
+      clk           => clk,
+      resetn        => resetn,
 
-      s_tvalid   => s_tvalid,
-      s_tready   => s_tready,
-      s_tdata    => s_tdata,
-      s_tlast    => s_tlast,
+      s_valid       => s_valid,
+      s_type        => s_type,
+      s_fields      => s_fields,
 
-      m_tvalid   => in_tvalid,
-      m_op       => in_op,
-      m_order_id => in_order_id,
-      m_book_id  => in_book_id,
-      m_side     => in_side,
-      m_qty      => in_qty,
-      m_price    => in_price,
-      m_px_valid => in_px_valid,
-      m_undisc   => in_undisc,
-      m_implied  => in_implied
+      m_tvalid      => in_tvalid,
+      m_op          => in_op,
+      m_order_id    => in_order_id,
+      m_book_id     => in_book_id,
+      m_side        => in_side,
+      m_qty         => in_qty,
+      m_price       => in_price,
+      m_px_valid    => in_px_valid,
+      m_undisc      => in_undisc,
+      m_implied     => in_implied,
+
+      stat_bad_side => stat_bad_side,
+      stat_qty_ovf  => stat_qty_ovf
     );
 
   ------------------------------------------------------------------------------

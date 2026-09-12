@@ -351,7 +351,7 @@ begin
   m_side <= side_store when op_r = OP_DELETE or replacing_r = '1' else
     insertion_wdata(C_VAL_W) or lookup_r(0);
 
-  m_price <= lookup_store(PRICE_RANGE) when op_r = OP_DELETE or replacing_r = '1' else
+  m_price <= lookup_store(PRICE_RANGE) when op_r = OP_DELETE or replacing_r = '1' or op_r = OP_EXEC else --exec "E" doesnt contain a price
     insertion_wdata(PRICE_RANGE) or modify_r(PRICE_RANGE);
 
   m_qty <= lookup_store(QTY_RANGE) when op_r = OP_DELETE or replacing_r = '1' else
