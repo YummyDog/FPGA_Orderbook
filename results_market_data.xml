@@ -1,7 +1,25 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1789139004" />
-    <testcase name="test_single_level_traffic" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="1013" time="1.1537439823150635" sim_time_ns="20294.28" ratio_time="17589.933565051568" />
-    <testcase name="test_multi_message_packet" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="1200" time="0.03882598876953125" sim_time_ns="956.3400000000001" ratio_time="24631.439669876207" />
+    <property name="random_seed" value="1789223012" />
+    <testcase name="test_single_level_traffic" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="40" time="0.5719151496887207" sim_time_ns="11066.22" ratio_time="19349.408747124588" />
+    <testcase name="test_two_sided_book" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="108" time="0.18889164924621582" sim_time_ns="4614.030000000001" ratio_time="24426.860681309005" />
+    <testcase name="test_price_ladder" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="164" time="0.14402437210083008" sim_time_ns="3719.790000000001" ratio_time="25827.50367691804" />
+    <testcase name="test_multi_message_packet" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="206" time="0.05065488815307617" sim_time_ns="1015.3350000000028" ratio_time="20044.16625956647">
+      <failure error_type="AttributeError" error_msg="'Harness' object has no attribute 'log'" />
+    </testcase>
+    <testcase name="test_back_to_back_packets" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="252" time="0.07182073593139648" sim_time_ns="1425.1949999999997" ratio_time="19843.781625425738">
+      <failure error_type="AttributeError" error_msg="'Harness' object has no attribute 'log'" />
+    </testcase>
+    <testcase name="test_replace_same_and_new_price" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="313" time="0.21626758575439453" sim_time_ns="2005.829999999998" ratio_time="9274.760214311218" />
+    <testcase name="test_execution_to_zero" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="377" time="0.09859275817871094" sim_time_ns="2856.5999999999985" ratio_time="28973.730452109638" />
+    <testcase name="test_out_of_scope_types" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="422" time="0.020612478256225586" sim_time_ns="493.6949999999997" ratio_time="23951.268443467685">
+      <failure error_type="AttributeError" error_msg="'Harness' object has no attribute 'log'" />
+    </testcase>
+    <testcase name="test_filtering" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="481" time="0.06708002090454102" sim_time_ns="1875.420000000002" ratio_time="27957.951931303654" />
+    <testcase name="test_qty_saturation" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="539" time="0.1609032154083252" sim_time_ns="1881.6299999999974" ratio_time="11694.172768548919" />
+    <testcase name="test_price_aliasing" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="581" time="0.16634774208068848" sim_time_ns="1881.6300000000047" ratio_time="11311.424949112343" />
+    <testcase name="test_mixed_session" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="657" time="0.07358002662658691" sim_time_ns="928.3950000000041" ratio_time="12617.48660015494">
+      <failure error_type="AttributeError" error_msg="'Harness' object has no attribute 'log'" />
+    </testcase>
   </testsuite>
 </testsuites>

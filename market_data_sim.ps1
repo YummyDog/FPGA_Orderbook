@@ -4,7 +4,7 @@
     Runner for the full-chain testbench: parser and engine together, driven
     by real ASX frames.
 
-        s_axis_* -> fullparser -> [adapter] -> book_input_stage
+        s_axis_* -> fullparser -> book_input_stage
                  -> order_fifo -> order_book -> price_storage
                                       |              |
                                   ram_array     level_array
@@ -12,34 +12,42 @@
     Sources come from two folders. market_data_top.vhd sits beside this
     script; everything else is in Parser\ or Engine\.
 
-    BOTH MEMORIES ARE REAL RTL
 
-    Unlike book_PLS_sim.ps1, level_array.vhd IS compiled and the level table
-    is read out of the design through the hierarchy. There is no Python model
-    of the level memory, and level_ram_model.py is not needed.
+    MEMORIES ARE NOT CLEARED BETWEEN TESTS
 
-    That costs elaboration time: ram_sdp's simulation initialiser walks
-    2 x 16384 x 65 bits of level RAM element by element before the first
-    cocotb line appears. Expect a long pause at startup, and a longer one
-    with -Waves, since --dump-arrays now has the level tables to dump as well
-    as the order tables.
+    One analyse, one elaborate, one run - all selected tests share a single
+    simulation. Neither ram_sdp nor level_array resets its array (real block
+    RAM has no reset on its contents), so elaboration is the only thing that
+    clears them, and there is one of those.
+
+    That means test 2 starts on top of test 1's resting orders, and so on.
+    The intended end states in README_tests.md are written for a test running
+    on empty memories, so to compare against them run ONE test at a time:
+
+        .\market_data_sim.ps1 -Test test_price_ladder *> ladder.log
+
+    Running everything in one go is still useful as a smoke test - it proves
+    nothing crashes - but with 12 tests adding orders into a 64-slot table
+    the later ones will be working against a table that is well past a
+    sensible load factor, and cuckoo inserts may fail for that reason alone.
+
 
     THE LOG IS THE DELIVERABLE
 
     test_market_data.py asserts nothing. It prints both memories after every
-    message, so a full run is several thousand lines. Redirect it:
+    step, so a run is thousands of lines. Redirect it:
 
         powershell -ExecutionPolicy Bypass -File .\market_data_sim.ps1 *> run.log
 
     A green result means the run reached the end without the simulator
     falling over. It says nothing about whether the design is correct - that
-    judgement comes from reading the tables in the log.
+    comes from comparing the dumps against README_tests.md.
 
     Usage:
-        powershell -ExecutionPolicy Bypass -File .\market_data_sim.ps1
-        powershell -ExecutionPolicy Bypass -File .\market_data_sim.ps1 -Waves
-        powershell -ExecutionPolicy Bypass -File .\market_data_sim.ps1 -Clean
-        powershell -ExecutionPolicy Bypass -File .\market_data_sim.ps1 -Test test_multi_message_packet
+        .\market_data_sim.ps1
+        .\market_data_sim.ps1 -Test test_filtering
+        .\market_data_sim.ps1 -Waves
+        .\market_data_sim.ps1 -Clean
 #>
 
 param(
@@ -68,7 +76,10 @@ foreach ($d in @($ParserDir, $EngineDir)) {
 
 # Compile order matters: package before the entity that uses it.
 #
-# Parser first, then the engine, then the toplevel that instantiates both.
+# Parser first, then the engine, then the toplevel. itch_parser_pkg MUST come
+# before the engine - book_input_stage takes msg_fields directly, so
+# order_book_engine_top depends on C_MSG_FIELDS_W.
+#
 # level_pkg.vhd holds THREE packages in one file - level_cfg_pkg, then
 # level_band_pkg, then level_pkg - because a package cannot call its own
 # body's function to build its own header constants. Compiling the file once
@@ -102,13 +113,14 @@ $EngineSources = @(
     "order_book_engine_top.vhd"
 ) | ForEach-Object { Join-Path $EngineDir $_ }
 
-$Sources = $ParserSources + $EngineSources + @(Join-Path $Root "market_data_top.vhd")
+$Sources = $ParserSources + $EngineSources + @(Join-Path $Root "$Toplevel.vhd")
 
 foreach ($s in $Sources) {
     if (-not (Test-Path $s)) { throw "Missing VHDL source: $s" }
 }
 
-foreach ($p in @("$Module.py", "asx_packets.py", "book_model.py")) {
+foreach ($p in @("$Module.py", "md_harness.py", "asx_packets.py",
+                 "book_model.py")) {
     if (-not (Test-Path (Join-Path $Root $p))) {
         throw "Missing Python module: $(Join-Path $Root $p)"
     }
@@ -162,8 +174,14 @@ Write-Host "libpython: $LibPython"
 Write-Host "vhpi     : $VhpiLib"
 Write-Host "parser   : $ParserDir"
 Write-Host "engine   : $EngineDir"
-Write-Host "toplevel : $Toplevel  (frames in, both memories real RTL)"
-if ($Test) { Write-Host "filter   : $Test" }
+Write-Host "toplevel : $Toplevel"
+if ($Test) {
+    Write-Host "filter   : $Test  (memories clear - single test, single elaboration)"
+} else {
+    Write-Host "filter   : none - ALL tests share one elaboration, so memories" -ForegroundColor Yellow
+    Write-Host "           carry over between them and the end states in" -ForegroundColor Yellow
+    Write-Host "           README_tests.md will not match. Use -Test to compare." -ForegroundColor Yellow
+}
 Write-Host ""
 
 # ---------------------------------------------------------------------------
@@ -226,8 +244,8 @@ if ($LASTEXITCODE -ne 0) { throw "Analysis failed." }
 # level_array prints its geometry as an elaboration-time assertion note, so
 # the first useful line arrives before any cocotb test starts. If the depth
 # or address width there disagrees with the constants at the top of
-# test_market_data.py, the harness and the design are addressing different
-# things and the level dumps will not make sense.
+# md_harness.py, the harness and the design are addressing different things
+# and the level dumps will not make sense.
 # ---------------------------------------------------------------------------
 Write-Host "`n--- simulate ---"
 $RunArgs = @("-e", $Toplevel, "--no-save", "-r", "--load", $VhpiLib)
@@ -241,6 +259,9 @@ $SimExit = $LASTEXITCODE
 #
 # NVC exits 0 even when a cocotb assertion fires, so parse results.xml.
 #
+# cocotb writes a <testcase> for EVERY test in the module, marking the ones a
+# filter excluded as <skipped>. Those are not passes.
+#
 # test_market_data.py asserts NOTHING. It is a dump, not a check.
 # ---------------------------------------------------------------------------
 Write-Host "`n--- results ---"
@@ -250,9 +271,9 @@ $Total  = 0
 
 if (Test-Path $Results) {
     [xml]$Xml = Get-Content $Results
-    $Cases = @($Xml.SelectNodes("//testcase"))
-    $Total = $Cases.Count
-    foreach ($c in $Cases) {
+    foreach ($c in $Xml.SelectNodes("//testcase")) {
+        if ($c.SelectSingleNode("skipped")) { continue }
+        $Total++
         if ($c.failure -or $c.error) {
             $Failed++
             Write-Host ("  FAIL  " + $c.name) -ForegroundColor Red
@@ -260,7 +281,7 @@ if (Test-Path $Results) {
             Write-Host ("  pass  " + $c.name) -ForegroundColor Green
         }
     }
-    Write-Host "  $Total test(s), $Failed failed"
+    Write-Host "  $Total test(s) ran, $Failed failed"
 } else {
     Write-Host "  results.xml not produced" -ForegroundColor Yellow
     $Failed = 1

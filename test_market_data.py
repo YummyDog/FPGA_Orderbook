@@ -1,1267 +1,738 @@
 """
-cocotb testbench for market_data_top - the whole chain, driven by real frames.
+cocotb tests for market_data_top - the whole chain, driven by real frames.
 
     Ethernet -> IPv4 -> UDP -> MoldUDP64 -> ITCH -> book_input_stage
                 -> order_fifo -> order_book -> price_storage
                                      |              |
                                  ram_array     level_array
 
-A VISIBILITY HARNESS, same as test_book_PLS. It drives traffic and prints
-state. It does not check anything, model anything, or decide whether the
-design is correct - there are no assertions, no expected values and no
-pass/fail verdict beyond "the run completed". Reading the dumps is the
-verification step, and that is yours.
+Every order that reaches the table got there as bytes on a wire. Nothing is
+driven onto the command bus; the command bus, the mutation bus and both
+memories are observed only.
 
+A VISIBILITY HARNESS. No assertions, no expected values, no verdict beyond
+"the run completed". See README_tests.md for what each test drives and what
+to look for in its output.
 
-WHAT IS DIFFERENT FROM test_book_PLS
+Run one test at a time - the logs are long:
 
-Nothing is driven onto the command bus. Every order reaching the table got
-there as bytes on a wire: an ITCH message inside a MoldUDP64 packet inside
-UDP inside IPv4 inside an Ethernet frame, built by asx_packets and
-book_model, sliced into 64-bit beats and clocked into s_axis_tdata. The
-command bus, the mutation bus and both memories are observed, never driven.
-
-BOTH MEMORIES ARE REAL RTL. level_array is in the build. The order tables are
-read out of the design through the hierarchy; the level tables are too when
-the simulator allows it, and from a shadow of the write bus when it does not
-(see LevelShadow). There is no Python model of either memory's behaviour.
-
-
-WHAT CHANGED SINCE THE LAST VERSION
-
-itch_parser now owns framing and field extraction, and book_input_stage takes
-msg_fields directly. So the repack-and-serialise adapter in market_data_top
-is gone, and with it eng_tvalid, eng_tlast, beat_r and msg_dropped. The chain
-between msg_valid and the command pulse is now one register stage.
-
-F and C are OUT OF SCOPE in the new book_input_stage - f_is_scoped accepts
-only A, U, E and D. itch_parser still decodes F and C, so they arrive at the
-engine and are dropped there. The stimulus uses A/U/E/D throughout, and one
-phase sends an F and a C specifically to show them being dropped.
-
-Two new status outputs are surfaced: stat_bad_side and stat_qty_ovf.
-
-
-THE TRAFFIC
-
-Same shape as test_book_PLS so the two logs read alike:
-
-    side   = 1  (sell)  on every message
-    price  = 50000      on every message
-    qty    varies       100, 200, 300 ... 3200
-
-so the only thing that distinguishes one order from another is its ID and
-its quantity. Everything lands in a single price level, which is the case
-that exercises the level table hardest: consecutive mutations at one index,
-back to back, through the forwarding path price_storage uses to dodge an SDP
-address collision.
-
-
-THE LEVEL WRITE PATH
-
-price_storage writes two cycles after every accepted transfer:
-
-    cycle N     s_tvalid high. side/price/qty/op and the index are latched,
-                inserting goes high. lvl_raddr is combinational off s_price,
-                so the level read is already in flight.
-    cycle N+1   lvl_rdata is back. lvl_we, lvl_waddr, lvl_wsel and lvl_wdata
-                are registered from it.
-    cycle N+2   the write is on the bus and lands in level_array.
-
-The exception is a REPLACE, which order_book emits as a delete then an add
-on consecutive cycles. Two back-to-back transfers at the same price and side
-take the forwarding branch instead: the first result is held in lvl_r rather
-than written, the second is computed from it, and one write covers both.
-Watch for double=1 in the trace when a replace goes through.
-
-
-WHAT GETS PRINTED, PER MESSAGE
-
-    1. the message, as ITCH bytes and as the frame carrying it
-    2. the cycle-by-cycle trace while the packet drains
-    3. the command pulse out of book_input_stage
-    4. any mutation that came out of order_book on m_*
-    5. every write seen on either write port
-    6. the four order hash tables, as keys and again as quantities
-    7. the level memory around whatever index the design touched, both sides
-    8. the price_storage bus and output state
-
-Verbose by design - a hundred-odd lines per message across 44 messages.
-Redirect it:
-
-    powershell -ExecutionPolicy Bypass -File .\\market_data_sim.ps1 *> run.log
-
-
-ELABORATION IS SLOW
-
-level_array is 2 x 16384 x 65 bits and ram_sdp's simulation initialiser walks
-it element by element at elaboration. Expect a long pause before the first
-line. -Waves makes it worse: --dump-arrays has both level tables to dump as
-well as the order tables.
+    powershell -File .\\market_data_sim.ps1 -Test test_price_ladder *> ladder.log
 
 Simulator: NVC. VHDL-2008. cocotb 2.x.
 """
 
-import struct
-
 import cocotb
-from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, FallingEdge, ReadOnly
 
-import asx_packets as pkt
+from md_harness import (
+    Harness, banner, header, report, run, dump_all,
+    frame_one, frame_many,
+    msg_add, msg_replace, msg_exec, msg_delete,
+    make_order_id, px_index, px_on_tick, px_tick,
+    BUY, SELL, PX, BOOK_ID, CAPACITY, DRAIN_CYCLES,
+    fmt, fmt_side, safe_int,
+)
 import book_model as bm
 
-CLK_PERIOD_NS = 6.21         # 161 MHz, matching the synthesis constraint
 
 # ===========================================================================
-# CONFIGURATION - the stimulus
-# ===========================================================================
-
-# Every message carries these. 1 = sell.
-#
-# 50000 price units. At C_PX_PER_CENT = 10 that is 5000 cents, $50.00, which
-# sits in the top band where the tick is 10 units - so the price is on-tick
-# and in range. With px_legal gone nothing checks that, so a price outside
-# the bands would silently aggregate into level 0 instead of being rejected.
-SIDE = 1
-SIDE_BYTE = bm.SIDE_SELL if SIDE else bm.SIDE_BUY
-PRICE = 50000
-
-BOOK_ID = bm.DEFAULT_BOOK_ID          # 85603, must match G_ORDER_BOOK_ID
-
-
-def add_qty(i: int) -> int:
-    """Quantity of added order i."""
-    return 100 * (i + 1)                # 100, 200, 300 ... 3200
-
-
-def replace_qty(i: int, old: int) -> int:
-    """Quantity a replace rewrites order i to."""
-    return old * 2
-
-
-def exec_qty(i: int, old: int, full: bool) -> int:
-    """Quantity an execution takes off order i."""
-    return old if full else old // 4
-
-
-# Which added orders each phase acts on, by index.
-DELETE_IDX = [5, 17, 30]
-REPLACE_IDX = [1, 14, 22]
-EXEC_PARTIAL_IDX = [7, 19, 25]
-EXEC_FULL_IDX = [9]
-
-# Which level indices get printed after every message.
-#
-# Nothing is hardcoded and nothing is computed from the price. The window
-# FOLLOWS THE DESIGN: whatever index turns up on lvl_raddr or lvl_waddr gets
-# added, along with WATCH_SPAN neighbours either side. That way the dump
-# cannot go stale when PRICE changes, and cannot quietly miss the level if
-# the price maps somewhere other than expected.
-WATCH_SEED = set()
-WATCH_SPAN = 3
-
-WATCH_LEVELS = set(WATCH_SEED)
-
-# ---------------------------------------------------------------------------
-# Order table geometry - must match ram_pkg
-# ---------------------------------------------------------------------------
-NUM_TABLES = 4
-ADDR_W = 4
-DEPTH = 2 ** ADDR_W
-ORDER_ID_W = 64
-KEY_W = ORDER_ID_W + 1
-VAL_W = 66
-SLOT_W = 1 + KEY_W + VAL_W
-VALID_BIT = SLOT_W - 1
-KEY_MASK = (1 << KEY_W) - 1
-VAL_MASK = (1 << VAL_W) - 1
-CAPACITY = NUM_TABLES * DEPTH
-
-KEY_HEX = (KEY_W + 3) // 4
-
-CELL_W = 5          # "E5EDS" - low 16 bits of the order ID plus B/S
-QCELL_W = 6         # quantity cell
-
-# ---------------------------------------------------------------------------
-# Level table geometry - must match level_pkg
-#
-# t_level is side(1) & qty(32) & price(32), so the side is the top bit and
-# the price is the bottom 32.
-# ---------------------------------------------------------------------------
-NUM_SIDES = 2
-LVL_ADDR_W = 14
-LVL_DEPTH = 2 ** LVL_ADDR_W
-LVL_SIDE_W = 1
-LVL_QTY_W = 32
-LVL_PRICE_W = 32
-LEVEL_W = LVL_SIDE_W + LVL_QTY_W + LVL_PRICE_W
-
-LVL_SIDE_BIT = LEVEL_W - 1
-LVL_QTY_LO = LVL_PRICE_W
-LVL_FIELD_W = 34    # column width for a formatted level slot
-
-# ---------------------------------------------------------------------------
-# t_book_op - ordinals must match the declaration order in ram_pkg
-# ---------------------------------------------------------------------------
-OP_NAMES = ("OP_ADD", "OP_EXEC", "OP_REPLACE", "OP_DELETE")
-OP_SHORT = ("ADD", "EXEC", "REPL", "DEL")
-
-OP_ADD = OP_NAMES.index("OP_ADD")
-OP_EXEC = OP_NAMES.index("OP_EXEC")
-OP_REPLACE = OP_NAMES.index("OP_REPLACE")
-OP_DELETE = OP_NAMES.index("OP_DELETE")
-
-# ---------------------------------------------------------------------------
-# Message types the engine accepts.
-#
-# book_input_stage.f_is_scoped takes A, U, E and D only. itch_parser still
-# decodes F and C, so those reach the engine and are dropped there rather
-# than never arriving.
-# ---------------------------------------------------------------------------
-IN_SCOPE = (bm.T_ADD, bm.T_REPLACE, bm.T_EXEC, bm.T_DELETE)
-OUT_OF_SCOPE = (bm.T_ADD_PID, bm.T_EXEC_PRICE)
-
-# ---------------------------------------------------------------------------
-# Order IDs - ASX shaped, fixed session prefix and an incrementing sequence
-# ---------------------------------------------------------------------------
-SESSION_PREFIX = 0x621F1282
-FIRST_SEQ = 0x0000E5ED
-
-N_INSERT = CAPACITY // 2             # 32 orders
-
-# How long to let a packet work through the whole chain before dumping.
-#
-# Shorter than it needed to be with the adapter in place - five parser
-# stages, then a single register in book_input_stage, the FIFO, the cuckoo
-# insert and two more cycles for the level write - but kept generous because
-# an eviction chain has no fixed length.
-DRAIN_CYCLES = 60
-
-
-def make_order_id(n: int) -> int:
-    return (SESSION_PREFIX << 32) | ((FIRST_SEQ + n) & 0xFFFFFFFF)
-
-
-def make_key(order_id: int, side: int) -> int:
-    """Matches the RTL:  key <= s_order_id & s_side.  Side is bit 0."""
-    return ((order_id & ((1 << ORDER_ID_W) - 1)) << 1) | (side & 1)
-
-
-def split_key(key: int):
-    return (key >> 1) & ((1 << ORDER_ID_W) - 1), key & 1
-
-
-def to_signed32(v: int) -> int:
-    return v - (1 << 32) if v & 0x80000000 else v
-
-
-def split_value(v):
-    """Matches the RTL:  value <= s_qty & s_price & s_undisc & s_implied."""
-    if v is None:
-        return None
-    return {
-        "qty": (v >> 34) & 0xFFFFFFFF,
-        "price": to_signed32((v >> 2) & 0xFFFFFFFF),
-        "undisc": (v >> 1) & 1,
-        "implied": v & 1,
-    }
-
-
-def slot_key(slot):
-    return None if slot is None else (slot >> VAL_W) & KEY_MASK
-
-
-def slot_val(slot):
-    return None if slot is None else slot & VAL_MASK
-
-
-# The traffic. Every order on the same side at the same price; only the ID
-# and the quantity move.
-INSERTS = [
-    (make_order_id(i), SIDE, add_qty(i), PRICE)
-    for i in range(N_INSERT)
-]
-
-
-# ===========================================================================
-# Frame building
-#
-# asx_packets.build_frame carries exactly one ITCH message per packet, which
-# is what the per-message dump wants. build_multi below packs several into
-# one MoldUDP64 block for the burst case, reusing asx_packets for every
-# header below Mold.
-# ===========================================================================
-_seqnum = [1]
-
-
-def next_seq(n: int = 1) -> int:
-    s = _seqnum[0]
-    _seqnum[0] += n
-    return s
-
-
-def frame_for(msg: bytes, **kw) -> bytes:
-    """One ITCH message in one packet, with the next Mold sequence number."""
-    return pkt.build_frame(itch_msg=msg, mold_seqnum=next_seq(),
-                           mold_msg_count=1, **kw)
-
-
-def build_multi(msgs, **kw) -> bytes:
-    """
-    Several ITCH messages in one MoldUDP64 packet.
-
-    asx_packets.build_frame writes a single length-prefixed block, so the
-    Mold payload is assembled here and handed to it as one opaque body with
-    the count and the first length corrected. Everything below Mold - UDP
-    length, IPv4 total length and checksum, Ethernet - still comes from
-    asx_packets.
-    """
-    body = b"".join(struct.pack(">H", len(m)) + m for m in msgs)
-
-    # build_frame emits: session + seq + count + len(itch_msg) + itch_msg.
-    # Hand it the first message so that first length field is right, then
-    # splice the remaining blocks on and fix the count.
-    first, rest = msgs[0], body[2 + len(msgs[0]):]
-    frame = pkt.build_frame(itch_msg=first, mold_seqnum=next_seq(len(msgs)),
-                            mold_msg_count=len(msgs), **kw)
-    frame += rest
-
-    # Lengths below Mold have to grow with the spliced tail.
-    eth_len = 14 if frame[12:14] != struct.pack(">H", pkt.TPID_8021Q) else 18
-    ihl = (frame[eth_len] & 0x0F) * 4
-    ip_off = eth_len
-    udp_off = ip_off + ihl
-
-    ip_total = ihl + (len(frame) - udp_off)
-    frame = (frame[:ip_off + 2] + struct.pack(">H", ip_total)
-             + frame[ip_off + 4:])
-    frame = (frame[:ip_off + 10] + b"\x00\x00" + frame[ip_off + 12:])
-    csum = pkt.ipv4_checksum(frame[ip_off:ip_off + ihl])
-    frame = (frame[:ip_off + 10] + struct.pack(">H", csum)
-             + frame[ip_off + 12:])
-
-    udp_len = len(frame) - udp_off
-    frame = (frame[:udp_off + 4] + struct.pack(">H", udp_len)
-             + frame[udp_off + 6:])
-    return frame
-
-
-# ---------------------------------------------------------------------------
-# Formatting
-# ---------------------------------------------------------------------------
-def safe_int(handle):
-    try:
-        return int(handle.value)
-    except (ValueError, TypeError):
-        return None
-
-
-def read_op(handle):
-    """t_book_op as an index into OP_NAMES. NVC may give ordinal or name."""
-    v = handle.value
-    try:
-        return int(v)
-    except (ValueError, TypeError):
-        name = str(v).strip().upper()
-        if name in OP_NAMES:
-            return OP_NAMES.index(name)
-        return None
-
-
-def fmt(v):
-    return "?" if v is None else str(v)
-
-
-def fmt_op(idx):
-    if idx is None or idx >= len(OP_SHORT):
-        return "????"
-    return OP_SHORT[idx]
-
-
-def fmt_type(t):
-    if t is None:
-        return "??"
-    name = bm.TYPE_NAME.get(t)
-    return f"{name}(0x{t:02X})" if name else f"0x{t:02X}"
-
-
-def fmt_key(key):
-    if key is None:
-        return f"{'....':>17} =0x{'?' * KEY_HEX}"
-    oid, side = split_key(key)
-    return (f"{oid >> 32:08X}:{oid & 0xFFFFFFFF:08X}"
-            f"{'B' if side == 0 else 'S'} =0x{key:0{KEY_HEX}X}")
-
-
-def fmt_key_short(key):
-    if key is None:
-        return "?" * CELL_W
-    oid, side = split_key(key)
-    return f"{oid & 0xFFFF:04X}{'B' if side == 0 else 'S'}"
-
-
-def fmt_value(v):
-    d = split_value(v)
-    if d is None:
-        return "?"
-    return (f"qty={d['qty']} px={d['price']} "
-            f"undisc={d['undisc']} implied={d['implied']}")
-
-
-def fmt_cell(slot):
-    """Order table cell, as a key."""
-    if slot is None:
-        return "?" * CELL_W
-    if (slot >> VALID_BIT) & 1:
-        return fmt_key_short(slot_key(slot))
-    return "." * CELL_W
-
-
-def fmt_qcell(slot):
-    """
-    Order table cell, as a quantity.
-
-    With every order at the same side and the same price, quantity is the
-    only field that tells one resting order from another, so it gets its own
-    grid.
-    """
-    if slot is None:
-        return "?" * QCELL_W
-    if not ((slot >> VALID_BIT) & 1):
-        return "." * QCELL_W
-    d = split_value(slot_val(slot))
-    return f"{d['qty']:>{QCELL_W}d}" if d else "?" * QCELL_W
-
-
-def split_level(v):
-    if v is None:
-        return None
-    return {
-        "side": (v >> LVL_SIDE_BIT) & 1,
-        "qty": (v >> LVL_QTY_LO) & 0xFFFFFFFF,
-        "price": to_signed32(v & 0xFFFFFFFF),
-    }
-
-
-def fmt_level(v, width=LVL_FIELD_W):
-    d = split_level(v)
-    if d is None:
-        return "?".ljust(width)
-    s = f"side={d['side']} qty={d['qty']} px={d['price']}"
-    return s.ljust(width)
-
-
-# ---------------------------------------------------------------------------
-# Reaching the memories through the hierarchy
-# ---------------------------------------------------------------------------
-def _reach(parent, gen_label, index, what):
-    """One RAM handle out of a generate, however the simulator names it."""
-    attempts = []
-    try:
-        return getattr(parent, gen_label)[index].u_ram.ram
-    except Exception as e:                     # noqa: BLE001
-        attempts.append(f"{gen_label}[{index}] -> {e}")
-
-    for name in (f"{gen_label}({index})", f"{gen_label}[{index}]",
-                 f"{gen_label}_{index}"):
-        try:
-            return getattr(parent, name).u_ram.ram
-        except Exception as e:                 # noqa: BLE001
-            attempts.append(f"{name} -> {e}")
-
-    raise AssertionError(
-        f"Could not reach the {what} RAM contents through the hierarchy.\n"
-        "Tried:\n  " + "\n  ".join(attempts) +
-        "\n\nRun with NVC's --preserve-case (the runner already does) and "
-        "check the instance names in market_data_top.vhd, "
-        "order_book_engine_top.vhd, ram_array.vhd and level_array.vhd "
-        "match those above."
-    )
-
-
-def find_ram_handles(dut):
-    return [_reach(dut.u_engine.u_ram_array, "g_tables", t, "order")
-            for t in range(NUM_TABLES)]
-
-
-class LevelShadow:
-    """
-    A copy of the level memory, built from what the design writes.
-
-    NVC's VHPI will not hand out element constraints for the level RAMs -
-    16384 x 65 bits per side is large enough that they are stored in a form
-    it cannot index, and any read raises
-
-        Unable to obtain constraints for an indexable object
-        ...U_LEVEL_ARRAY.G_SIDES(0).U_RAM.RAM
-
-    The 16 x 132 bit order tables are small enough to read directly, which is
-    why only this one needs a shadow.
-
-    level_array IS STILL THE DESIGN. This is not a model standing in for it:
-    the RTL memory is what price_storage reads back through lvl_rdata and
-    what every aggregation decision is made from. This only mirrors the write
-    port so the contents can be printed. If the two ever disagreed it would
-    show up immediately as price_storage computing from a value the log says
-    is not there.
-
-    Both sides start at zero, matching ram_sdp's simulation initialiser.
-    """
-
-    def __init__(self):
-        self.mem = [{} for _ in range(NUM_SIDES)]
-        self.writes = 0
-        self.dropped = 0
-
-    def reset(self):
-        self.mem = [{} for _ in range(NUM_SIDES)]
-        self.writes = 0
-        self.dropped = 0
-
-    def write(self, wsel, waddr, wdata):
-        if wsel is None or waddr is None or wdata is None:
-            self.dropped += 1
-            return False
-        if not (0 <= wsel < NUM_SIDES) or not (0 <= waddr < LVL_DEPTH):
-            self.dropped += 1
-            return False
-        self.mem[wsel][waddr] = wdata
-        self.writes += 1
-        return True
-
-    def read(self, side, addr):
-        return self.mem[side].get(addr, 0)
-
-    def touched(self):
-        s = set()
-        for side in self.mem:
-            s.update(side.keys())
-        return s
-
-
-LEVEL_SHADOW = LevelShadow()
-
-
-def find_level_handles(dut):
-    """
-    Handles for the level RAMs, or None if VHPI will not index them.
-
-    Probes with a single element read rather than assuming: on a smaller
-    C_LVL_MAX_CENT the tables shrink and direct readback starts working
-    again, and then the log should come from the RTL rather than the shadow.
-    """
-    try:
-        rams = [_reach(dut.u_engine.u_level_array, "g_sides", s, "level")
-                for s in range(NUM_SIDES)]
-        _ = int(rams[0][0].value)
-        dut._log.info("level memory: reading level_array directly")
-        return rams
-    except Exception as e:                     # noqa: BLE001
-        dut._log.warning(
-            "level memory: cannot index level_array through VHPI (%s)", e)
-        dut._log.warning(
-            "              falling back to a shadow built from lvl_we. The "
-            "RTL memory is still")
-        dut._log.warning(
-            "              the design; only the printed contents come from "
-            "the write bus.")
-        return None
-
-
-def level_label(lvls):
-    return ("    LEVEL MEMORY (level_array)" if lvls is not None
-            else "    LEVEL MEMORY (shadow of the write bus)")
-
-
-def read_tables(rams):
-    return [[safe_int(rams[t][a]) for a in range(DEPTH)]
-            for t in range(NUM_TABLES)]
-
-
-def read_levels(lvls, addrs):
-    """
-    Only the watched indices - the table is 16384 deep per side.
-
-    From the RTL when VHPI allows it, from the shadow otherwise. Indices the
-    design has written are always included, so a level cannot go missing just
-    because the watch window drifted.
-    """
-    wanted = set(addrs) | LEVEL_SHADOW.touched()
-    out = {}
-    for a in sorted(wanted):
-        if not (0 <= a < LVL_DEPTH):
-            continue
-        if lvls is not None:
-            out[a] = [safe_int(lvls[s][a]) for s in range(NUM_SIDES)]
-        else:
-            out[a] = [LEVEL_SHADOW.read(s, a) for s in range(NUM_SIDES)]
-    return out
-
-
-# ---------------------------------------------------------------------------
-# Dumps
-# ---------------------------------------------------------------------------
-def dump_orders(log, tables, label=""):
-    """
-    The four order tables, twice - once as keys, once as quantities.
-
-    One log call with embedded newlines rather than one per row: cocotb
-    prefixes each record with about 50 columns of timestamp and logger name,
-    and paying that once is what keeps the rows from wrapping.
-    """
-    lines = []
-    if label:
-        lines.append(label)
-
-    lines.append("      keys")
-    lines.append("         " + " ".join(f"{a:>{CELL_W}d}"
-                                        for a in range(DEPTH)))
-    for t in range(NUM_TABLES):
-        lines.append(f"      T{t} " +
-                     " ".join(fmt_cell(tables[t][a]) for a in range(DEPTH)))
-
-    lines.append("      quantities")
-    lines.append("         " + " ".join(f"{a:>{QCELL_W}d}"
-                                        for a in range(DEPTH)))
-    for t in range(NUM_TABLES):
-        lines.append(f"      T{t} " +
-                     " ".join(fmt_qcell(tables[t][a]) for a in range(DEPTH)))
-
-    n = sum(1 for t in range(NUM_TABLES) for s in tables[t]
-            if s is not None and (s >> VALID_BIT) & 1)
-    lines.append(f"      occupancy {n}/{CAPACITY}")
-
-    log.info("%s", "\n".join(lines))
-
-
-def dump_levels(log, levels, label=""):
-    """
-    The level memory.
-
-    Only the watched window is shown. An index the design has never touched
-    still appears, as whatever the memory holds, rather than going missing.
-    """
-    lines = []
-    if label:
-        lines.append(label)
-
-    if not levels:
-        lines.append("      no level index touched yet")
-    else:
-        lines.append(f"      {'index':>6}  {'side 0':<{LVL_FIELD_W}}  "
-                     f"{'side 1':<{LVL_FIELD_W}}")
-        for a, both in levels.items():
-            lines.append(f"      {a:>6}  {fmt_level(both[0])}  "
-                         f"{fmt_level(both[1])}")
-
-    log.info("%s", "\n".join(lines))
-
-
-def dump_pls(log, dut, label=""):
-    """
-    The price_storage bus and outputs, exactly as they stand.
-
-    'U' on an output means price_storage is not driving it. Reported as read,
-    with no interpretation.
-    """
-    e = dut.u_engine
-    ps = e.u_price_storage
-
-    lines = []
-    if label:
-        lines.append(label)
-    lines.append(f"      mutation in : tvalid={fmt(safe_int(e.mut_tvalid))} "
-                 f"tready={fmt(safe_int(e.mut_tready))} "
-                 f"op={fmt_op(read_op(e.mut_op))} "
-                 f"side={fmt(safe_int(e.mut_side))}")
-    lines.append(f"                    qty={fmt(safe_int(e.mut_qty))} "
-                 f"price={fmt(safe_int(e.mut_price))}")
-    lines.append(f"      internal    : inserting={fmt(safe_int(ps.inserting))} "
-                 f"double={fmt(safe_int(ps.double))} "
-                 f"index={fmt(safe_int(ps.index))}")
-    lines.append(f"                    lvl_r={fmt_level(safe_int(ps.lvl_r))}")
-    lines.append(f"      level write : we={fmt(safe_int(e.lvl_we))} "
-                 f"wsel={fmt(safe_int(e.lvl_wsel))} "
-                 f"waddr={fmt(safe_int(e.lvl_waddr))}")
-    lines.append(f"                    "
-                 f"wdata={fmt_level(safe_int(e.lvl_wdata))}")
-    lines.append(f"      level read  : raddr={fmt(safe_int(e.lvl_raddr))}")
-    for s in range(NUM_SIDES):
-        lines.append(f"                    rdata[{s}]="
-                     f"{fmt_level(safe_int(e.lvl_rdata[s]))}")
-    lines.append(f"      handshake   : "
-                 f"s_tready={fmt(safe_int(ps.s_tready))} "
-                 f"busy={fmt(safe_int(dut.level_busy))} "
-                 f"oor={fmt(safe_int(dut.oor))}")
-    lines.append(f"      top of book : "
-                 f"tvalid={fmt(safe_int(dut.m_tvalid))} "
-                 f"valid={fmt(safe_int(dut.m_valid))}")
-    lines.append(f"                    bid "
-                 f"px={fmt(safe_int(dut.m_bid_price))}"
-                 f" qty={fmt(safe_int(dut.m_bid_qty))}")
-    lines.append(f"                    ask "
-                 f"px={fmt(safe_int(dut.m_ask_price))}"
-                 f" qty={fmt(safe_int(dut.m_ask_qty))}")
-    log.info("%s", "\n".join(lines))
-
-
-# ---------------------------------------------------------------------------
-# Bus tracing
-# ---------------------------------------------------------------------------
-def trace(dut, cycle, quiet=True):
-    """
-    Print the bus state for the current cycle and return what was seen.
-
-    Call from ReadOnly after a FallingEdge, so the values shown are the ones
-    in effect during this cycle - what the memories will act on at the next
-    rising edge. Sampling after RisingEdge would show the registers already
-    updated for the following cycle.
-
-    quiet suppresses the line when nothing at all happened, which is most of
-    a packet's beats.
-    """
-    e = dut.u_engine
-
-    # parser out, and the gate in market_data_top that decides what the
-    # engine is allowed to see
-    mvalid = safe_int(dut.msg_valid_i)
-    mtype = safe_int(dut.msg_type_i)
-    gated = safe_int(dut.eng_valid)
-
-    # command pulse out of book_input_stage
-    cmd_v = safe_int(e.in_tvalid)
-    cmd_op = read_op(e.in_op)
-
-    # order table write port
-    we = safe_int(e.ram_we)
-    wsel = safe_int(e.ram_wsel)
-    waddr = safe_int(e.ram_waddr)
-    wdata = safe_int(e.ram_wdata)
-
-    # mutation bus
-    ev_v = safe_int(e.mut_tvalid)
-    ev_op = read_op(e.mut_op)
-
-    # level write port
-    lwe = safe_int(e.lvl_we)
-    lwaddr = safe_int(e.lvl_waddr)
-    lraddr = safe_int(e.lvl_raddr)
-
-    # Whatever level the design touches gets added to the printed window,
-    # with its neighbours, so the surrounding levels are visible too.
-    for a in (lwaddr, lraddr):
-        if a is not None and 0 <= a < LVL_DEPTH:
-            WATCH_LEVELS.update(
-                range(max(0, a - WATCH_SPAN),
-                      min(LVL_DEPTH - 1, a + WATCH_SPAN) + 1))
-
-    wr = "-"
-    order_write = None
-    if we == 1 and None not in (wdata, wsel, waddr):
-        vbit = (wdata >> VALID_BIT) & 1
-        wr = (f"T{wsel}[{waddr:2d}]<={'V' if vbit else 'x'} "
-              f"0x{slot_key(wdata):0{KEY_HEX}X}")
-        order_write = (cycle, wsel, waddr, slot_key(wdata), slot_val(wdata),
-                       vbit)
-
-    lw = "-"
-    level_write = None
-    if lwe == 1:
-        lwdata = safe_int(e.lvl_wdata)
-        lwsel = safe_int(e.lvl_wsel)
-        lw = f"S{fmt(lwsel)}[{fmt(lwaddr)}]<= {fmt_level(lwdata)}"
-        level_write = (cycle, lwsel, lwaddr, lwdata)
-        # lvl_we is high during this cycle, so the write commits at the edge
-        # that ends it. Applying it here keeps the shadow in step with the
-        # memory rather than a cycle ahead of it.
-        if not LEVEL_SHADOW.write(lwsel, lwaddr, lwdata):
-            lw += "  [shadow REJECTED: unusable address or data]"
-
-    event = None
-    if ev_v == 1:
-        event = (cycle, ev_op, safe_int(e.mut_side), safe_int(e.mut_qty),
-                 safe_int(e.mut_price))
-
-    command = None
-    if cmd_v == 1:
-        command = (cycle, cmd_op, safe_int(e.in_order_id),
-                   safe_int(e.in_side), safe_int(e.in_qty),
-                   safe_int(e.in_price))
-
-    # A message the parser decoded but the engine never turned into a
-    # command: wrong book, unrecognised side, or a type out of scope.
-    dropped = (mvalid == 1 and gated == 1)
-
-    interesting = (mvalid == 1 or cmd_v == 1 or we == 1 or ev_v == 1
-                   or lwe == 1)
-    if interesting or not quiet:
-        dut._log.info(
-            "cyc %3d | msg=%s%s gate=%s | cmd=%s %s | order %s | "
-            "mut=%s %s | lvl raddr=%s write %s",
-            cycle,
-            fmt(mvalid),
-            f" {fmt_type(mtype)}" if mvalid == 1 else "",
-            fmt(gated),
-            fmt(cmd_v), fmt_op(cmd_op) if cmd_v == 1 else "",
-            wr, fmt(ev_v), fmt_op(ev_op) if ev_v == 1 else "",
-            fmt(lraddr), lw,
-        )
-
-    return order_write, event, level_write, command, dropped
-
-
-# ---------------------------------------------------------------------------
-# Stimulus driver
-# ---------------------------------------------------------------------------
-async def drive_frame(dut, frame, gaps=None):
-    """Clock one Ethernet frame in, 8 bytes per beat."""
-    beats = pkt.to_beats(frame)
-    for i, (tdata, tkeep, tlast) in enumerate(beats):
-        if gaps and gaps[i]:
-            dut.s_axis_tvalid.value = 0
-            for _ in range(gaps[i]):
-                await RisingEdge(dut.clk)
-        dut.s_axis_tdata.value = tdata
-        dut.s_axis_tkeep.value = tkeep
-        dut.s_axis_tvalid.value = 1
-        dut.s_axis_tlast.value = 1 if tlast else 0
-        await RisingEdge(dut.clk)
-    dut.s_axis_tvalid.value = 0
-    dut.s_axis_tlast.value = 0
-    return len(beats)
-
-
-async def run_frame(dut, frame, gaps=None, drain=DRAIN_CYCLES):
-    """
-    Send one frame and watch the whole chain until it goes quiet.
-
-    There is no handshake to wait on - the command bus is a one-cycle pulse
-    and price_storage takes no back-pressure - so completion is a fixed drain
-    rather than a quiet-window search. The trace only prints cycles where
-    something happened.
-
-    Returns (order_writes, events, level_writes, commands, msgs_seen).
-    """
-    order_writes = []
-    events = []
-    level_writes = []
-    commands = []
-    msgs_seen = []
-    cycle = 0
-
-    async def sample():
-        nonlocal cycle
-        await FallingEdge(dut.clk)
-        await ReadOnly()
-        w, ev, lw, cm, seen = trace(dut, cycle)
-        if w is not None:
-            order_writes.append(w)
-        if ev is not None:
-            events.append(ev)
-        if lw is not None:
-            level_writes.append(lw)
-        if cm is not None:
-            commands.append(cm)
-        if seen:
-            msgs_seen.append((cycle, safe_int(dut.msg_type_i)))
-        await RisingEdge(dut.clk)
-        cycle += 1
-
-    # Drive and observe concurrently: the frame is long enough that the first
-    # messages are already through the chain while later beats are still
-    # arriving.
-    driver = cocotb.start_soon(drive_frame(dut, frame, gaps))
-    while not driver.done():
-        await sample()
-    for _ in range(drain):
-        await sample()
-
-    return order_writes, events, level_writes, commands, msgs_seen
-
-
-async def message(dut, rams, lvls, banner, msg, order_id, op, qty=0,
-                  price=0, frame=None, expect_drop=False):
-    """
-    Send one ITCH message inside one packet, then dump everything.
-
-    This is the unit the whole file is built around: one message in, one full
-    picture of both memories out.
-    """
-    key = make_key(order_id, SIDE)
-    if frame is None:
-        frame = frame_for(msg)
-
-    dut._log.info("")
-    dut._log.info("-" * 100)
-    dut._log.info("%s", banner)
-    dut._log.info("    command : op=%s  key=%s  side=%d  qty=%d  price=%d",
-                  fmt_op(op), fmt_key(key), SIDE, qty, price)
-    dut._log.info("    itch    : type %s, %d bytes  %s",
-                  fmt_type(msg[0]), len(msg), msg[:20].hex(" "))
-    dut._log.info("    frame   : %d bytes, %d beats  (mold seq %d)",
-                  len(frame), (len(frame) + 7) // 8, _seqnum[0] - 1)
-    if expect_drop:
-        dut._log.info("    NOTE    : out of scope for book_input_stage - "
-                      "the parser decodes it, the engine drops it")
-    dut._log.info("-" * 100)
-
-    (order_writes, events, level_writes,
-     commands, msgs_seen) = await run_frame(dut, frame)
-
-    # ---- what reached the engine's slave port ----------------------------
-    for c, t in msgs_seen:
-        dut._log.info("    parser out  : @cyc %d  type %s  (passed the "
-                      "status gate)", c, fmt_type(t))
-    if not msgs_seen:
-        dut._log.info("    parser out  : nothing passed the status gate")
-
-    # ---- what book_input_stage emitted -----------------------------------
-    if commands:
-        for c, cop, coid, cside, cqty, cpx in commands:
-            dut._log.info("    command out : @cyc %d  op=%s side=%s qty=%s "
-                          "price=%s", c, fmt_op(cop), fmt(cside), fmt(cqty),
-                          fmt(None if cpx is None else to_signed32(cpx)))
-            dut._log.info("                  order id 0x%016X",
-                          coid if coid is not None else 0)
-    else:
-        dut._log.info("    command out : none - the message never became a "
-                      "command")
-
-    dut._log.info("    stat        : bad_side=%s qty_ovf=%s",
-                  fmt(safe_int(dut.stat_bad_side)),
-                  fmt(safe_int(dut.stat_qty_ovf)))
-
-    # ---- what came out on the mutation bus -------------------------------
-    if events:
-        for c, eop, es, eq, ep in events:
-            dut._log.info("    mutation : @cyc %d  op=%s side=%s qty=%s "
-                          "price=%s", c, fmt_op(eop), fmt(es), fmt(eq),
-                          fmt(None if ep is None else to_signed32(ep)))
-    else:
-        dut._log.info("    mutation : none emitted")
-
-    # ---- what hit the order tables ---------------------------------------
-    if order_writes:
-        for n, (c, t, a, k, v, vbit) in enumerate(order_writes):
-            dut._log.info("    order write %d @cyc %d: T%d[%d] valid=%d "
-                          "key=%s", n, c, t, a, vbit, fmt_key(k))
-            dut._log.info("                             value %s",
-                          fmt_value(v))
-    else:
-        dut._log.info("    order write : none")
-
-    # ---- what hit the level memory ---------------------------------------
-    #
-    # Two writes for a REPLACE would mean the forwarding branch did not fire.
-    # One write covering both halves is the intended behaviour - watch
-    # double= in the price_storage dump below.
-    if level_writes:
-        for n, (c, s, a, d) in enumerate(level_writes):
-            dut._log.info("    level write %d @cyc %d: side %s [%s] <= %s",
-                          n, c, fmt(s), fmt(a), fmt_level(d))
-    else:
-        dut._log.info("    level write : nothing on the bus "
-                      "(lvl_we stayed low)")
-
-    # ---- the two memories ------------------------------------------------
-    await FallingEdge(dut.clk)
-    await ReadOnly()
-    tables = read_tables(rams)
-    levels = read_levels(lvls, WATCH_LEVELS)
-    dump_orders(dut._log, tables, "    ORDER TABLES")
-    dump_levels(dut._log, levels, level_label(lvls))
-    dump_pls(dut._log, dut, "    PRICE STORAGE")
-    await RisingEdge(dut.clk)
-
-
-async def reset(dut):
-    cocotb.start_soon(Clock(dut.clk, CLK_PERIOD_NS, unit="ns").start())
-
-    dut.resetn.value = 0
-
-    dut.s_axis_tdata.value = 0
-    dut.s_axis_tkeep.value = 0
-    dut.s_axis_tvalid.value = 0
-    dut.s_axis_tlast.value = 0
-    dut.m_axis_tready.value = 1        # ignored by the parser
-
-    # Price window and top-of-book consumer.
-    dut.base_price.value = 0
-    dut.m_tready.value = 1
-
-    LEVEL_SHADOW.reset()
-    WATCH_LEVELS.clear()
-    WATCH_LEVELS.update(WATCH_SEED)
-
-    for _ in range(5):
-        await RisingEdge(dut.clk)
-    dut.resetn.value = 1
-    await RisingEdge(dut.clk)
-
-    # NOTE: this resets the logic, not the memories. Neither ram_sdp nor
-    # level_array resets its array - real block RAM has no reset on its
-    # contents, and forcing one would stop the synthesiser inferring a memory
-    # at all. The shadow is cleared above to match a fresh elaboration, so
-    # after a mid-run reset it and the RTL will disagree about anything
-    # written before it.
-
-
-# ===========================================================================
-# The run
+# 1. Baseline - one price, one side, one message per packet
 # ===========================================================================
 @cocotb.test()
 async def test_single_level_traffic(dut):
     """
-    32 adds, 3 deletes, 3 replaces and 4 executions, all on side 1 at price
-    50000 with varying quantities, each delivered as a real ASX frame. Both
-    memories are printed after every message.
+    Adds, deletes, replaces and executions, all SELL at one price, each in
+    its own packet. Everything lands in a single level, which is the case
+    that stresses the level table hardest: repeated mutation of one index.
+
+    This is the regression baseline - it is the closest of these tests to
+    test_book_PLS, so the two logs should read alike.
     """
-    await reset(dut)
+    h = Harness(dut)
+    await h.start()
+    header(h, "1. BASELINE - single level, single side, one message per packet",
+           [f"side        : SELL at price {PX['ref']} "
+            f"(index {px_index(PX['ref'])}), on every message",
+            "packets     : one ITCH message each, full dump after every one"])
 
-    rams = find_ram_handles(dut)
-    lvls = find_level_handles(dut)
+    h.expect(PX["ref"])
+    n_add = 16
+    qty = {}
 
-    dut._log.info("=" * 100)
-    dut._log.info("toplevel    : market_data_top - parser and engine, no "
-                  "adapter between them")
-    dut._log.info("order table : %d tables x %d slots = %d capacity, "
-                  "slot %d bits", NUM_TABLES, DEPTH, CAPACITY, SLOT_W)
-    dut._log.info("level table : %d sides x %d slots, %d addr bits, "
-                  "slot %d bits", NUM_SIDES, LVL_DEPTH, LVL_ADDR_W, LEVEL_W)
-    dut._log.info("key         : %d bits, order_id(64) & side(1), "
-                  "side at bit 0", KEY_W)
-    dut._log.info("value       : qty(32) price(32) undisc(1) implied(1)")
-    dut._log.info("level slot  : side(%d) qty(%d) price(%d)",
-                  LVL_SIDE_W, LVL_QTY_W, LVL_PRICE_W)
-    dut._log.info("")
-    dut._log.info("delivery    : one ITCH message per MoldUDP64 packet, "
-                  "over UDP / IPv4 / Ethernet")
-    dut._log.info("              %s -> %s port %d, book id %d",
-                  pkt.ASX_SRC_IP_A, pkt.ASX_GRP_IP, pkt.ASX_DST_PORT,
-                  BOOK_ID)
-    dut._log.info("in scope    : A U E D. F and C are decoded by the parser "
-                  "and dropped by")
-    dut._log.info("              book_input_stage - see the OUT OF SCOPE "
-                  "phase below")
-    dut._log.info("stimulus    : side=%d, price=%d on EVERY message; "
-                  "only quantity varies", SIDE, PRICE)
-    dut._log.info("              %d adds, %d deletes, %d replaces, %d execs "
-                  "(%d partial, %d full)",
-                  N_INSERT, len(DELETE_IDX), len(REPLACE_IDX),
-                  len(EXEC_PARTIAL_IDX) + len(EXEC_FULL_IDX),
-                  len(EXEC_PARTIAL_IDX), len(EXEC_FULL_IDX))
-    dut._log.info("              add quantities %d .. %d",
-                  add_qty(0), add_qty(N_INSERT - 1))
-    dut._log.info("")
-    dut._log.info("level write : two cycles after each accepted transfer. A "
-                  "REPLACE arrives as two")
-    dut._log.info("              back-to-back transfers at one price and "
-                  "takes the forwarding")
-    dut._log.info("              branch instead - one write for both halves, "
-                  "with double=1.")
-    dut._log.info("")
-    dut._log.info("cells       : keys as <low16 of order id><B|S>, "
-                  "'.' is an empty slot")
-    dut._log.info("              this harness checks nothing - read the dumps")
-    dut._log.info("=" * 100)
+    banner(dut, "ADDS")
+    for i in range(n_add):
+        oid = make_order_id(i)
+        qty[i] = 100 * (i + 1)
+        banner(dut, f"ADD {i + 1}/{n_add}  order {i}  qty {qty[i]}")
+        obs = await run(h, frame_one(msg_add(oid, SELL, qty[i], PX["ref"],
+                                             pos=i + 1)))
+        report(h, obs, expect_msgs=1)
+        await dump_all(h)
 
-    # What each order was last known to carry, so a delete, replace or exec
-    # banner can say what it is acting on. Bookkeeping for the log only -
-    # nothing is ever compared against it.
-    qty_now = {}
+    banner(dut, "DELETES")
+    for i in (3, 9, 14):
+        banner(dut, f"DELETE order {i}  (was resting {qty[i]})")
+        obs = await run(h, frame_one(msg_delete(make_order_id(i), SELL)))
+        report(h, obs, expect_msgs=1)
+        await dump_all(h)
+        qty[i] = 0
 
-    # ---- adds ------------------------------------------------------------
-    dut._log.info("")
-    dut._log.info("=" * 100)
-    dut._log.info("ADDS")
-    dut._log.info("=" * 100)
+    banner(dut, "REPLACES - the forwarding branch should fire, double=1")
+    for i in (1, 7):
+        new = qty[i] * 2
+        banner(dut, f"REPLACE order {i}  qty {qty[i]} -> {new}, "
+                    f"price unchanged")
+        obs = await run(h, frame_one(msg_replace(make_order_id(i), SELL, new,
+                                                 PX["ref"])))
+        report(h, obs, expect_msgs=1)
+        await dump_all(h)
+        qty[i] = new
 
-    for i, (oid, side, qty, price) in enumerate(INSERTS):
-        qty_now[i] = qty
-        msg = bm.build_add(order_id=oid, book_id=BOOK_ID, side=SIDE_BYTE,
-                           qty=qty, price=price, position=i + 1)
-        await message(dut, rams, lvls,
-                      f"ADD {i + 1}/{N_INSERT}   order index {i}",
-                      msg, oid, OP_ADD, qty=qty, price=price)
+    banner(dut, "EXECUTIONS")
+    for i, full in ((5, False), (11, False), (2, True)):
+        take = qty[i] if full else qty[i] // 4
+        banner(dut, f"EXEC order {i}  take {take} of {qty[i]}"
+                    f"{'  [fills the order]' if full else ''}")
+        obs = await run(h, frame_one(msg_exec(make_order_id(i), SELL, take)))
+        report(h, obs, expect_msgs=1)
+        await dump_all(h)
+        qty[i] = max(0, qty[i] - take)
 
-    # ---- deletes ---------------------------------------------------------
-    dut._log.info("")
-    dut._log.info("=" * 100)
-    dut._log.info("DELETES")
-    dut._log.info("=" * 100)
-
-    for i in DELETE_IDX:
-        oid, side, _, price = INSERTS[i]
-        msg = bm.build_delete(order_id=oid, book_id=BOOK_ID, side=SIDE_BYTE)
-        await message(dut, rams, lvls,
-                      f"DELETE   order index {i}   "
-                      f"(was resting {qty_now[i]})",
-                      msg, oid, OP_DELETE, qty=0, price=price)
-        qty_now[i] = 0
-
-    # ---- replaces --------------------------------------------------------
-    dut._log.info("")
-    dut._log.info("=" * 100)
-    dut._log.info("REPLACES   -   these are the ones that exercise the "
-                  "forwarding branch")
-    dut._log.info("=" * 100)
-
-    for i in REPLACE_IDX:
-        oid, side, _, price = INSERTS[i]
-        new_qty = replace_qty(i, qty_now[i])
-        msg = bm.build_replace(order_id=oid, book_id=BOOK_ID, side=SIDE_BYTE,
-                               qty=new_qty, price=price, position=1)
-        await message(dut, rams, lvls,
-                      f"REPLACE  order index {i}   qty {qty_now[i]} -> "
-                      f"{new_qty}, price unchanged at {price}",
-                      msg, oid, OP_REPLACE, qty=new_qty, price=price)
-        qty_now[i] = new_qty
-
-    # ---- executions ------------------------------------------------------
-    dut._log.info("")
-    dut._log.info("=" * 100)
-    dut._log.info("EXECUTIONS")
-    dut._log.info("=" * 100)
-
-    for i in EXEC_PARTIAL_IDX + EXEC_FULL_IDX:
-        oid, side, _, price = INSERTS[i]
-        full = i in EXEC_FULL_IDX
-        take = exec_qty(i, qty_now[i], full)
-        msg = bm.build_exec(order_id=oid, book_id=BOOK_ID, side=SIDE_BYTE,
-                            qty=take)
-        await message(dut, rams, lvls,
-                      f"EXEC     order index {i}   take {take} of "
-                      f"{qty_now[i]}"
-                      f"{'   [fills the order]' if full else ''}",
-                      msg, oid, OP_EXEC, qty=take, price=price)
-        qty_now[i] = max(0, qty_now[i] - take)
-
-    # ---- out of scope ----------------------------------------------------
-    #
-    # F is an add with a participant id and C is an execution with a trade
-    # price. itch_parser decodes both, so msg_valid fires and the fields are
-    # populated - but f_is_scoped rejects them, so no command is emitted and
-    # neither memory moves. The order tables either side of this phase should
-    # be identical.
-    dut._log.info("")
-    dut._log.info("=" * 100)
-    dut._log.info("OUT OF SCOPE   -   F and C reach the engine and are "
-                  "dropped by book_input_stage")
-    dut._log.info("=" * 100)
-
-    oid_f = make_order_id(0xF00)
-    await message(dut, rams, lvls,
-                  "F        add with participant id - out of scope",
-                  bm.build_add(order_id=oid_f, book_id=BOOK_ID,
-                               side=SIDE_BYTE, qty=4242, price=PRICE,
-                               with_pid=True),
-                  oid_f, OP_ADD, qty=4242, price=PRICE, expect_drop=True)
-
-    oid_c = INSERTS[0][0]
-    await message(dut, rams, lvls,
-                  "C        execution with trade price - out of scope",
-                  bm.build_exec(order_id=oid_c, book_id=BOOK_ID,
-                                side=SIDE_BYTE, qty=10, trade_price=99999),
-                  oid_c, OP_EXEC, qty=10, price=PRICE, expect_drop=True)
-
-    # ---- final state -----------------------------------------------------
-    await FallingEdge(dut.clk)
-    await ReadOnly()
-    tables = read_tables(rams)
-    levels = read_levels(lvls, WATCH_LEVELS)
-    dut._log.info("")
-    dut._log.info("=" * 100)
-    dut._log.info("FINAL STATE")
-    dut._log.info("=" * 100)
-    dump_orders(dut._log, tables, "    ORDER TABLES")
-    dump_levels(dut._log, levels, level_label(lvls))
-    dump_pls(dut._log, dut, "    PRICE STORAGE")
-    await RisingEdge(dut.clk)
-
-    dut._log.info("")
-    dut._log.info("  per-table load:")
-    for t in range(NUM_TABLES):
-        n = sum(1 for s in tables[t]
-                if s is not None and (s >> VALID_BIT) & 1)
-        dut._log.info("    T%d  %2d/%2d  %s", t, n, DEPTH, "#" * n)
-    dut._log.info("")
-    dut._log.info("  fifo: full=%s overflow=%s   "
-                  "input stage: bad_side=%s qty_ovf=%s",
-                  fmt(safe_int(dut.fifo_full)),
-                  fmt(safe_int(dut.fifo_overflow)),
-                  fmt(safe_int(dut.stat_bad_side)),
-                  fmt(safe_int(dut.stat_qty_ovf)))
-    dut._log.info("  level writes seen on the bus: %d",
-                  LEVEL_SHADOW.writes)
-    dut._log.info("=" * 100)
+    banner(dut, "FINAL STATE", rule="=")
+    await dump_all(h)
+    dut._log.info("  level writes seen on the bus: %d", h.shadow.writes)
 
 
+# ===========================================================================
+# 2. Two-sided book
+# ===========================================================================
+@cocotb.test()
+async def test_two_sided_book(dut):
+    """
+    Buys and sells at several prices, so both level tables populate.
+
+    Everything before this drove SELL only, which means side 0 of the level
+    memory was never written and lvl_wsel never changed. Here the sides
+    interleave, so the wsel decode in level_array and the side bit stored in
+    each slot both get exercised.
+
+    The bid ladder sits below the ask ladder, as a real book would: buys at
+    20000/35000, sells at 50000/65000.
+    """
+    h = Harness(dut)
+    await h.start()
+    header(h, "2. TWO-SIDED BOOK - both level tables, interleaved sides",
+           ["bids        : 20000 (idx %d), 35000 (idx %d)"
+            % (px_index(PX["low"]), px_index(PX["mid"])),
+            "asks        : 50000 (idx %d), 65000 (idx %d)"
+            % (px_index(PX["ref"]), px_index(PX["high"])),
+            "packets     : one message each, sides alternating"])
+
+    book = [
+        (0, BUY, 500, PX["low"]),
+        (1, SELL, 400, PX["ref"]),
+        (2, BUY, 600, PX["mid"]),
+        (3, SELL, 300, PX["high"]),
+        (4, BUY, 700, PX["low"]),
+        (5, SELL, 200, PX["ref"]),
+        (6, BUY, 800, PX["mid"]),
+        (7, SELL, 900, PX["high"]),
+    ]
+    for _, _, _, p in book:
+        h.expect(p)
+
+    for n, side, q, p in book:
+        banner(dut, f"ADD order {n}  {fmt_side(side)}  qty {q}  px {p}  "
+                    f"-> level index {px_index(p)}")
+        obs = await run(h, frame_one(msg_add(make_order_id(n), side, q, p)))
+        report(h, obs, expect_msgs=1)
+        await dump_all(h)
+
+    banner(dut, "Now take one order off each side")
+    for n, side in ((0, BUY), (3, SELL)):
+        banner(dut, f"DELETE order {n} {fmt_side(side)}")
+        obs = await run(h, frame_one(msg_delete(make_order_id(n), side)))
+        report(h, obs, expect_msgs=1)
+        await dump_all(h)
+
+    banner(dut, "FINAL STATE", rule="=")
+    await dump_all(h)
+
+
+# ===========================================================================
+# 3. Price ladder
+# ===========================================================================
+@cocotb.test()
+async def test_price_ladder(dut):
+    """
+    One order at each of eight consecutive on-tick prices.
+
+    Each should land on its own level index, one apart, since the tick in
+    this band is 10 price units per level. That makes the whole ladder
+    visible in one dump and is the cheapest check that px_index is monotonic
+    and correctly scaled - an off-by-ten in C_PX_PER_CENT would show as
+    indices ten apart, or all the same.
+    """
+    h = Harness(dut)
+    await h.start()
+
+    base = PX["ref"]
+    tick = px_tick(base)
+    prices = [base + k * tick for k in range(8)]
+    header(h, "3. PRICE LADDER - eight consecutive on-tick prices, one side",
+           [f"tick        : {tick} price units in this band",
+            f"prices      : {prices[0]} .. {prices[-1]}",
+            f"expected idx: {px_index(prices[0])} .. {px_index(prices[-1])} "
+            f"(consecutive)"])
+
+    for p in prices:
+        h.expect(p)
+
+    for n, p in enumerate(prices):
+        banner(dut, f"ADD order {n}  SELL qty {100 * (n + 1)}  px {p}  "
+                    f"-> level index {px_index(p)}")
+        obs = await run(h, frame_one(msg_add(make_order_id(n), SELL,
+                                             100 * (n + 1), p)))
+        report(h, obs, expect_msgs=1)
+        await dump_all(h)
+
+    banner(dut, "FINAL STATE - the ladder should be eight adjacent indices",
+           rule="=")
+    await dump_all(h)
+
+
+# ===========================================================================
+# 4. Several messages per packet
+# ===========================================================================
 @cocotb.test()
 async def test_multi_message_packet(dut):
     """
-    Several ITCH messages in ONE MoldUDP64 packet.
+    Six ITCH messages in ONE MoldUDP64 packet.
 
-    The per-message test gives the chain a whole packet gap between messages.
-    This one does not: four messages arrive back to back inside a single
-    frame, so the parser retires msg_valid four times in quick succession and
-    the input stage and FIFO have to keep up.
+    The per-message tests give the chain a whole packet gap between messages.
+    This one does not: the parser retires msg_valid six times in quick
+    succession. book_input_stage has no buffering - one register stage,
+    accepting a message every cycle - so the pressure lands on order_fifo.
 
-    book_input_stage has no buffering - it is one register stage and accepts
-    a message every cycle - so the pressure lands on order_fifo. If it is
-    going to overflow, it happens here.
+    Mixed sides and prices so the level writes go to different indices on
+    different sides back to back, which is where an address collision in
+    price_storage would show.
     """
-    await reset(dut)
+    h = Harness(dut)
+    await h.start()
+    header(h, "4. MULTI-MESSAGE PACKET - six messages, one frame",
+           ["mixed sides and prices, so consecutive level writes hit "
+            "different indices"])
 
-    rams = find_ram_handles(dut)
-    lvls = find_level_handles(dut)
+    for p in (PX["low"], PX["ref"], PX["high"]):
+        h.expect(p)
 
-    base = 0x900
     msgs = [
-        bm.build_add(order_id=make_order_id(base + 0), book_id=BOOK_ID,
-                     side=SIDE_BYTE, qty=1100, price=PRICE),
-        bm.build_add(order_id=make_order_id(base + 1), book_id=BOOK_ID,
-                     side=SIDE_BYTE, qty=1200, price=PRICE),
-        bm.build_exec(order_id=make_order_id(base + 0), book_id=BOOK_ID,
-                      side=SIDE_BYTE, qty=100),
-        bm.build_delete(order_id=make_order_id(base + 1), book_id=BOOK_ID,
-                        side=SIDE_BYTE),
+        msg_add(make_order_id(0), BUY, 100, PX["low"]),
+        msg_add(make_order_id(1), SELL, 200, PX["ref"]),
+        msg_add(make_order_id(2), BUY, 300, PX["low"]),
+        msg_exec(make_order_id(0), BUY, 50),
+        msg_add(make_order_id(3), SELL, 400, PX["high"]),
+        msg_delete(make_order_id(1), SELL),
     ]
-    frame = build_multi(msgs)
-
-    dut._log.info("=" * 100)
-    dut._log.info("MULTI-MESSAGE PACKET: %d messages, %d bytes, %d beats",
-                  len(msgs), len(frame), (len(frame) + 7) // 8)
+    frame = frame_many(msgs)
+    dut._log.info("frame: %d bytes, %d beats, %d messages",
+                  len(frame), (len(frame) + 7) // 8, len(msgs))
     for n, m in enumerate(msgs):
-        dut._log.info("    msg %d: type %s  %d bytes",
-                      n, fmt_type(m[0]), len(m))
-    dut._log.info("=" * 100)
+        dut._log.info("  msg %d: type %s, %d bytes",
+                      n, bm.TYPE_NAME.get(m[0], "?"), len(m))
 
-    (order_writes, events, level_writes,
-     commands, msgs_seen) = await run_frame(dut, frame,
-                                            drain=DRAIN_CYCLES * 2)
+    obs = await run(h, frame, drain=DRAIN_CYCLES * 2)
+    report(h, obs, expect_msgs=len(msgs))
+    await dump_all(h, "AFTER THE PACKET")
 
-    dut._log.info("")
-    dut._log.info("    messages through the gate : %d of %d",
-                  len(msgs_seen), len(msgs))
-    for c, t in msgs_seen:
-        dut._log.info("        @cyc %d  %s", c, fmt_type(t))
-    dut._log.info("    commands out : %d   mutations : %d",
-                  len(commands), len(events))
-    dut._log.info("    order writes : %d   level writes : %d",
-                  len(order_writes), len(level_writes))
 
-    await FallingEdge(dut.clk)
-    await ReadOnly()
-    tables = read_tables(rams)
-    levels = read_levels(lvls, WATCH_LEVELS)
-    dump_orders(dut._log, tables, "    ORDER TABLES")
-    dump_levels(dut._log, levels, level_label(lvls))
-    dump_pls(dut._log, dut, "    PRICE STORAGE")
-    dut._log.info("    fifo: full=%s overflow=%s   "
-                  "input stage: bad_side=%s qty_ovf=%s",
+# ===========================================================================
+# 5. Back-to-back packets
+# ===========================================================================
+@cocotb.test()
+async def test_back_to_back_packets(dut):
+    """
+    Eight packets with NO idle cycle between them - each frame's first beat
+    follows the previous frame's tlast immediately.
+
+    This is the sustained-rate case. Every stage has to accept a new packet
+    while still finishing the last one: the parser's per-packet state reset,
+    the input stage, the FIFO, and a cuckoo insert that may still be walking
+    an eviction chain when the next command arrives.
+
+    fifo_full and fifo_overflow in the status line are the things to watch.
+    """
+    h = Harness(dut)
+    await h.start()
+    header(h, "5. BACK-TO-BACK PACKETS - eight frames, zero gap",
+           ["each frame's first beat follows the previous tlast with no idle "
+            "cycle",
+            "watch fifo_full and fifo_overflow in the status line"])
+
+    for p in (PX["ref"], PX["mid"]):
+        h.expect(p)
+
+    frames = []
+    for n in range(8):
+        side = SELL if n % 2 else BUY
+        price = PX["ref"] if n % 2 else PX["mid"]
+        frames.append(frame_one(msg_add(make_order_id(n), side,
+                                        100 * (n + 1), price)))
+
+    dut._log.info("driving %d frames, %d beats total",
+                  len(frames), sum((len(f) + 7) // 8 for f in frames))
+
+    obs = await run(h, frames, gap=0, drain=DRAIN_CYCLES * 2)
+    report(h, obs, expect_msgs=len(frames))
+    await dump_all(h, "AFTER THE BURST")
+
+    banner(dut, "Same traffic again with a 4-cycle gap, for comparison")
+    dut._log.info("NOTE: order ids are offset by 0x100 for this run. Reset "
+                  "clears the logic but NOT")
+    dut._log.info("      the memories, so reusing the first run's ids would "
+                  "re-add live keys.")
+    h2 = Harness(dut)
+    await h2.start()
+    for p in (PX["ref"], PX["mid"]):
+        h2.expect(p)
+    frames = []
+    for n in range(8):
+        side = SELL if n % 2 else BUY
+        price = PX["ref"] if n % 2 else PX["mid"]
+        frames.append(frame_one(msg_add(make_order_id(0x100 + n), side,
+                                        100 * (n + 1), price)))
+    obs = await run(h2, frames, gap=4, drain=DRAIN_CYCLES * 2)
+    report(h2, obs, expect_msgs=len(frames))
+    await dump_all(h2, "AFTER THE GAPPED RUN - levels should be double the "
+                       "burst run, 16 orders resting")
+
+
+# ===========================================================================
+# 6. Replace - same price and moved price
+# ===========================================================================
+@cocotb.test()
+async def test_replace_same_and_new_price(dut):
+    """
+    The two shapes of REPLACE, which take different paths through
+    price_storage.
+
+    order_book emits a replace as a delete followed by an add on consecutive
+    cycles. When the price is UNCHANGED both halves target the same level
+    index on the same side, so the forwarding branch fires: the first result
+    is held in lvl_r rather than written, the second is computed from it, and
+    ONE write covers both. Look for double=1 and a single level write.
+
+    When the price MOVES the two halves target different indices, the
+    forwarding condition fails, and there should be TWO level writes - a
+    subtraction at the old index and an addition at the new one. Look for
+    double=0 and two writes at different addresses.
+    """
+    h = Harness(dut)
+    await h.start()
+    header(h, "6. REPLACE - same price vs moved price",
+           ["same price  : one level write, double=1",
+            "moved price : two level writes at different indices, double=0"])
+
+    for p in (PX["ref"], PX["ref1"], PX["high"]):
+        h.expect(p)
+
+    oid_a, oid_b = make_order_id(0), make_order_id(1)
+
+    banner(dut, "Seed two SELL orders at the reference price")
+    obs = await run(h, [frame_one(msg_add(oid_a, SELL, 1000, PX["ref"])),
+                        frame_one(msg_add(oid_b, SELL, 2000, PX["ref"]))],
+                    gap=8)
+    report(h, obs, expect_msgs=2)
+    await dump_all(h)
+
+    banner(dut, f"REPLACE at the SAME price: order 0, qty 1000 -> 1500, "
+                f"px stays {PX['ref']} (idx {px_index(PX['ref'])})")
+    obs = await run(h, frame_one(msg_replace(oid_a, SELL, 1500, PX["ref"])))
+    report(h, obs, expect_msgs=1)
+    dut._log.info("    ^ expect ONE level write and double=1 below")
+    await dump_all(h)
+
+    banner(dut, f"REPLACE to a NEW price: order 1, qty 2000 -> 2000, "
+                f"px {PX['ref']} (idx {px_index(PX['ref'])}) -> "
+                f"{PX['high']} (idx {px_index(PX['high'])})")
+    obs = await run(h, frame_one(msg_replace(oid_b, SELL, 2000, PX["high"])))
+    report(h, obs, expect_msgs=1)
+    dut._log.info("    ^ expect TWO level writes at different indices, "
+                  "double=0")
+    await dump_all(h)
+
+    banner(dut, f"REPLACE one tick up: order 0, px {PX['ref']} -> "
+                f"{PX['ref1']} (adjacent indices)")
+    obs = await run(h, frame_one(msg_replace(oid_a, SELL, 1500, PX["ref1"])))
+    report(h, obs, expect_msgs=1)
+    await dump_all(h)
+
+    banner(dut, "FINAL STATE", rule="=")
+    await dump_all(h)
+
+
+# ===========================================================================
+# 7. Execution down to zero
+# ===========================================================================
+@cocotb.test()
+async def test_execution_to_zero(dut):
+    """
+    Partial fills followed by the one that empties the order.
+
+    Executed quantity is a DELTA, and the spec says an order is removed when
+    its visible quantity reaches zero - normally with no Order Delete message
+    following. So the last execution here must clear the slot in the order
+    table as well as decrementing the level.
+
+    Watch the order table: the key should disappear on the final exec, not
+    linger with qty 0.
+    """
+    h = Harness(dut)
+    await h.start()
+    header(h, "7. EXECUTION TO ZERO - cumulative deltas, slot cleared at 0",
+           ["exec qty is a delta, not an absolute",
+            "the final exec should clear the order slot, not leave qty=0"])
+
+    h.expect(PX["ref"])
+    oid = make_order_id(0)
+
+    banner(dut, "ADD  SELL qty 1000 at the reference price")
+    obs = await run(h, frame_one(msg_add(oid, SELL, 1000, PX["ref"])))
+    report(h, obs, expect_msgs=1)
+    await dump_all(h)
+
+    resting = 1000
+    for take in (250, 250, 300, 200):
+        banner(dut, f"EXEC take {take} of {resting}"
+                    f"{'   [this one fills it]' if take == resting else ''}")
+        obs = await run(h, frame_one(msg_exec(oid, SELL, take)))
+        report(h, obs, expect_msgs=1)
+        await dump_all(h)
+        resting -= take
+
+    banner(dut, "An EXEC for an order that no longer exists", rule="=")
+    obs = await run(h, frame_one(msg_exec(oid, SELL, 100)))
+    report(h, obs, expect_msgs=1)
+    await dump_all(h)
+
+
+# ===========================================================================
+# 8. Out of scope types
+# ===========================================================================
+@cocotb.test()
+async def test_out_of_scope_types(dut):
+    """
+    F and C reach the engine and are dropped by book_input_stage.
+
+    itch_parser decodes both - is_decoded_type includes them - so msg_valid
+    fires and msg_fields is populated. f_is_scoped does not, so no command is
+    emitted and neither memory moves.
+
+    The order tables either side of this test should be identical. Also sends
+    a few types the parser never decodes (T, S, P) so both drop paths appear
+    in one log.
+    """
+    h = Harness(dut)
+    await h.start()
+    header(h, "8. OUT OF SCOPE - F and C dropped at the engine, T/S/P at the "
+              "parser",
+           ["F = add with participant id, C = execution with trade price",
+            "both are decoded upstream and rejected by f_is_scoped",
+            "the order tables must not move anywhere in this test"])
+
+    h.expect(PX["ref"])
+
+    banner(dut, "Seed one in-scope order so the tables are not empty")
+    obs = await run(h, frame_one(msg_add(make_order_id(0), SELL, 1000,
+                                         PX["ref"])))
+    report(h, obs, expect_msgs=1)
+    before, _ = await dump_all(h, "BEFORE")
+
+    banner(dut, "F - add order with participant id")
+    obs = await run(h, frame_one(msg_add(make_order_id(1), SELL, 4242,
+                                         PX["ref"], pid=True)))
+    report(h, obs, expect_msgs=1)
+    await dump_all(h)
+
+    banner(dut, "C - execution with trade price")
+    obs = await run(h, frame_one(msg_exec(make_order_id(0), SELL, 10,
+                                          trade_price=99999)))
+    report(h, obs, expect_msgs=1)
+    await dump_all(h)
+
+    banner(dut, "P - trade. Never affects the displayed book (spec 2.7)")
+    obs = await run(h, frame_one(bm.build_trade(book_id=BOOK_ID)))
+    report(h, obs, expect_msgs=1)
+    await dump_all(h)
+
+    banner(dut, "T and S - seconds and system event")
+    obs = await run(h, [frame_one(bm.build_other(bm.T_SECONDS)),
+                        frame_one(bm.build_other(bm.T_SYSEVENT))], gap=6)
+    report(h, obs, expect_msgs=2)
+    after, _ = await dump_all(h, "AFTER - compare against BEFORE")
+
+    same = (before == after)
+    dut._log.info("  order tables unchanged across this test: %s", same)
+
+
+# ===========================================================================
+# 9. Filtering - wrong book, bad side
+# ===========================================================================
+@cocotb.test()
+async def test_filtering(dut):
+    """
+    The two filters inside book_input_stage.
+
+    book_hit compares the message's order book id against G_ORDER_BOOK_ID, so
+    a well-formed message for another instrument is dropped. side_ok accepts
+    only 'B' and 'S', so anything else - a blank from a Centre Point trade,
+    or junk - drops the message and pulses stat_bad_side.
+
+    Watch stat_bad_side in the status line: it should pulse for the bad-side
+    messages and stay low for the wrong-book ones, since a wrong book is not
+    a malformed message.
+    """
+    h = Harness(dut)
+    await h.start()
+    header(h, "9. FILTERING - wrong order book, unrecognised side byte",
+           [f"this engine tracks book {BOOK_ID} only",
+            "side must be 'B' or 'S'; anything else pulses stat_bad_side"])
+
+    h.expect(PX["ref"])
+
+    banner(dut, "A valid order first, for contrast")
+    obs = await run(h, frame_one(msg_add(make_order_id(0), SELL, 500,
+                                         PX["ref"])))
+    report(h, obs, expect_msgs=1)
+    await dump_all(h)
+
+    banner(dut, f"Wrong order book: {BOOK_ID + 1}")
+    wrong = bm.build_add(order_id=make_order_id(1), book_id=BOOK_ID + 1,
+                         side=bm.SIDE_SELL, qty=999, price=PX["ref"])
+    obs = await run(h, frame_one(wrong))
+    report(h, obs, expect_msgs=1)
+    await dump_all(h)
+
+    banner(dut, "Blank side byte (0x20) - a Centre Point trade's side")
+    blank = bm.build_add(order_id=make_order_id(2), book_id=BOOK_ID,
+                         side=bm.SIDE_BLANK, qty=888, price=PX["ref"])
+    obs = await run(h, frame_one(blank))
+    report(h, obs, expect_msgs=1)
+    dut._log.info("    ^ expect stat_bad_side to have pulsed")
+    await dump_all(h)
+
+    banner(dut, "Junk side byte ('X')")
+    junk = bm.build_add(order_id=make_order_id(3), book_id=BOOK_ID,
+                        side=ord("X"), qty=777, price=PX["ref"])
+    obs = await run(h, frame_one(junk))
+    report(h, obs, expect_msgs=1)
+    await dump_all(h)
+
+    banner(dut, "FINAL STATE - only the first order should be resting",
+           rule="=")
+    await dump_all(h)
+
+
+# ===========================================================================
+# 10. Quantity saturation
+# ===========================================================================
+@cocotb.test()
+async def test_qty_saturation(dut):
+    """
+    The wire quantity is 64 bits and the command bus is 32.
+
+    book_input_stage saturates rather than truncating, so an oversized
+    quantity becomes 0xFFFFFFFF and pulses stat_qty_ovf - it cannot silently
+    become a small number. Drives the boundary either side plus one clearly
+    over.
+
+    Note what saturation means downstream: the level aggregate is now wrong
+    by construction, and a later exec of the true quantity will not bring it
+    back to zero. stat_qty_ovf is the only warning of that.
+    """
+    h = Harness(dut)
+    await h.start()
+    header(h, "10. QUANTITY SATURATION - 64-bit wire field, 32-bit bus",
+           ["saturates to 0xFFFFFFFF and pulses stat_qty_ovf",
+            "a saturated quantity permanently desynchronises that level"])
+
+    h.expect(PX["ref"])
+
+    cases = [
+        (0, 0xFFFFFFFE, "one below the boundary"),
+        (1, 0xFFFFFFFF, "exactly the boundary"),
+        (2, 0x1_0000_0000, "one above - saturates"),
+        (3, 0xDEAD_BEEF_CAFE, "far above - saturates"),
+    ]
+    for n, q, note in cases:
+        banner(dut, f"ADD qty {q} (0x{q:X}) - {note}")
+        obs = await run(h, frame_one(msg_add(make_order_id(n), SELL, q,
+                                             PX["ref"])))
+        report(h, obs, expect_msgs=1)
+        await dump_all(h)
+
+    banner(dut, "FINAL STATE", rule="=")
+    await dump_all(h)
+
+
+# ===========================================================================
+# 11. Price aliasing - the px_legal hole
+# ===========================================================================
+@cocotb.test()
+async def test_price_aliasing(dut):
+    """
+    What happens now that px_legal is gone.
+
+    px_index truncates within a band, so two prices inside one tick map to
+    the SAME level index - their quantities merge and index_price can no
+    longer recover which was meant. And a price outside every band falls
+    through the loop and returns 0, so it aggregates into level 0, a real
+    level at price 0.
+
+    Nothing rejects either case. This test makes both visible:
+
+      - two orders one price unit apart, which should share an index
+      - an order above the $100 cap, which should land on index 0
+      - a negative price, which unsigned-reinterprets to a huge value and
+        also lands on index 0
+
+    Compare each slot's stored price against the "maps to" column in the
+    level dump. Where they disagree, the aliasing has happened.
+    """
+    h = Harness(dut)
+    await h.start()
+
+    on_tick = PX["ref"]
+    off_tick = PX["ref"] + 5          # inside the same 10-unit tick
+    over_cap = 100000                 # C_LVL_MAX_CENT * C_PX_PER_CENT
+    header(h, "11. PRICE ALIASING - no px_legal, nothing rejects a bad price",
+           [f"{on_tick} on-tick  -> index {px_index(on_tick)}",
+            f"{off_tick} off-tick -> index {px_index(off_tick)}  "
+            f"(same index, quantities merge)",
+            f"{over_cap} over cap -> index {px_index(over_cap)}  "
+            f"(level 0, a real level at price 0)",
+            "negative      -> index 0 as well, via unsigned reinterpretation"])
+
+    h.expect(on_tick)
+    h.note(0)
+
+    banner(dut, f"ADD SELL qty 1000 at {on_tick} (on tick, "
+                f"index {px_index(on_tick)})")
+    obs = await run(h, frame_one(msg_add(make_order_id(0), SELL, 1000,
+                                         on_tick)))
+    report(h, obs, expect_msgs=1)
+    await dump_all(h)
+
+    banner(dut, f"ADD SELL qty 7 at {off_tick} (off tick by 5, "
+                f"on_tick={px_on_tick(off_tick)})")
+    dut._log.info("    this should land on index %d - the SAME slot - and "
+                  "merge with the 1000", px_index(off_tick))
+    obs = await run(h, frame_one(msg_add(make_order_id(1), SELL, 7,
+                                         off_tick)))
+    report(h, obs, expect_msgs=1)
+    dut._log.info("    ^ the slot's stored price is whichever arrived last; "
+                  "the index cannot distinguish them")
+    await dump_all(h)
+
+    banner(dut, f"ADD SELL qty 33 at {over_cap} - above the $100 cap")
+    obs = await run(h, frame_one(msg_add(make_order_id(2), SELL, 33,
+                                         over_cap)))
+    report(h, obs, expect_msgs=1)
+    dut._log.info("    ^ expect a write at index 0, and oor still undriven")
+    await dump_all(h)
+
+    banner(dut, "ADD SELL qty 44 at a NEGATIVE price")
+    obs = await run(h, frame_one(msg_add(make_order_id(3), SELL, 44, -25)))
+    report(h, obs, expect_msgs=1)
+    await dump_all(h)
+
+    banner(dut, "FINAL STATE - look at index 0 and at the on-tick index",
+           rule="=")
+    await dump_all(h)
+
+
+# ===========================================================================
+# 12. Mixed session
+# ===========================================================================
+@cocotb.test()
+async def test_mixed_session(dut):
+    """
+    A session-shaped run: multiple packets, several messages each, both
+    sides, several prices, all four in-scope types interleaved, with
+    out-of-scope and non-book types mixed in as a real feed would carry them.
+
+    This is the closest thing here to a capture replay. It is also the test
+    most likely to surface an interaction the focused tests miss, because
+    nothing about it is tidy: a delete lands in the same packet as an add at
+    the same price, an exec follows a replace one message later, and the
+    packet boundaries fall wherever they fall.
+    """
+    h = Harness(dut)
+    await h.start()
+    header(h, "12. MIXED SESSION - five packets, mixed types, sides, prices",
+           ["the closest thing here to a capture replay",
+            "packet boundaries deliberately cut across related messages"])
+
+    for p in (PX["low"], PX["mid"], PX["ref"], PX["high"]):
+        h.expect(p)
+
+    def build_packets(base):
+        """The same session, with order ids offset so a second run cannot
+        collide with the first - reset does not clear the memories."""
+        o = [make_order_id(base + n) for n in range(12)]
+        return [
+            # Open the book on both sides.
+            [msg_add(o[0], BUY, 1000, PX["mid"]),
+             msg_add(o[1], SELL, 800, PX["ref"]),
+             msg_add(o[2], BUY, 500, PX["low"])],
+
+            # A non-book message in the middle of book traffic.
+            [bm.build_other(bm.T_SECONDS),
+             msg_add(o[3], SELL, 600, PX["high"]),
+             msg_exec(o[0], BUY, 250)],
+
+            # Replace at the same price, then one that moves price.
+            [msg_replace(o[1], SELL, 1200, PX["ref"]),
+             msg_add(o[4], BUY, 900, PX["mid"]),
+             msg_replace(o[2], BUY, 500, PX["mid"])],
+
+            # Out of scope mixed with in scope.
+            [msg_add(o[5], SELL, 300, PX["ref"], pid=True),      # F, dropped
+             msg_exec(o[1], SELL, 600),
+             msg_delete(o[3], SELL),
+             msg_add(o[6], BUY, 450, PX["low"])],
+
+            # Fill an order out and delete another.
+            [msg_exec(o[0], BUY, 750),                            # fills it
+             msg_delete(o[4], BUY),
+             msg_add(o[7], SELL, 1100, PX["high"])],
+        ]
+
+    packets = build_packets(0)
+
+    for n, msgs in enumerate(packets):
+        frame = frame_many(msgs)
+        banner(dut, f"PACKET {n + 1}/{len(packets)} - {len(msgs)} messages, "
+                    f"{len(frame)} bytes, {(len(frame) + 7) // 8} beats")
+        for k, m in enumerate(msgs):
+            dut._log.info("    msg %d: %s, %d bytes",
+                          k, bm.TYPE_NAME.get(m[0], "?"), len(m))
+        obs = await run(h, frame, drain=DRAIN_CYCLES * 2)
+        report(h, obs, expect_msgs=len(msgs))
+        await dump_all(h, f"AFTER PACKET {n + 1}")
+
+    banner(dut, "Now the same five packets back to back, no gap", rule="=")
+    dut._log.info("NOTE: order ids offset by 0x200 - the memories still hold "
+                  "the gapped run's orders.")
+    h2 = Harness(dut)
+    await h2.start()
+    for p in (PX["low"], PX["mid"], PX["ref"], PX["high"]):
+        h2.expect(p)
+    packets2 = build_packets(0x200)
+    frames = [frame_many(msgs) for msgs in packets2]
+    obs = await run(h2, frames, gap=0, drain=DRAIN_CYCLES * 3)
+    report(h2, obs, expect_msgs=sum(len(m) for m in packets2))
+    await dump_all(h2, "AFTER THE BURST - levels should be double the gapped run, 8 orders resting")
+    dut._log.info("  fifo_full=%s fifo_overflow=%s",
                   fmt(safe_int(dut.fifo_full)),
-                  fmt(safe_int(dut.fifo_overflow)),
-                  fmt(safe_int(dut.stat_bad_side)),
-                  fmt(safe_int(dut.stat_qty_ovf)))
-    await RisingEdge(dut.clk)
+                  fmt(safe_int(dut.fifo_overflow)))

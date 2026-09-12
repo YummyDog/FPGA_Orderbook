@@ -1,0 +1,34 @@
+[*]
+[*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
+[*] Sat Sep 12 15:07:37 2026
+[*]
+[dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\market_data_top.fst"
+[dumpfile_mtime] "Sat Sep 12 14:23:34 2026"
+[dumpfile_size] 78751
+[savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\fullsave.gtkw"
+[timestart] 0
+[size] 1920 1017
+[pos] -217 -217
+*-33.000000 189200000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] market_data_top.
+[treeopen] market_data_top.u_fullparser.
+[sst_width] 321
+[signals_width] 134
+[sst_expanded] 1
+[sst_vpaned_height] 304
+@28
+market_data_top.u_engine.u_order_book.s_op
+market_data_top.u_engine.u_order_book.s_tvalid
+market_data_top.u_engine.u_book_input_stage.m_tvalid
+market_data_top.u_engine.u_order_fifo.m_tvalid
+market_data_top.u_engine.u_order_fifo.m_tready
+market_data_top.u_fullparser.u_itch.msg_valid
+market_data_top.clk
+market_data_top.u_engine.u_order_book.we
+market_data_top.u_engine.u_order_book.evicting_r
+market_data_top.u_engine.u_price_storage.lvl_we
+market_data_top.u_fullparser.u_eth.s_axis_tvalid
+@29
+market_data_top.u_fullparser.u_eth.s_axis_tready
+[pattern_trace] 1
+[pattern_trace] 0

@@ -1,0 +1,38 @@
+====================================================================================================
+output: stdout + C:\Users\lskje\Desktop\FPGA_Orderbook\dump_test_out_of_scope_types.log
+level memory: cannot index level_array through VHPI (Could not reach the level RAM through the hierarchy.
+Tried:
+  g_sides[0] -> market_data_top.u_engine.u_level_array.g_sides[0].u_ram contains no child object named ram
+  g_sides(0) -> market_data_top.u_engine.u_level_array.g_sides[0].u_ram contains no child object named ram
+  g_sides[0] -> market_data_top.u_engine.u_level_array contains no child object named g_sides[0]
+  g_sides_0 -> market_data_top.u_engine.u_level_array contains no child object named g_sides_0
+
+Check the instance names in market_data_top.vhd, order_book_engine_top.vhd, ram_array.vhd and level_array.vhd.)
+              printing a shadow of the write bus instead; the RTL memory is
+              still the design and still what price_storage reads back.
+====================================================================================================
+8. OUT OF SCOPE - F and C dropped at the engine, T/S/P at the parser
+====================================================================================================
+order table : 4 x 16 = 64 slots, slot 132 bits
+level table : 2 sides x 16384 slots, 14 addr bits, 10280 reachable via px_index
+level source: shadow of the write bus
+book id     : 85603   in scope: A U E D   dropped: F C
+F = add with participant id, C = execution with trade price
+both are decoded upstream and rejected by f_is_scoped
+the order tables must not move anywhere in this test
+this harness checks nothing - read the dumps
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+Seed one in-scope order so the tables are not empty
+----------------------------------------------------------------------------------------------------
+cyc  20 | msg=? gate=0 | cmd=1 ADD | order - | mut=0  | lvl raddr=0 write -
+cyc  22 | msg=? gate=0 | cmd=0  | order T0[13]<=V 0x0C43E250400000001 | mut=1 ADD | lvl raddr=5280 write -
+cyc  24 | msg=? gate=0 | cmd=0  | order - | mut=0  | lvl raddr=0 write S1[5280]<= side=1 qty=1000 px=50000          
+    parser out  : 0 message(s) through the status gate  (sent 1)
+    command out : @cyc 20  op=ADD side=SELL qty=1000 px=50000
+                  order id 0x621F128200000000
+    mutation    : @cyc 22  op=ADD side=SELL qty=1000 px=50000
+    order write 0 @cyc 22: T0[13] valid=1 key=621F1282:00000000S =0x0C43E250400000001
+                             value qty=1000 px=50000 undisc=0 implied=0
+    level write 0 @cyc 24: side 1 [5280] <= side=1 qty=1000 px=50000          

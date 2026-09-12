@@ -1,0 +1,338 @@
+====================================================================================================
+output: stdout + C:\Users\lskje\Desktop\FPGA_Orderbook\dump_test_execution_to_zero.log
+level memory: cannot index level_array through VHPI (Could not reach the level RAM through the hierarchy.
+Tried:
+  g_sides[0] -> market_data_top.u_engine.u_level_array.g_sides[0].u_ram contains no child object named ram
+  g_sides(0) -> market_data_top.u_engine.u_level_array.g_sides[0].u_ram contains no child object named ram
+  g_sides[0] -> market_data_top.u_engine.u_level_array contains no child object named g_sides[0]
+  g_sides_0 -> market_data_top.u_engine.u_level_array contains no child object named g_sides_0
+
+Check the instance names in market_data_top.vhd, order_book_engine_top.vhd, ram_array.vhd and level_array.vhd.)
+              printing a shadow of the write bus instead; the RTL memory is
+              still the design and still what price_storage reads back.
+====================================================================================================
+7. EXECUTION TO ZERO - cumulative deltas, slot cleared at 0
+====================================================================================================
+order table : 4 x 16 = 64 slots, slot 132 bits
+level table : 2 sides x 16384 slots, 14 addr bits, 10280 reachable via px_index
+level source: shadow of the write bus
+book id     : 85603   in scope: A U E D   dropped: F C
+exec qty is a delta, not an absolute
+the final exec should clear the order slot, not leave qty=0
+this harness checks nothing - read the dumps
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+ADD  SELL qty 1000 at the reference price
+----------------------------------------------------------------------------------------------------
+cyc  20 | msg=? gate=0 | cmd=1 ADD | order - | mut=0  | lvl raddr=0 write -
+cyc  22 | msg=? gate=0 | cmd=0  | order T0[13]<=V 0x0C43E250400000001 | mut=1 ADD | lvl raddr=5280 write -
+cyc  24 | msg=? gate=0 | cmd=0  | order - | mut=0  | lvl raddr=0 write S1[5280]<= side=1 qty=1000 px=50000          
+    parser out  : 0 message(s) through the status gate  (sent 1)
+    command out : @cyc 20  op=ADD side=SELL qty=1000 px=50000
+                  order id 0x621F128200000000
+    mutation    : @cyc 22  op=ADD side=SELL qty=1000 px=50000
+    order write 0 @cyc 22: T0[13] valid=1 key=621F1282:00000000S =0x0C43E250400000001
+                             value qty=1000 px=50000 undisc=0 implied=0
+    level write 0 @cyc 24: side 1 [5280] <= side=1 qty=1000 px=50000          
+    ORDER TABLES
+      keys
+             0     1     2     3     4     5     6     7     8     9    10    11    12    13    14    15
+      T0 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... 0000S ..... .....
+      T1 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T2 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T3 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      quantities
+              0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15
+      T0 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......   1000 ...... ......
+      T1 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T2 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T3 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      occupancy 1/64
+    LEVEL MEMORY (shadow of the write bus)
+       index  maps to  side 0 (buy)                        side 1 (sell)                     
+           0        0  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+           1        1  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+           2        2  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5278    49980  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5279    49990  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5280    50000  side=0 qty=0 px=0                   side=1 qty=1000 px=50000          
+        5281    50010  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5282    50020  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+    PRICE STORAGE
+      mutation in : tvalid=0 tready=? op=DEL side=0
+                    qty=0 price=0
+      internal    : inserting=0 double=0 index=5280
+                    lvl_r=side=0 qty=0 px=0                 
+      level write : we=0 wsel=1 waddr=5280
+                    wdata=side=1 qty=1000 px=50000          
+      level read  : raddr=0
+                    rdata[0]=side=0 qty=0 px=0                 
+                    rdata[1]=side=0 qty=0 px=0                 
+      handshake   : s_tready=? busy=? oor=?
+      top of book : tvalid=0 valid=0
+                    bid px=0 qty=0
+                    ask px=0 qty=0
+      status      : fifo_full=0 fifo_overflow=0 bad_side=0 qty_ovf=0
+
+----------------------------------------------------------------------------------------------------
+EXEC take 250 of 1000
+----------------------------------------------------------------------------------------------------
+cyc  95 | msg=? gate=0 | cmd=1 EXEC | order - | mut=0  | lvl raddr=0 write -
+cyc  98 | msg=? gate=0 | cmd=0  | order T0[13]<=V 0x0C43E250400000001 | mut=1 DEL | lvl raddr=5280 write -
+cyc 100 | msg=? gate=0 | cmd=0  | order - | mut=0  | lvl raddr=0 write S1[5280]<= side=1 qty=750 px=50000           
+    parser out  : 0 message(s) through the status gate  (sent 1)
+    command out : @cyc 95  op=EXEC side=SELL qty=250 px=0
+                  order id 0x621F128200000000
+    mutation    : @cyc 98  op=DEL side=SELL qty=250 px=50000
+    order write 0 @cyc 98: T0[13] valid=1 key=621F1282:00000000S =0x0C43E250400000001
+                             value qty=750 px=0 undisc=0 implied=0
+    level write 0 @cyc 100: side 1 [5280] <= side=1 qty=750 px=50000           
+    ORDER TABLES
+      keys
+             0     1     2     3     4     5     6     7     8     9    10    11    12    13    14    15
+      T0 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... 0000S ..... .....
+      T1 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T2 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T3 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      quantities
+              0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15
+      T0 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......    750 ...... ......
+      T1 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T2 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T3 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      occupancy 1/64
+    LEVEL MEMORY (shadow of the write bus)
+       index  maps to  side 0 (buy)                        side 1 (sell)                     
+           0        0  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+           1        1  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+           2        2  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5278    49980  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5279    49990  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5280    50000  side=0 qty=0 px=0                   side=1 qty=750 px=50000           
+        5281    50010  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5282    50020  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+    PRICE STORAGE
+      mutation in : tvalid=0 tready=? op=DEL side=0
+                    qty=0 price=0
+      internal    : inserting=0 double=0 index=5280
+                    lvl_r=side=0 qty=0 px=0                 
+      level write : we=0 wsel=1 waddr=5280
+                    wdata=side=1 qty=750 px=50000           
+      level read  : raddr=0
+                    rdata[0]=side=0 qty=0 px=0                 
+                    rdata[1]=side=0 qty=0 px=0                 
+      handshake   : s_tready=? busy=? oor=?
+      top of book : tvalid=0 valid=0
+                    bid px=0 qty=0
+                    ask px=0 qty=0
+      status      : fifo_full=0 fifo_overflow=0 bad_side=0 qty_ovf=0
+
+----------------------------------------------------------------------------------------------------
+EXEC take 250 of 750
+----------------------------------------------------------------------------------------------------
+cyc 170 | msg=? gate=0 | cmd=1 EXEC | order - | mut=0  | lvl raddr=0 write -
+cyc 173 | msg=? gate=0 | cmd=0  | order T0[13]<=V 0x0C43E250400000001 | mut=1 DEL | lvl raddr=0 write -
+cyc 175 | msg=? gate=0 | cmd=0  | order - | mut=0  | lvl raddr=0 write S1[0]<= side=1 qty=4294967046 px=0        
+    parser out  : 0 message(s) through the status gate  (sent 1)
+    command out : @cyc 170  op=EXEC side=SELL qty=250 px=0
+                  order id 0x621F128200000000
+    mutation    : @cyc 173  op=DEL side=SELL qty=250 px=0
+    order write 0 @cyc 173: T0[13] valid=1 key=621F1282:00000000S =0x0C43E250400000001
+                             value qty=500 px=0 undisc=0 implied=0
+    level write 0 @cyc 175: side 1 [0] <= side=1 qty=4294967046 px=0        
+    ORDER TABLES
+      keys
+             0     1     2     3     4     5     6     7     8     9    10    11    12    13    14    15
+      T0 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... 0000S ..... .....
+      T1 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T2 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T3 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      quantities
+              0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15
+      T0 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......    500 ...... ......
+      T1 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T2 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T3 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      occupancy 1/64
+    LEVEL MEMORY (shadow of the write bus)
+       index  maps to  side 0 (buy)                        side 1 (sell)                     
+           0        0  side=0 qty=0 px=0                   side=1 qty=4294967046 px=0        
+           1        1  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+           2        2  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5278    49980  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5279    49990  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5280    50000  side=0 qty=0 px=0                   side=1 qty=750 px=50000           
+        5281    50010  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5282    50020  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+    PRICE STORAGE
+      mutation in : tvalid=0 tready=? op=DEL side=0
+                    qty=0 price=0
+      internal    : inserting=0 double=0 index=0
+                    lvl_r=side=0 qty=0 px=0                 
+      level write : we=0 wsel=1 waddr=0
+                    wdata=side=1 qty=4294967046 px=0        
+      level read  : raddr=0
+                    rdata[0]=side=0 qty=0 px=0                 
+                    rdata[1]=side=1 qty=4294967046 px=0        
+      handshake   : s_tready=? busy=? oor=?
+      top of book : tvalid=0 valid=0
+                    bid px=0 qty=0
+                    ask px=0 qty=0
+      status      : fifo_full=0 fifo_overflow=0 bad_side=0 qty_ovf=0
+
+----------------------------------------------------------------------------------------------------
+EXEC take 300 of 500
+----------------------------------------------------------------------------------------------------
+cyc 245 | msg=? gate=0 | cmd=1 EXEC | order - | mut=0  | lvl raddr=0 write -
+cyc 248 | msg=? gate=0 | cmd=0  | order T0[13]<=V 0x0C43E250400000001 | mut=1 DEL | lvl raddr=0 write -
+cyc 250 | msg=? gate=0 | cmd=0  | order - | mut=0  | lvl raddr=0 write S1[0]<= side=1 qty=4294966746 px=0        
+    parser out  : 0 message(s) through the status gate  (sent 1)
+    command out : @cyc 245  op=EXEC side=SELL qty=300 px=0
+                  order id 0x621F128200000000
+    mutation    : @cyc 248  op=DEL side=SELL qty=300 px=0
+    order write 0 @cyc 248: T0[13] valid=1 key=621F1282:00000000S =0x0C43E250400000001
+                             value qty=200 px=0 undisc=0 implied=0
+    level write 0 @cyc 250: side 1 [0] <= side=1 qty=4294966746 px=0        
+    ORDER TABLES
+      keys
+             0     1     2     3     4     5     6     7     8     9    10    11    12    13    14    15
+      T0 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... 0000S ..... .....
+      T1 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T2 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T3 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      quantities
+              0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15
+      T0 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......    200 ...... ......
+      T1 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T2 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T3 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      occupancy 1/64
+    LEVEL MEMORY (shadow of the write bus)
+       index  maps to  side 0 (buy)                        side 1 (sell)                     
+           0        0  side=0 qty=0 px=0                   side=1 qty=4294966746 px=0        
+           1        1  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+           2        2  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5278    49980  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5279    49990  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5280    50000  side=0 qty=0 px=0                   side=1 qty=750 px=50000           
+        5281    50010  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5282    50020  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+    PRICE STORAGE
+      mutation in : tvalid=0 tready=? op=DEL side=0
+                    qty=0 price=0
+      internal    : inserting=0 double=0 index=0
+                    lvl_r=side=0 qty=0 px=0                 
+      level write : we=0 wsel=1 waddr=0
+                    wdata=side=1 qty=4294966746 px=0        
+      level read  : raddr=0
+                    rdata[0]=side=0 qty=0 px=0                 
+                    rdata[1]=side=1 qty=4294966746 px=0        
+      handshake   : s_tready=? busy=? oor=?
+      top of book : tvalid=0 valid=0
+                    bid px=0 qty=0
+                    ask px=0 qty=0
+      status      : fifo_full=0 fifo_overflow=0 bad_side=0 qty_ovf=0
+
+----------------------------------------------------------------------------------------------------
+EXEC take 200 of 200   [this one fills it]
+----------------------------------------------------------------------------------------------------
+cyc 320 | msg=? gate=0 | cmd=1 EXEC | order - | mut=0  | lvl raddr=0 write -
+cyc 323 | msg=? gate=0 | cmd=0  | order T0[13]<=x 0x00000000000000000 | mut=1 DEL | lvl raddr=0 write -
+cyc 325 | msg=? gate=0 | cmd=0  | order - | mut=0  | lvl raddr=0 write S1[0]<= side=1 qty=4294966546 px=0        
+    parser out  : 0 message(s) through the status gate  (sent 1)
+    command out : @cyc 320  op=EXEC side=SELL qty=200 px=0
+                  order id 0x621F128200000000
+    mutation    : @cyc 323  op=DEL side=SELL qty=200 px=0
+    order write 0 @cyc 323: T0[13] valid=0 key=00000000:00000000B =0x00000000000000000
+                             value qty=0 px=0 undisc=0 implied=0
+    level write 0 @cyc 325: side 1 [0] <= side=1 qty=4294966546 px=0        
+    ORDER TABLES
+      keys
+             0     1     2     3     4     5     6     7     8     9    10    11    12    13    14    15
+      T0 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T1 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T2 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T3 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      quantities
+              0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15
+      T0 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T1 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T2 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T3 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      occupancy 0/64
+    LEVEL MEMORY (shadow of the write bus)
+       index  maps to  side 0 (buy)                        side 1 (sell)                     
+           0        0  side=0 qty=0 px=0                   side=1 qty=4294966546 px=0        
+           1        1  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+           2        2  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5278    49980  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5279    49990  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5280    50000  side=0 qty=0 px=0                   side=1 qty=750 px=50000           
+        5281    50010  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5282    50020  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+    PRICE STORAGE
+      mutation in : tvalid=0 tready=? op=DEL side=0
+                    qty=0 price=0
+      internal    : inserting=0 double=0 index=0
+                    lvl_r=side=0 qty=0 px=0                 
+      level write : we=0 wsel=1 waddr=0
+                    wdata=side=1 qty=4294966546 px=0        
+      level read  : raddr=0
+                    rdata[0]=side=0 qty=0 px=0                 
+                    rdata[1]=side=1 qty=4294966546 px=0        
+      handshake   : s_tready=? busy=? oor=?
+      top of book : tvalid=0 valid=0
+                    bid px=0 qty=0
+                    ask px=0 qty=0
+      status      : fifo_full=0 fifo_overflow=0 bad_side=0 qty_ovf=0
+
+====================================================================================================
+An EXEC for an order that no longer exists
+====================================================================================================
+cyc 395 | msg=? gate=0 | cmd=1 EXEC | order - | mut=0  | lvl raddr=0 write -
+    parser out  : 0 message(s) through the status gate  (sent 1)
+    command out : @cyc 395  op=EXEC side=SELL qty=100 px=0
+                  order id 0x621F128200000000
+    mutation    : none emitted
+    order write : none
+    level write : nothing on the bus (lvl_we stayed low)
+    ORDER TABLES
+      keys
+             0     1     2     3     4     5     6     7     8     9    10    11    12    13    14    15
+      T0 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T1 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T2 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      T3 ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... ..... .....
+      quantities
+              0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15
+      T0 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T1 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T2 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      T3 ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ......
+      occupancy 0/64
+    LEVEL MEMORY (shadow of the write bus)
+       index  maps to  side 0 (buy)                        side 1 (sell)                     
+           0        0  side=0 qty=0 px=0                   side=1 qty=4294966546 px=0        
+           1        1  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+           2        2  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5278    49980  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5279    49990  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5280    50000  side=0 qty=0 px=0                   side=1 qty=750 px=50000           
+        5281    50010  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+        5282    50020  side=0 qty=0 px=0                   side=0 qty=0 px=0                 
+    PRICE STORAGE
+      mutation in : tvalid=0 tready=? op=DEL side=0
+                    qty=0 price=0
+      internal    : inserting=0 double=0 index=0
+                    lvl_r=side=0 qty=0 px=0                 
+      level write : we=0 wsel=1 waddr=0
+                    wdata=side=1 qty=4294966546 px=0        
+      level read  : raddr=0
+                    rdata[0]=side=0 qty=0 px=0                 
+                    rdata[1]=side=1 qty=4294966546 px=0        
+      handshake   : s_tready=? busy=? oor=?
+      top of book : tvalid=0 valid=0
+                    bid px=0 qty=0
+                    ask px=0 qty=0
+      status      : fifo_full=0 fifo_overflow=0 bad_side=0 qty_ovf=0

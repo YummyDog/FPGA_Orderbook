@@ -1,0 +1,58 @@
+====================================================================================================
+output: stdout + C:\Users\lskje\Desktop\FPGA_Orderbook\dump_test_mixed_session.log
+level memory: cannot index level_array through VHPI (Could not reach the level RAM through the hierarchy.
+Tried:
+  g_sides[0] -> market_data_top.u_engine.u_level_array.g_sides[0].u_ram contains no child object named ram
+  g_sides(0) -> market_data_top.u_engine.u_level_array.g_sides[0].u_ram contains no child object named ram
+  g_sides[0] -> market_data_top.u_engine.u_level_array contains no child object named g_sides[0]
+  g_sides_0 -> market_data_top.u_engine.u_level_array contains no child object named g_sides_0
+
+Check the instance names in market_data_top.vhd, order_book_engine_top.vhd, ram_array.vhd and level_array.vhd.)
+              printing a shadow of the write bus instead; the RTL memory is
+              still the design and still what price_storage reads back.
+====================================================================================================
+12. MIXED SESSION - five packets, mixed types, sides, prices
+====================================================================================================
+order table : 4 x 16 = 64 slots, slot 132 bits
+level table : 2 sides x 16384 slots, 14 addr bits, 10280 reachable via px_index
+level source: shadow of the write bus
+book id     : 85603   in scope: A U E D   dropped: F C
+the closest thing here to a capture replay
+packet boundaries deliberately cut across related messages
+this harness checks nothing - read the dumps
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+PACKET 1/5 - 3 messages, 179 bytes, 23 beats
+----------------------------------------------------------------------------------------------------
+    msg 0: A, 37 bytes
+    msg 1: A, 37 bytes
+    msg 2: A, 37 bytes
+cyc  20 | msg=? gate=0 | cmd=1 ADD | order - | mut=0  | lvl raddr=0 write -
+cyc  22 | msg=? gate=0 | cmd=0  | order T0[12]<=V 0x0C43E250400000000 | mut=1 ADD | lvl raddr=3780 write -
+cyc  24 | msg=? gate=1 | cmd=0  | order - | mut=0  | lvl raddr=0 write S0[3780]<= side=0 qty=1000 px=35000          
+cyc  25 | msg=? gate=0 | cmd=1 ADD | order - | mut=0  | lvl raddr=0 write -
+cyc  27 | msg=? gate=0 | cmd=0  | order T0[15]<=V 0x0C43E250400000003 | mut=1 ADD | lvl raddr=5280 write -
+cyc  29 | msg=? gate=1 | cmd=0  | order - | mut=0  | lvl raddr=0 write S1[5280]<= side=1 qty=800 px=50000           
+cyc  30 | msg=? gate=0 | cmd=1 ADD | order - | mut=0  | lvl raddr=0 write -
+cyc  32 | msg=? gate=0 | cmd=0  | order T0[ 8]<=V 0x0C43E250400000004 | mut=1 ADD | lvl raddr=2280 write -
+cyc  34 | msg=? gate=0 | cmd=0  | order - | mut=0  | lvl raddr=0 write S0[2280]<= side=0 qty=500 px=20000           
+    parser out  : 0 message(s) through the status gate  (sent 3)
+    command out : @cyc 20  op=ADD side=BUY qty=1000 px=35000
+                  order id 0x621F128200000000
+    command out : @cyc 25  op=ADD side=SELL qty=800 px=50000
+                  order id 0x621F128200000001
+    command out : @cyc 30  op=ADD side=BUY qty=500 px=20000
+                  order id 0x621F128200000002
+    mutation    : @cyc 22  op=ADD side=BUY qty=1000 px=35000
+    mutation    : @cyc 27  op=ADD side=SELL qty=800 px=50000
+    mutation    : @cyc 32  op=ADD side=BUY qty=500 px=20000
+    order write 0 @cyc 22: T0[12] valid=1 key=621F1282:00000000B =0x0C43E250400000000
+                             value qty=1000 px=35000 undisc=0 implied=0
+    order write 1 @cyc 27: T0[15] valid=1 key=621F1282:00000001S =0x0C43E250400000003
+                             value qty=800 px=50000 undisc=0 implied=0
+    order write 2 @cyc 32: T0[8] valid=1 key=621F1282:00000002B =0x0C43E250400000004
+                             value qty=500 px=20000 undisc=0 implied=0
+    level write 0 @cyc 24: side 0 [3780] <= side=0 qty=1000 px=35000          
+    level write 1 @cyc 29: side 1 [5280] <= side=1 qty=800 px=50000           
+    level write 2 @cyc 34: side 0 [2280] <= side=0 qty=500 px=20000           
