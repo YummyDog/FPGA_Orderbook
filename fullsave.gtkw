@@ -1,34 +1,48 @@
 [*]
 [*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
-[*] Sat Sep 12 15:07:37 2026
+[*] Sat Sep 19 14:17:11 2026
 [*]
 [dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\market_data_top.fst"
-[dumpfile_mtime] "Sat Sep 12 14:23:34 2026"
-[dumpfile_size] 78751
+[dumpfile_mtime] "Sat Sep 19 12:54:50 2026"
+[dumpfile_size] 122289
 [savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\fullsave.gtkw"
-[timestart] 0
+[timestart] 26554900000
 [size] 1920 1017
-[pos] -217 -217
-*-33.000000 189200000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -139 -139
+*-26.000000 26793100000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] market_data_top.
+[treeopen] market_data_top.u_engine.
 [treeopen] market_data_top.u_fullparser.
-[sst_width] 321
-[signals_width] 134
+[treeopen] market_data_top.u_input.
+[sst_width] 398
+[signals_width] 158
 [sst_expanded] 1
-[sst_vpaned_height] 304
+[sst_vpaned_height] 647
 @28
-market_data_top.u_engine.u_order_book.s_op
-market_data_top.u_engine.u_order_book.s_tvalid
+market_data_top.u_fullparser.u_itch.clk
+@200
+-input stage
+@28
 market_data_top.u_engine.u_book_input_stage.m_tvalid
+market_data_top.u_engine.u_book_input_stage.m_op
+@24
+market_data_top.test_number[4:0]
+@200
+-crc/extender
+@28
+market_data_top.u_input.u_extend.ext_fcs_true
+@200
+-order fifo axi
+@28
 market_data_top.u_engine.u_order_fifo.m_tvalid
 market_data_top.u_engine.u_order_fifo.m_tready
-market_data_top.u_fullparser.u_itch.msg_valid
-market_data_top.clk
-market_data_top.u_engine.u_order_book.we
-market_data_top.u_engine.u_order_book.evicting_r
-market_data_top.u_engine.u_price_storage.lvl_we
-market_data_top.u_fullparser.u_eth.s_axis_tvalid
-@29
-market_data_top.u_fullparser.u_eth.s_axis_tready
+@200
+-order book table
+@28
+market_data_top.u_engine.u_order_book.s_xfer
+@22
+market_data_top.u_engine.u_order_fifo.ord_count[4:0]
+@28
+market_data_top.u_engine.u_order_book.insertion_we
 [pattern_trace] 1
 [pattern_trace] 0

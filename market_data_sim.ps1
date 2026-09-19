@@ -69,9 +69,26 @@ Set-Location $Root
 
 $ParserDir = Join-Path $Root "Parser"
 $EngineDir = Join-Path $Root "Engine"
+$InputDir  = Join-Path $Root "Input"
 
 foreach ($d in @($ParserDir, $EngineDir)) {
     if (-not (Test-Path $d)) { throw "Missing source folder: $d" }
+}
+
+# The XGMII front end may live in its own folder or alongside the engine, so
+# resolve each file by searching rather than assuming. Keeps the script from
+# caring how the tree is laid out.
+$SearchDirs = @($InputDir, $EngineDir, $ParserDir, $Root) |
+              Where-Object { Test-Path $_ }
+
+function Find-Source {
+    param([string] $Name)
+    foreach ($d in $SearchDirs) {
+        $p = Join-Path $d $Name
+        if (Test-Path $p) { return $p }
+    }
+    throw ("Missing VHDL source: $Name`n" +
+           "  looked in: " + ($SearchDirs -join ", "))
 }
 
 # Compile order matters: package before the entity that uses it.
@@ -84,6 +101,15 @@ foreach ($d in @($ParserDir, $EngineDir)) {
 # level_band_pkg, then level_pkg - because a package cannot call its own
 # body's function to build its own header constants. Compiling the file once
 # gets all three, in order.
+# Stage 0: the XGMII front end. xgmii_crc32_rx64.vhd carries a package ahead
+# of its entity, so it has to precede anything that might use it.
+$InputSources = @(
+    "xgmii64_to_axis.vhd",
+    "xgmii_crc32_rx64.vhd",
+    "fcs_msg_extend_sync.vhd",
+    "input_top.vhd"
+) | ForEach-Object { Find-Source $_ }
+
 $ParserSources = @(
     "eth_parser_pkg.vhd",
     "eth_parser.vhd",
@@ -96,7 +122,7 @@ $ParserSources = @(
     "itch_parser_pkg.vhd",
     "itch_parser.vhd",
     "fullparser.vhd"
-) | ForEach-Object { Join-Path $ParserDir $_ }
+) | ForEach-Object { Find-Source $_ }
 
 $EngineSources = @(
     "ram_pkg.vhd",
@@ -111,15 +137,12 @@ $EngineSources = @(
     "order_fifo.vhd",
     "book_input_stage.vhd",
     "order_book_engine_top.vhd"
-) | ForEach-Object { Join-Path $EngineDir $_ }
+) | ForEach-Object { Find-Source $_ }
 
-$Sources = $ParserSources + $EngineSources + @(Join-Path $Root "$Toplevel.vhd")
+$Sources = $InputSources + $ParserSources + $EngineSources +
+           @(Find-Source "$Toplevel.vhd")
 
-foreach ($s in $Sources) {
-    if (-not (Test-Path $s)) { throw "Missing VHDL source: $s" }
-}
-
-foreach ($p in @("$Module.py", "md_harness.py", "asx_packets.py",
+foreach ($p in @("$Module.py", "md_harness.py", "xgmii.py", "asx_packets.py",
                  "book_model.py")) {
     if (-not (Test-Path (Join-Path $Root $p))) {
         throw "Missing Python module: $(Join-Path $Root $p)"
@@ -174,7 +197,8 @@ Write-Host "libpython: $LibPython"
 Write-Host "vhpi     : $VhpiLib"
 Write-Host "parser   : $ParserDir"
 Write-Host "engine   : $EngineDir"
-Write-Host "toplevel : $Toplevel"
+Write-Host "input    : $(Split-Path $InputSources[0] -Parent)"
+Write-Host "toplevel : $Toplevel  (XGMII in)"
 if ($Test) {
     Write-Host "filter   : $Test  (memories clear - single test, single elaboration)"
 } else {

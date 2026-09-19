@@ -1,16 +1,20 @@
 --------------------------------------------------------------------------------
 -- market_data_top
 --
--- Final top: the five-stage packet parser feeding the order book engine.
+-- Final top: XGMII in, order book out.
 --
---   fullparser -> order_book_engine_top
+--   input_top -> fullparser -> order_book_engine_top
 --
--- Pure wiring. The repack-and-serialise adapter that used to sit between them
--- is gone: itch_parser owns framing and field extraction, book_input_stage
--- takes msg_fields directly, and the message layout is defined once in
--- itch_parser_pkg instead of three times.
+-- input_top holds the XGMII-to-AXI-Stream converter, the FCS checker and the
+-- pulse extender. The raw XGMII bus feeds the converter and the checker in
+-- parallel; the converter strips preamble and SFD and hands the frame, FCS
+-- included, to the parser chain.
 --
--- The only decision left here is which messages the engine is allowed to see.
+-- The FCS result is stretched to the packet's MoldUDP64 message count, which
+-- comes back out of fullparser's mold stage, and lands in order_fifo where it
+-- is registered and nothing more. That flop exists so the path can be timed.
+--
+-- Single clock. No CDC anywhere.
 --
 -- VHDL-2008
 --------------------------------------------------------------------------------
@@ -22,41 +26,39 @@ library ieee;
 
 entity market_data_top is
   generic (
-    G_TPID          : std_logic_vector(15 downto 0) := x"8100";
-    G_ORDER_BOOK_ID : natural                       := 85603;
-    G_FIFO_DEPTH    : positive                      := 16;
-    G_MAX_ORDERS    : natural                       := 16384
+    G_TPID           : std_logic_vector(15 downto 0) := x"8100";
+    G_ORDER_BOOK_ID  : natural                       := 85603;
+    G_FIFO_DEPTH     : positive                      := 16;
+    G_MAX_ORDERS     : natural                       := 16384;
+    G_CHECK_PREAMBLE : boolean                       := true
   );
   port (
     clk              : in    std_logic;
     resetn           : in    std_logic;
 
     ----------------------------------------------------------------------------
-    -- Slave: raw Ethernet frames
+    -- Slave: 64-bit XGMII from the PCS
     ----------------------------------------------------------------------------
-    s_axis_tdata     : in    std_logic_vector(63 downto 0);
-    s_axis_tkeep     : in    std_logic_vector(7 downto 0);
-    s_axis_tvalid    : in    std_logic;
-    s_axis_tready    : out   std_logic;
-    s_axis_tlast     : in    std_logic;
+    xgmii_rxd        : in    std_logic_vector(63 downto 0);
+    xgmii_rxc        : in    std_logic_vector(7 downto 0);
 
     ----------------------------------------------------------------------------
-    -- Master: packet passthrough.
-    --
-    -- itch_parser no longer forwards the packet, so whatever fullparser drives
-    -- these from now is the last stage that does. See the note at the bottom of
-    -- this file.
+    -- Master: packet passthrough, taken from the input stage
     ----------------------------------------------------------------------------
     m_axis_tdata     : out   std_logic_vector(63 downto 0);
     m_axis_tkeep     : out   std_logic_vector(7 downto 0);
     m_axis_tvalid    : out   std_logic;
     m_axis_tready    : in    std_logic;
     m_axis_tlast     : out   std_logic;
+    m_axis_tuser     : out   std_logic_vector(0 downto 0);
 
     ----------------------------------------------------------------------------
     -- Price window
     ----------------------------------------------------------------------------
     base_price       : in    std_logic_vector(31 downto 0);
+
+    --FOR TESTING
+    test_number : in std_logic_vector(4 downto 0);
 
     ----------------------------------------------------------------------------
     -- Master: top of book
@@ -84,23 +86,89 @@ entity market_data_top is
     fifo_full        : out   std_logic;
     fifo_overflow    : out   std_logic;
     stat_bad_side    : out   std_logic;
-    stat_qty_ovf     : out   std_logic
+    stat_qty_ovf     : out   std_logic;
+
+    ----------------------------------------------------------------------------
+    -- Input stage status
+    ----------------------------------------------------------------------------
+    axis_overflow    : out   std_logic;
+    fcs_pair_err     : out   std_logic;
+    fcs_flags        : out   std_logic_vector(2 downto 0)
   );
 end entity market_data_top;
 
 architecture rtl of market_data_top is
 
   ------------------------------------------------------------------------------
-  -- fullparser -> engine
+  -- input_top -> fullparser
   ------------------------------------------------------------------------------
-  signal msg_valid_i  : std_logic;
+  signal p_tdata  : std_logic_vector(63 downto 0);
+  signal p_tkeep  : std_logic_vector(7 downto 0);
+  signal p_tvalid : std_logic;
+  signal p_tready : std_logic;
+  signal p_tlast  : std_logic;
+  signal p_tuser  : std_logic_vector(0 downto 0);
+
+  ------------------------------------------------------------------------------
+  -- fullparser -> input_top (message count) and -> engine
+  ------------------------------------------------------------------------------
+  signal mold_cnt     : std_logic_vector(15 downto 0);
+  signal mold_cnt_v   : std_logic;
+
   signal msg_type_i   : std_logic_vector(7 downto 0);
   signal msg_fields_i : std_logic_vector(C_MSG_FIELDS_W - 1 downto 0);
   signal msg_status_i : std_logic_vector(C_MSG_STATUS_W - 1 downto 0);
-
   signal eng_valid    : std_logic;
 
+  ------------------------------------------------------------------------------
+  -- input_top -> engine
+  ------------------------------------------------------------------------------
+  signal fcs_complete_i : std_logic;
+  signal fcs_true_i     : std_logic;
+  signal fcs_false_i    : std_logic;
+
 begin
+
+  ------------------------------------------------------------------------------
+  -- Stage 0 : XGMII to AXI-Stream, FCS check, pulse extension
+  ------------------------------------------------------------------------------
+  u_input : entity work.input_top
+    generic map (
+      G_CHECK_PREAMBLE => G_CHECK_PREAMBLE,
+      G_COUNT_W        => 16,
+      G_ZERO_AS_ONE    => true
+    )
+    port map (
+      clk             => clk,
+      resetn          => resetn,
+
+      xgmii_rxd       => xgmii_rxd,
+      xgmii_rxc       => xgmii_rxc,
+
+      m_axis_tdata    => p_tdata,
+      m_axis_tkeep    => p_tkeep,
+      m_axis_tvalid   => p_tvalid,
+      m_axis_tready   => p_tready,
+      m_axis_tlast    => p_tlast,
+      m_axis_tuser    => p_tuser,
+
+      msg_count       => mold_cnt,
+      msg_count_valid => mold_cnt_v,
+
+      fcs_complete    => fcs_complete_i,
+      fcs_true        => fcs_true_i,
+      fcs_false       => fcs_false_i,
+
+      axis_overflow   => axis_overflow,
+      fcs_pair_err    => fcs_pair_err
+    );
+
+  -- Packet passthrough, straight off the input stage
+  m_axis_tdata  <= p_tdata;
+  m_axis_tkeep  <= p_tkeep;
+  m_axis_tvalid <= p_tvalid;
+  m_axis_tlast  <= p_tlast;
+  m_axis_tuser  <= p_tuser;
 
   ------------------------------------------------------------------------------
   -- Stage 1-5 : packet parsing
@@ -113,12 +181,11 @@ begin
       clk               => clk,
       resetn            => resetn,
 
-      s_axis_tdata      => s_axis_tdata,
-      s_axis_tkeep      => s_axis_tkeep,
-      s_axis_tvalid     => s_axis_tvalid,
-      s_axis_tready     => s_axis_tready,
-      s_axis_tlast      => s_axis_tlast,
-
+      s_axis_tdata      => p_tdata,
+      s_axis_tkeep      => p_tkeep,
+      s_axis_tvalid     => p_tvalid,
+      s_axis_tready     => p_tready,
+      s_axis_tlast      => p_tlast,
 
       msg_valid         => eng_valid,
       msg_index         => open,
@@ -134,28 +201,15 @@ begin
       pkt_done          => pkt_done,
       pkt_msg_count     => pkt_msg_count,
 
+      mold_msgcnt       => mold_cnt,
+
       eth_fields_valid  => open,
       ipv4_fields_valid => open,
       udp_fields_valid  => open,
-      mold_fields_valid => open
+      mold_fields_valid => mold_cnt_v
     );
 
   msg_status <= msg_status_i;
-
-  ------------------------------------------------------------------------------
-  -- Only present a message the parser fully decoded.
-  --
-  -- msg_fields is zeroed for undecoded types, so those are harmless. A
-  -- TRUNCATED or LENGTH-MISMATCHED message is not: its type byte survives and
-  -- its fields are whatever was extracted before the message ran out, which
-  -- book_input_stage would normalise into a perfectly well-formed command.
-  --
-  -- Loosen this line if you would rather count those downstream than drop them.
-  ------------------------------------------------------------------------------
-  --eng_valid <= msg_valid_i
- --              and msg_status_i(C_ST_DECODED)
-    --           and not msg_status_i(C_ST_MSG_TRUNCATED)
-   --            and not msg_status_i(C_ST_LEN_MISMATCH);
 
   ------------------------------------------------------------------------------
   -- Order book engine
@@ -173,6 +227,11 @@ begin
       s_valid       => eng_valid,
       s_type        => msg_type_i,
       s_fields      => msg_fields_i,
+
+      fcs_complete  => fcs_complete_i,
+      fcs_true      => fcs_true_i,
+      fcs_false     => fcs_false_i,
+      fcs_flags     => fcs_flags,
 
       base_price    => base_price,
 
@@ -192,23 +251,5 @@ begin
       stat_bad_side => stat_bad_side,
       stat_qty_ovf  => stat_qty_ovf
     );
-
-  ------------------------------------------------------------------------------
-  -- FULLPARSER NEEDS ONE EDIT BEFORE THIS ELABORATES
-  --
-  -- fullparser still maps m_axis_* on its u_itch instance, and the new
-  -- itch_parser has no such ports. Either:
-  --
-  --   keep the passthrough - drive fullparser's m_axis_* from the mold stage
-  --   outputs (d_tdata / d_tkeep / d_tvalid / d_tlast) and drop the five lines
-  --   from the u_itch port map, or
-  --
-  --   drop it - delete fullparser's m_axis_* ports and the m_axis_* ports
-  --   above, which is honest given nothing downstream consumes the packet.
-  --
-  -- This file assumes the first. If you take the second, delete the five
-  -- m_axis_* ports from the entity and the five lines from the u_fullparser
-  -- port map; nothing else here changes.
-  ------------------------------------------------------------------------------
 
 end architecture rtl;

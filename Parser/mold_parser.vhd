@@ -58,31 +58,32 @@ use work.mold_parser_pkg.all;
 
 entity mold_parser is
   port (
-    clk    : in  std_logic;
-    resetn : in  std_logic;                        -- synchronous, active low
+    clk    : in std_logic;
+    resetn : in std_logic; -- synchronous, active low
 
     -- AXI-Stream slave -------------------------------------------------------
-    s_axis_tdata   : in  std_logic_vector(63 downto 0);
-    s_axis_tkeep   : in  std_logic_vector(7 downto 0);
-    s_axis_tvalid  : in  std_logic;
-    s_axis_tready  : out std_logic;                -- tied high, never stalls
-    s_axis_tlast   : in  std_logic;
+    s_axis_tdata  : in std_logic_vector(63 downto 0);
+    s_axis_tkeep  : in std_logic_vector(7 downto 0);
+    s_axis_tvalid : in std_logic;
+    s_axis_tready : out std_logic; -- tied high, never stalls
+    s_axis_tlast  : in std_logic;
 
     -- AXI-Stream master ------------------------------------------------------
-    m_axis_tdata   : out std_logic_vector(63 downto 0);
-    m_axis_tkeep   : out std_logic_vector(7 downto 0);
-    m_axis_tvalid  : out std_logic;
-    m_axis_tready  : in  std_logic;                -- UNUSED, parsers never stall
-    m_axis_tlast   : out std_logic;
+    m_axis_tdata  : out std_logic_vector(63 downto 0);
+    m_axis_tkeep  : out std_logic_vector(7 downto 0);
+    m_axis_tvalid : out std_logic;
+    m_axis_tready : in std_logic; -- UNUSED, parsers never stall
+    m_axis_tlast  : out std_logic;
 
     -- Field bus --------------------------------------------------------------
-    s_fields       : in  std_logic_vector(C_UDP_BUS_W-1 downto 0);
-    m_fields       : out std_logic_vector(C_MOLD_BUS_W-1 downto 0);
-    m_fields_valid : out std_logic                 -- 1-cycle pulse on complete
+    s_fields       : in std_logic_vector(C_UDP_BUS_W - 1 downto 0);
+    m_fields       : out std_logic_vector(C_MOLD_BUS_W - 1 downto 0);
+    m_fields_valid : out std_logic; -- 1-cycle pulse on complete
+
+    -- MSG count
+    msgcnt : out std_logic_vector(15 downto 0)
   );
 end entity mold_parser;
-
-
 architecture rtl of mold_parser is
 
   ------------------------------------------------------------------------------
@@ -91,7 +92,7 @@ architecture rtl of mold_parser is
   function bsel (d : std_logic_vector(63 downto 0); n : natural)
     return std_logic_vector is
   begin
-    return d(8*n + 7 downto 8*n);
+    return d(8 * n + 7 downto 8 * n);
   end function;
 
   -- Beat position within the packet. Saturates at 9; nothing past beat 8 is
@@ -106,9 +107,9 @@ architecture rtl of mold_parser is
   signal last_beat_c : unsigned(3 downto 0);
 
   -- Extracted fields
-  signal session_r  : std_logic_vector(79 downto 0);
-  signal seqnum_r   : std_logic_vector(63 downto 0);
-  signal msgcnt_r   : std_logic_vector(15 downto 0);
+  signal session_r : std_logic_vector(79 downto 0);
+  signal seqnum_r  : std_logic_vector(63 downto 0);
+  signal msgcnt_r  : std_logic_vector(15 downto 0);
 
   -- Informational status
   signal heartbeat_r : std_logic;
@@ -118,7 +119,7 @@ architecture rtl of mold_parser is
   signal fields_valid_r : std_logic;
 
   -- Upstream field bus, re-registered to stay aligned with the data path
-  signal s_fields_r : std_logic_vector(C_UDP_BUS_W-1 downto 0);
+  signal s_fields_r : std_logic_vector(C_UDP_BUS_W - 1 downto 0);
 
   -- Data path pipeline register
   signal tdata_r  : std_logic_vector(63 downto 0);
@@ -135,7 +136,7 @@ architecture rtl of mold_parser is
   --
   -- Identical to m_fields(C_MOLD_BUS_W-1 downto C_MOLD_BASE).
   ------------------------------------------------------------------------------
-  signal mold_fields : std_logic_vector(C_MOLD_FIELDS_W-1 downto 0);
+  signal mold_fields : std_logic_vector(C_MOLD_FIELDS_W - 1 downto 0);
 
 begin
 
@@ -150,7 +151,8 @@ begin
   vlan_c <= eth_vlan_present(s_fields);
 
   last_beat_c <= to_unsigned(8, last_beat_c'length) when vlan_c = '1'
-            else to_unsigned(7, last_beat_c'length);
+    else
+    to_unsigned(7, last_beat_c'length);
 
   ------------------------------------------------------------------------------
   -- Data path and upstream field bus: one register stage each, so the two
@@ -212,52 +214,52 @@ begin
           ----------------------------------------------------------------------
           case to_integer(beat_cnt) is
 
-            -- Beat 0 : nothing for Mold; clear per-packet status
+              -- Beat 0 : nothing for Mold; clear per-packet status
             when 0 =>
               hdr_trunc_r <= '0';
 
-            -- Beat 5
+              -- Beat 5
             when 5 =>
               if vlan_c = '0' then
                 -- untagged: bytes 42-47 -> session[9:4]
                 session_r(79 downto 32) <=
-                  bsel(s_axis_tdata, 2) & bsel(s_axis_tdata, 3) &
-                  bsel(s_axis_tdata, 4) & bsel(s_axis_tdata, 5) &
-                  bsel(s_axis_tdata, 6) & bsel(s_axis_tdata, 7);
+                bsel(s_axis_tdata, 2) & bsel(s_axis_tdata, 3) &
+                bsel(s_axis_tdata, 4) & bsel(s_axis_tdata, 5) &
+                bsel(s_axis_tdata, 6) & bsel(s_axis_tdata, 7);
               else
                 -- tagged: bytes 46-47 -> session[9:8]
                 session_r(79 downto 64) <=
-                  bsel(s_axis_tdata, 6) & bsel(s_axis_tdata, 7);
+                bsel(s_axis_tdata, 6) & bsel(s_axis_tdata, 7);
               end if;
 
-            -- Beat 6
+              -- Beat 6
             when 6 =>
               if vlan_c = '0' then
                 -- untagged: bytes 48-51 -> session[3:0], 52-55 -> seqnum[7:4]
                 session_r(31 downto 0) <=
-                  bsel(s_axis_tdata, 0) & bsel(s_axis_tdata, 1) &
-                  bsel(s_axis_tdata, 2) & bsel(s_axis_tdata, 3);
+                bsel(s_axis_tdata, 0) & bsel(s_axis_tdata, 1) &
+                bsel(s_axis_tdata, 2) & bsel(s_axis_tdata, 3);
                 seqnum_r(63 downto 32) <=
-                  bsel(s_axis_tdata, 4) & bsel(s_axis_tdata, 5) &
-                  bsel(s_axis_tdata, 6) & bsel(s_axis_tdata, 7);
+                bsel(s_axis_tdata, 4) & bsel(s_axis_tdata, 5) &
+                bsel(s_axis_tdata, 6) & bsel(s_axis_tdata, 7);
               else
                 -- tagged: bytes 48-55 -> session[7:0]
                 session_r(63 downto 0) <=
-                  bsel(s_axis_tdata, 0) & bsel(s_axis_tdata, 1) &
-                  bsel(s_axis_tdata, 2) & bsel(s_axis_tdata, 3) &
-                  bsel(s_axis_tdata, 4) & bsel(s_axis_tdata, 5) &
-                  bsel(s_axis_tdata, 6) & bsel(s_axis_tdata, 7);
+                bsel(s_axis_tdata, 0) & bsel(s_axis_tdata, 1) &
+                bsel(s_axis_tdata, 2) & bsel(s_axis_tdata, 3) &
+                bsel(s_axis_tdata, 4) & bsel(s_axis_tdata, 5) &
+                bsel(s_axis_tdata, 6) & bsel(s_axis_tdata, 7);
               end if;
 
-            -- Beat 7 : untagged completes here
+              -- Beat 7 : untagged completes here
             when 7 =>
               if vlan_c = '0' then
                 -- untagged: bytes 56-59 -> seqnum[3:0], 60-61 -> message count
                 seqnum_r(31 downto 0) <=
-                  bsel(s_axis_tdata, 0) & bsel(s_axis_tdata, 1) &
-                  bsel(s_axis_tdata, 2) & bsel(s_axis_tdata, 3);
+                bsel(s_axis_tdata, 0) & bsel(s_axis_tdata, 1) &
+                bsel(s_axis_tdata, 2) & bsel(s_axis_tdata, 3);
 
-                v_cnt       := bsel(s_axis_tdata, 4) & bsel(s_axis_tdata, 5);
+                v_cnt := bsel(s_axis_tdata, 4) & bsel(s_axis_tdata, 5);
                 msgcnt_r    <= v_cnt;
                 heartbeat_r <= to_sl(unsigned(v_cnt) = 0);
                 eos_r       <= to_sl(v_cnt = x"FFFF");
@@ -270,11 +272,11 @@ begin
                   bsel(s_axis_tdata, 6) & bsel(s_axis_tdata, 7);
               end if;
 
-            -- Beat 8 : tagged completes here
+              -- Beat 8 : tagged completes here
             when 8 =>
               if vlan_c = '1' then
                 -- tagged: bytes 64-65 -> message count
-                v_cnt       := bsel(s_axis_tdata, 0) & bsel(s_axis_tdata, 1);
+                v_cnt := bsel(s_axis_tdata, 0) & bsel(s_axis_tdata, 1);
                 msgcnt_r    <= v_cnt;
                 heartbeat_r <= to_sl(unsigned(v_cnt) = 0);
                 eos_r       <= to_sl(v_cnt = x"FFFF");
@@ -314,11 +316,13 @@ begin
   -- Mold-only field vector (internal, for standalone verification)
   ------------------------------------------------------------------------------
   mold_fields(C_MOLD_SESSION_LOC + C_MOLD_SESSION_W - 1 downto C_MOLD_SESSION_LOC)
-      <= session_r;
-  mold_fields(C_MOLD_SEQNUM_LOC  + C_MOLD_SEQNUM_W  - 1 downto C_MOLD_SEQNUM_LOC)
-      <= seqnum_r;
-  mold_fields(C_MOLD_MSGCNT_LOC  + C_MOLD_MSGCNT_W  - 1 downto C_MOLD_MSGCNT_LOC)
-      <= msgcnt_r;
+  <= session_r;
+  mold_fields(C_MOLD_SEQNUM_LOC + C_MOLD_SEQNUM_W - 1 downto C_MOLD_SEQNUM_LOC)
+  <= seqnum_r;
+  mold_fields(C_MOLD_MSGCNT_LOC + C_MOLD_MSGCNT_W - 1 downto C_MOLD_MSGCNT_LOC)
+  <= msgcnt_r;
+
+  msgcnt <= msgcnt_r;
 
   mold_fields(C_MOLD_HEARTBEAT_LOC) <= heartbeat_r;
   mold_fields(C_MOLD_EOS_LOC)       <= eos_r;

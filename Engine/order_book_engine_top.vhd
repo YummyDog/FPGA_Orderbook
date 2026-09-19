@@ -53,6 +53,14 @@ entity order_book_engine_top is
     s_fields      : in    std_logic_vector(C_MSG_FIELDS_W - 1 downto 0);
 
     ----------------------------------------------------------------------------
+    -- FCS result from input_top. Registered in order_fifo, unused otherwise.
+    ----------------------------------------------------------------------------
+    fcs_complete  : in    std_logic;
+    fcs_true      : in    std_logic;
+    fcs_false     : in    std_logic;
+    fcs_flags     : out   std_logic_vector(2 downto 0);
+
+    ----------------------------------------------------------------------------
     -- Price window
     ----------------------------------------------------------------------------
     base_price    : in    std_logic_vector(31 downto 0);
@@ -219,7 +227,12 @@ begin
       m_implied  => cmd_implied,
 
       full       => fifo_full,
-      overflow   => fifo_overflow
+      overflow   => fifo_overflow,
+
+      fcs_complete => fcs_complete,
+      fcs_true     => fcs_true,
+      fcs_false    => fcs_false,
+      fcs_flags    => fcs_flags
     );
 
   assert not (rising_edge(clk) and in_tvalid = '1' and fifo_ready = '0')

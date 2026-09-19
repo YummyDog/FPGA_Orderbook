@@ -71,6 +71,9 @@ entity fullparser is
     pkt_done           : out std_logic;
     pkt_msg_count      : out std_logic_vector(15 downto 0);
 
+    -- MoldUDP64 message count, valid with mold_fields_valid ------------------
+    mold_msgcnt        : out std_logic_vector(15 downto 0);
+
     -- Per-stage completion pulses, for verification --------------------------
     eth_fields_valid  : out std_logic;
     ipv4_fields_valid : out std_logic;
@@ -217,7 +220,9 @@ begin
 
       s_fields       => u_fields,
       m_fields       => d_fields,
-      m_fields_valid => d_fvalid
+      m_fields_valid => d_fvalid,
+
+      msgcnt         => mold_msgcnt
     );
 
   ------------------------------------------------------------------------------

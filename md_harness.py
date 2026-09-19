@@ -9,9 +9,24 @@ NOTHING IN HERE CHECKS ANYTHING. It drives traffic and prints state. There
 are no assertions, no expected values and no pass/fail verdict beyond "the
 run completed". Reading the dumps is the verification step.
 
+STIMULUS IS XGMII
+
+The DUT's slave port is now the raw 64-bit XGMII bus, so the driver emits
+IDLE / /S/ / data / /T/ rather than AXI-Stream beats, and every frame
+carries a real Ethernet FCS. xgmii.py does that encoding; the frames it
+encodes are the same ones asx_packets has always built.
+
+The FCS is load bearing. order_fifo will not release a command until a
+passing verdict is paired with it, so a frame with a wrong CRC produces no
+command at all - a broken encoder looks exactly like a broken engine. The
+FCS gate state is in every PRICE STORAGE dump for that reason.
+
 See README_tests.md for what each test does and what to look for.
 """
 
+import inspect
+import os
+import re
 import struct
 
 import cocotb
@@ -20,6 +35,7 @@ from cocotb.triggers import RisingEdge, FallingEdge, ReadOnly
 
 import asx_packets as pkt
 import book_model as bm
+import xgmii as xg
 
 CLK_PERIOD_NS = 6.21         # 161 MHz, matching the synthesis constraint
 
@@ -27,6 +43,80 @@ CLK_PERIOD_NS = 6.21         # 161 MHz, matching the synthesis constraint
 # an EMPTY log message raises IndexError inside the formatter. A single space
 # formats fine and still reads as a blank line.
 BLANK = " "
+
+
+# ===========================================================================
+# TEST NUMBERING
+#
+# market_data_top carries a test_number input that nothing in the
+# architecture reads. Its only job is to appear in the waveform, so that an
+# .fst holding several tests says which one produced any given stretch of it.
+#
+# The numbers are the ones README_tests.md uses, and they are taken from the
+# order the tests are declared in the test module rather than from a list
+# kept in step by hand - add or reorder a test and the numbering follows.
+#
+# The port is driven 0 while reset is asserted and the test number once the
+# test is running, so consecutive tests in one waveform are separated by a
+# visible gap rather than running into each other.
+# ===========================================================================
+TEST_NUMBER_W = 5                      # width of the DUT port
+_TEST_MAP = None
+_NO_PORT_WARNED = False
+
+
+def _build_test_map():
+    """Test name -> 1-based number, in declaration order."""
+    mod = os.environ.get("COCOTB_TEST_MODULES", "test_market_data")
+    mod = mod.split(",")[0].strip()
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        mod + ".py")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            src = fh.read()
+    except OSError:
+        return {}
+    names = re.findall(r"^async def (test_\w+)", src, re.M)
+    return {n: i + 1 for i, n in enumerate(names)}
+
+
+def running_test():
+    """
+    (name, number) of the test currently executing.
+
+    Found by walking the call stack for a frame whose function starts with
+    test_, so a test carries a number without having to declare one. Returns
+    (None, 0) if that fails, which drives the port to 0 rather than guessing.
+    """
+    global _TEST_MAP
+    if _TEST_MAP is None:
+        _TEST_MAP = _build_test_map()
+
+    for fr in inspect.stack():
+        if fr.function.startswith("test_"):
+            return fr.function, _TEST_MAP.get(fr.function, 0)
+    return None, 0
+
+
+def set_test_number(dut, value):
+    """
+    Drive test_number, if the top level has one.
+
+    A top level without the port is not an error - it is a debug aid, and the
+    harness has to keep working against a build that does not carry it. The
+    miss is reported once so it is not silent either.
+    """
+    global _NO_PORT_WARNED
+    try:
+        dut.test_number.value = value & ((1 << TEST_NUMBER_W) - 1)
+        return True
+    except Exception:                            # noqa: BLE001
+        if not _NO_PORT_WARNED:
+            _NO_PORT_WARNED = True
+            dut._log.warning(
+                "no test_number port on the top level - waveforms will not "
+                "be marked with the test")
+        return False
 
 
 def blank(dut, n=1):
@@ -87,7 +177,13 @@ OP_ADD, OP_EXEC, OP_REPLACE, OP_DELETE = 0, 1, 2, 3
 IN_SCOPE = (bm.T_ADD, bm.T_REPLACE, bm.T_EXEC, bm.T_DELETE)
 OUT_OF_SCOPE = (bm.T_ADD_PID, bm.T_EXEC_PRICE)
 
-DRAIN_CYCLES = 60
+# Cycles to keep watching after the last XGMII beat.
+#
+# Longer than it was on AXI-Stream: input_top adds three stages before the
+# parser even starts, and a command now waits in order_fifo until its FCS
+# verdict turns up - which cannot happen until the mold stage has produced
+# the message count that fcs_msg_extend_sync pairs the verdict with.
+DRAIN_CYCLES = 80
 WATCH_SPAN = 2                       # level neighbours printed either side
 
 
@@ -432,7 +528,7 @@ class LevelShadow:
 class Harness:
     """Handles, shadow and watch window for one test."""
 
-    def __init__(self, dut):
+    def __init__(self, dut, number=None):
         self.dut = dut
         self.rams = None
         self.lvls = None
@@ -440,23 +536,39 @@ class Harness:
         self.watch = set()
         self.cycle = 0
 
+        # Worked out from the calling test unless one is passed explicitly.
+        # A test that builds a second Harness part way through - tests 5 and
+        # 12 do - keeps the same number, since it is still the same test.
+        name, auto = running_test()
+        self.test_name = name
+        self.number = auto if number is None else number
+
     async def start(self):
         dut = self.dut
 
         cocotb.start_soon(Clock(dut.clk, CLK_PERIOD_NS, unit="ns").start())
 
         dut.resetn.value = 0
-        dut.s_axis_tdata.value = 0
-        dut.s_axis_tkeep.value = 0
-        dut.s_axis_tvalid.value = 0
-        dut.s_axis_tlast.value = 0
-        dut.m_axis_tready.value = 1        # ignored by the parser
+
+        # 0 marks "in reset" in the waveform, so one test's stretch does not
+        # run straight into the next one's.
+        set_test_number(dut, 0)
+
+        # The XGMII bus is never silent: between frames the PCS sends IDLE,
+        # so that is what the line rests at, not zeros. Driving zeros would
+        # leave rxc low, which reads as eight data bytes rather than idle.
+        dut.xgmii_rxd.value = xg.IDLE_RXD
+        dut.xgmii_rxc.value = xg.IDLE_RXC
+
+        dut.m_axis_tready.value = 1        # monitored only, nothing can stall
         dut.base_price.value = 0
         dut.m_tready.value = 1
 
         reset_seq()
         for _ in range(5):
             await RisingEdge(dut.clk)
+
+        set_test_number(dut, self.number)
         dut.resetn.value = 1
         await RisingEdge(dut.clk)
 
@@ -608,6 +720,25 @@ def dump_pls(log, dut):
         f"bad_side={fmt(safe_int(dut.stat_bad_side))} "
         f"qty_ovf={fmt(safe_int(dut.stat_qty_ovf))}",
     ]
+
+    # The front end and the FCS gate. ord/fcs are the two order_fifo column
+    # depths: they should track each other. A growing gap means verdicts are
+    # arriving without commands to pair with, or the other way round, and the
+    # pairing is no longer meaningful.
+    fi = dut.u_engine.u_order_fifo
+    lines += [
+        f"      input stage : axis_overflow={fmt(safe_int(dut.axis_overflow))} "
+        f"fcs_pair_err={fmt(safe_int(dut.fcs_pair_err))} "
+        f"tuser={fmt(safe_int(dut.p_tuser))}",
+        f"      fcs in      : complete={fmt(safe_int(dut.fcs_complete_i))} "
+        f"true={fmt(safe_int(dut.fcs_true_i))} "
+        f"false={fmt(safe_int(dut.fcs_false_i))}  "
+        f"mold_cnt={fmt(safe_int(dut.mold_cnt))}",
+        f"      fcs gate    : ord_q={fmt(safe_int(fi.ord_count))} "
+        f"fcs_q={fmt(safe_int(fi.fcs_count))} "
+        f"pass={fmt(safe_int(fi.fcs_pass))} fail={fmt(safe_int(fi.fcs_fail))}",
+    ]
+
     log.info("%s", "\n".join(lines))
 
 
@@ -633,11 +764,14 @@ class Obs:
     """What one run of the driver saw."""
 
     def __init__(self):
+        self.pkts = []      # (cycle,)        a frame reached the parser
+        self.verdicts = []  # (cycle, true)   an FCS verdict was enqueued
         self.msgs = []      # (cycle, type)   reached the engine slave port
         self.cmds = []      # (cycle, op, order_id, side, qty, price)
         self.muts = []      # (cycle, op, side, qty, price)
         self.owrites = []   # (cycle, table, addr, key, value, valid)
         self.lwrites = []   # (cycle, wsel, waddr, wdata)
+        self.dumps = []     # (cycle,)        a command discarded on a bad FCS
 
 
 def trace(h, obs, quiet=True):
@@ -651,14 +785,32 @@ def trace(h, obs, quiet=True):
     """
     dut = h.dut
     e = dut.u_engine
+    f = e.u_order_fifo
     c = h.cycle
 
-    mvalid = safe_int(dut.msg_valid_i)
+    # Front end: the packet stream out of input_top. Only the last beat is
+    # reported, otherwise every beat of every frame earns a line.
+    ax_last = safe_int(dut.p_tlast)
+    ax_v = safe_int(dut.p_tvalid)
+    ax_err = safe_int(dut.p_tuser)
+    pkt_end = 1 if (ax_v == 1 and ax_last == 1) else 0
+
+    # FCS verdict, stretched to one per message by fcs_msg_extend_sync.
+    fc = safe_int(dut.fcs_complete_i)
+    ft = safe_int(dut.fcs_true_i)
+
+    mvalid = safe_int(dut.eng_valid)
     mtype = safe_int(dut.msg_type_i)
-    gated = safe_int(dut.eng_valid)
 
     cmd_v = safe_int(e.in_tvalid)
     cmd_op = read_op(e.in_op)
+
+    # The FCS gate inside order_fifo: a command only leaves when a passing
+    # verdict is paired with it, and is discarded outright on a failing one.
+    gate_v = safe_int(f.m_tvalid_i)
+    gate_d = safe_int(f.dump)
+    n_ord = safe_int(f.ord_count)
+    n_fcs = safe_int(f.fcs_count)
 
     we = safe_int(e.ram_we)
     wsel = safe_int(e.ram_wsel)
@@ -706,35 +858,49 @@ def trace(h, obs, quiet=True):
                          safe_int(e.in_side), safe_int(e.in_qty),
                          safe_int(e.in_price)))
 
-    if mvalid == 1 and gated == 1:
+    if mvalid == 1:
         obs.msgs.append((c, mtype))
 
-    if (mvalid == 1 or cmd_v == 1 or we == 1 or ev_v == 1 or lwe == 1
-            or not quiet):
+    if pkt_end == 1:
+        obs.pkts.append((c, ax_err))
+
+    if fc == 1:
+        obs.verdicts.append((c, ft))
+
+    if gate_d == 1:
+        obs.dumps.append((c,))
+
+    if (pkt_end == 1 or fc == 1 or mvalid == 1 or cmd_v == 1 or we == 1
+            or ev_v == 1 or lwe == 1 or gate_d == 1 or not quiet):
         dut._log.info(
-            "cyc %3d | msg=%s%s gate=%s | cmd=%s %s | order %s | mut=%s %s "
-            "| lvl raddr=%s write %s",
-            c, fmt(mvalid), f" {fmt_type(mtype)}" if mvalid == 1 else "",
-            fmt(gated), fmt(cmd_v), fmt_op(cmd_op) if cmd_v == 1 else "",
+            "cyc %3d | pkt=%s%s fcs=%s%s | msg=%s%s | cmd=%s %s | "
+            "gate=%s%s q=%s/%s | order %s | mut=%s %s | lvl raddr=%s write %s",
+            c,
+            fmt(pkt_end), " ERR" if (pkt_end == 1 and ax_err == 1) else "",
+            fmt(fc), (" ok" if ft == 1 else " BAD") if fc == 1 else "",
+            fmt(mvalid), f" {fmt_type(mtype)}" if mvalid == 1 else "",
+            fmt(cmd_v), fmt_op(cmd_op) if cmd_v == 1 else "",
+            fmt(gate_v), " DUMP" if gate_d == 1 else "",
+            fmt(n_ord), fmt(n_fcs),
             wr, fmt(ev_v), fmt_op(ev_op) if ev_v == 1 else "",
             fmt(lraddr), lw)
 
 
 async def _drive(dut, frames, gap):
-    """Clock frames in, 8 bytes per beat, with gap idle cycles between."""
-    for n, frame in enumerate(frames):
-        if n and gap:
-            dut.s_axis_tvalid.value = 0
-            for _ in range(gap):
-                await RisingEdge(dut.clk)
-        for tdata, tkeep, tlast in pkt.to_beats(frame):
-            dut.s_axis_tdata.value = tdata
-            dut.s_axis_tkeep.value = tkeep
-            dut.s_axis_tvalid.value = 1
-            dut.s_axis_tlast.value = 1 if tlast else 0
-            await RisingEdge(dut.clk)
-    dut.s_axis_tvalid.value = 0
-    dut.s_axis_tlast.value = 0
+    """
+    Clock the frames onto the XGMII bus.
+
+    Every frame gets a correct FCS appended and is wrapped in /S/ ... /T/
+    with at least one IDLE beat ahead of it; gap adds further idle beats
+    between frames. The bus is left at IDLE afterwards, never at zero.
+    """
+    for rxd, rxc in xg.stream(frames, gap=gap):
+        dut.xgmii_rxd.value = rxd
+        dut.xgmii_rxc.value = rxc
+        await RisingEdge(dut.clk)
+
+    dut.xgmii_rxd.value = xg.IDLE_RXD
+    dut.xgmii_rxc.value = xg.IDLE_RXC
 
 
 async def run(h, frames, gap=0, drain=DRAIN_CYCLES):
@@ -771,8 +937,19 @@ def report(h, obs, expect_msgs=None):
     """Summarise what the run saw, before the memory dumps."""
     log = h.dut._log
 
-    log.info("    parser out  : %d message(s) through the status gate%s",
-             len(obs.msgs),
+    log.info("    packets in  : %d frame(s) off the wire%s",
+             len(obs.pkts),
+             "" if not any(e for _, e in obs.pkts)
+             else "  (some flagged bad by the converter)")
+    for c, err in obs.pkts:
+        log.info("                  @cyc %d%s", c, "  tuser=BAD" if err else "")
+
+    log.info("    fcs verdicts: %d  (%d pass, %d fail)",
+             len(obs.verdicts),
+             sum(1 for _, t in obs.verdicts if t == 1),
+             sum(1 for _, t in obs.verdicts if t != 1))
+
+    log.info("    parser out  : %d message(s)%s", len(obs.msgs),
              "" if expect_msgs is None else f"  (sent {expect_msgs})")
     for c, t in obs.msgs:
         log.info("                  @cyc %d  %s", c, fmt_type(t))
@@ -809,6 +986,17 @@ def report(h, obs, expect_msgs=None):
     else:
         log.info("    level write : nothing on the bus (lvl_we stayed low)")
 
+    # A dump is a command that reached the head of order_fifo and was thrown
+    # away because its paired verdict said the frame was corrupt. Every frame
+    # these tests send has a good FCS, so this should stay at zero - if it
+    # does not, either the encoder is emitting a bad CRC or the pairing has
+    # slipped.
+    if obs.dumps:
+        log.warning("    FCS DUMP    : %d command(s) discarded on a failing "
+                    "verdict", len(obs.dumps))
+        for (c,) in obs.dumps:
+            log.warning("                  @cyc %d", c)
+
 
 def banner(dut, text, rule="-"):
     blank(dut)
@@ -822,6 +1010,9 @@ def header(h, title, lines=()):
     dut._log.info("=" * 100)
     dut._log.info("%s", title)
     dut._log.info("=" * 100)
+    dut._log.info("test_number : %d   (%s) - driven onto the DUT port, so a "
+                  "waveform says which", h.number, h.test_name or "unknown")
+    dut._log.info("              test it holds. 0 while reset is asserted.")
     dut._log.info("order table : %d x %d = %d slots, slot %d bits",
                   NUM_TABLES, DEPTH, CAPACITY, SLOT_W)
     dut._log.info("level table : %d sides x %d slots, %d addr bits, "
@@ -830,6 +1021,12 @@ def header(h, title, lines=()):
     dut._log.info("level source: %s", h.level_source)
     dut._log.info("book id     : %d   in scope: A U E D   dropped: F C",
                   BOOK_ID)
+    dut._log.info("stimulus    : 64-bit XGMII - IDLE / S+preamble+SFD / data "
+                  "/ T, every frame")
+    dut._log.info("              carrying a correct Ethernet FCS. No command "
+                  "reaches the book")
+    dut._log.info("              until order_fifo pairs it with a passing "
+                  "verdict.")
     for ln in lines:
         dut._log.info("%s", ln)
     dut._log.info("this harness checks nothing - read the dumps")
