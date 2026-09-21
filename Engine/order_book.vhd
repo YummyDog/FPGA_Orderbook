@@ -171,7 +171,9 @@ begin
       if resetn = '0' then
         table_cnt <= (others => '0');
       else
-        if s_xfer = '1' or busy_i = '1' then
+        if s_xfer = '1' then
+          table_cnt <= to_unsigned(1,table_cnt'length);
+        elsif busy_i = '1' then
           if table_cnt = C_NUM_TABLES - 1 then
             table_cnt <= (others => '0');
           else

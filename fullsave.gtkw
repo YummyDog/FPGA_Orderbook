@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
-[*] Mon Sep 21 08:56:29 2026
+[*] Mon Sep 21 09:43:34 2026
 [*]
 [dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\market_data_top.fst"
-[dumpfile_mtime] "Sun Sep 20 15:30:39 2026"
-[dumpfile_size] 132314
+[dumpfile_mtime] "Mon Sep 21 09:33:03 2026"
+[dumpfile_size] 132062
 [savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\fullsave.gtkw"
-[timestart] 26690900000
+[timestart] 26392000000
 [size] 1920 1017
-[pos] -165 -165
-*-25.000000 26748200000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -35 -35
+*-29.000000 28671000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] market_data_top.
 [treeopen] market_data_top.u_engine.
 [treeopen] market_data_top.u_fullparser.
