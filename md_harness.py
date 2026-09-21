@@ -24,10 +24,10 @@ FCS gate state is in every PRICE STORAGE dump for that reason.
 See README_tests.md for what each test does and what to look for.
 """
 
-import inspect
 import os
 import re
 import struct
+import sys
 
 import cocotb
 from cocotb.clock import Clock
@@ -86,15 +86,22 @@ def running_test():
 
     Found by walking the call stack for a frame whose function starts with
     test_, so a test carries a number without having to declare one. Returns
-    (None, 0) if that fails, which drives the port to 0 rather than guessing.
+    (None, 0) if that fails.
+
+    Walks f_back directly rather than using inspect.stack(), which builds
+    FrameInfo objects and reads source for every frame - too slow to sit
+    under make_order_id, which is called once per order.
     """
     global _TEST_MAP
     if _TEST_MAP is None:
         _TEST_MAP = _build_test_map()
 
-    for fr in inspect.stack():
-        if fr.function.startswith("test_"):
-            return fr.function, _TEST_MAP.get(fr.function, 0)
+    f = sys._getframe(1)
+    while f is not None:
+        name = f.f_code.co_name
+        if name.startswith("test_"):
+            return name, _TEST_MAP.get(name, 0)
+        f = f.f_back
     return None, 0
 
 
@@ -256,7 +263,44 @@ SESSION_PREFIX = 0x621F1282
 
 
 def make_order_id(n: int) -> int:
-    return (SESSION_PREFIX << 32) | (n & 0xFFFFFFFF)
+    """
+    An order id for this test, namespaced so no two tests share a key.
+
+    WHY THE NAMESPACE EXISTS
+
+    The tests all count their orders from 0, and the memories are not cleared
+    between them, so without this every test would re-ADD order ids that an
+    earlier test left resting. order_book's insert path does not check
+    whether a key is already present - it walks for an empty slot and writes
+    a second copy - so a repeated ADD duplicates the key across tables, and a
+    DELETE only ever removes one copy.
+
+    Once a key occupies its own hash slot in ALL FOUR tables, an ADD of it
+    can never terminate: the chain evicts it from table 0 into table 1 where
+    it meets itself, and round forever. That wedges busy high and s_tready
+    low with as few as four slots occupied, so it is not a load-factor
+    problem and raising the capacity does not help.
+
+    Across the suite as it was written, order 1 SELL and order 3 SELL were
+    each added four times - the fourth landing in test 4, which is where it
+    showed up.
+
+    THE LAYOUT
+
+        bits 63:32  session prefix, as before
+        bits 31:16  test number, 1-12
+        bits 15:0   the caller's n
+
+    The low 16 bits are still n, so every dump that prints an order id by its
+    low 16 bits reads exactly as it did before, and the tables in
+    README_tests.md are unchanged. The test number sits above that, visible
+    in the full key.
+
+    A test whose number cannot be worked out gets namespace 0 - Harness warns
+    about that at start rather than letting it silently collide.
+    """
+    _, t = running_test()
+    return (SESSION_PREFIX << 32) | ((t & 0xFFFF) << 16) | (n & 0xFFFF)
 
 
 def make_key(order_id: int, side: int) -> int:
@@ -553,6 +597,14 @@ class Harness:
         # 0 marks "in reset" in the waveform, so one test's stretch does not
         # run straight into the next one's.
         set_test_number(dut, 0)
+
+        # Namespace 0 means make_order_id could not tell which test is
+        # running, so this test's keys will collide with every other test's.
+        # Worth shouting about: the symptom is a wedged engine much later.
+        if self.number == 0:
+            dut._log.warning(
+                "test number is 0 - order ids are NOT namespaced and will "
+                "collide with other tests")
 
         # The XGMII bus is never silent: between frames the PCS sends IDLE,
         # so that is what the line rests at, not zeros. Driving zeros would

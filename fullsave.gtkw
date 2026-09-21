@@ -1,26 +1,25 @@
 [*]
 [*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
-[*] Sat Sep 19 14:37:11 2026
+[*] Mon Sep 21 08:56:29 2026
 [*]
 [dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\market_data_top.fst"
-[dumpfile_mtime] "Sat Sep 19 14:34:34 2026"
-[dumpfile_size] 124502
+[dumpfile_mtime] "Sun Sep 20 15:30:39 2026"
+[dumpfile_size] 132314
 [savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\fullsave.gtkw"
-[timestart] 26050000000
+[timestart] 26690900000
 [size] 1920 1017
-[pos] -191 -191
-*-31.000000 31240000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -165 -165
+*-25.000000 26748200000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] market_data_top.
 [treeopen] market_data_top.u_engine.
 [treeopen] market_data_top.u_fullparser.
 [treeopen] market_data_top.u_input.
 [sst_width] 398
-[signals_width] 158
+[signals_width] 182
 [sst_expanded] 1
 [sst_vpaned_height] 647
 @28
 market_data_top.u_fullparser.u_itch.clk
-@29
 market_data_top.resetn
 @200
 -input stage
@@ -44,6 +43,33 @@ market_data_top.u_engine.u_order_fifo.ord_count[4:0]
 -order book table
 @28
 market_data_top.u_engine.u_order_book.s_xfer
+market_data_top.u_engine.u_order_book.s_tready
 market_data_top.u_engine.u_order_book.insertion_we
+market_data_top.u_engine.u_order_book.modify_we
+market_data_top.u_engine.u_order_book.s_op
+market_data_top.u_engine.u_order_book.looking_r
+market_data_top.u_engine.u_order_book.lookup_found
+market_data_top.u_engine.u_order_book.insertion_wsel[1:0]
+market_data_top.u_engine.u_order_book.table_cnt[1:0]
+market_data_top.u_engine.u_order_book.modify_wsel[1:0]
+@200
+-price storage
+@24
+market_data_top.u_engine.u_price_storage.s_price[31:0]
+market_data_top.u_engine.u_price_storage.s_qty[31:0]
+@28
+market_data_top.u_engine.u_price_storage.s_side
+market_data_top.u_engine.u_price_storage.s_op
+market_data_top.u_engine.u_price_storage.lvl_we
+@24
+market_data_top.u_engine.u_price_storage.wprice[31:0]
+market_data_top.u_engine.u_price_storage.wqty[31:0]
+@28
+market_data_top.u_engine.u_price_storage.wside
+@24
+market_data_top.u_engine.u_price_storage.rprice0[31:0]
+market_data_top.u_engine.u_price_storage.rqty0[31:0]
+market_data_top.u_engine.u_price_storage.rprice1[31:0]
+market_data_top.u_engine.u_price_storage.rqty1[31:0]
 [pattern_trace] 1
 [pattern_trace] 0

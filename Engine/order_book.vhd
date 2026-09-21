@@ -323,7 +323,7 @@ begin
   end process lookup;
 
   busy       <= busy_i;
-  s_tready_i <= not (busy_i or looking_r or modify_we);
+  s_tready_i <= not (busy_i or looking_r or lookup_found);
 
   -- !!NOTES
 
