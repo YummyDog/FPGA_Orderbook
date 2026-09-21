@@ -14,6 +14,19 @@ A VISIBILITY HARNESS. No assertions, no expected values, no verdict beyond
 "the run completed". See README_tests.md for what each test drives and what
 to look for in its output.
 
+THE MEMORIES CARRY OVER BETWEEN TESTS
+
+All twelve run in one elaboration. resetn clears the logic, not the arrays -
+neither ram_sdp nor level_array resets its contents, because block RAM on
+the part does not either. So test N starts on top of everything tests 1..N-1
+left resting, and every dump is cumulative.
+
+Nothing here assumes otherwise. Order ids are namespaced per test so no two
+tests can write the same key; each dump tags every slot and every level with
+the test that owns it; each header prints what was carried in. Where a test
+says "should be resting", it means THIS test's orders - the tables will also
+hold plenty of other tests'.
+
 Run one test at a time - the logs are long:
 
     powershell -File .\\market_data_sim.ps1 -Test test_price_ladder *> ladder.log
@@ -46,6 +59,10 @@ async def test_single_level_traffic(dut):
 
     This is the regression baseline - it is the closest of these tests to
     test_book_PLS, so the two logs should read alike.
+
+    It is also the ONLY test that starts on an empty memory, being first. Its
+    dumps are the one place in the suite where what is on screen is entirely
+    this test's doing. Everything after it inherits.
     """
     h = Harness(dut)
     await h.start()
@@ -99,7 +116,8 @@ async def test_single_level_traffic(dut):
 
     banner(dut, "FINAL STATE", rule="=")
     await dump_all(h)
-    dut._log.info("  level writes seen on the bus: %d", h.shadow.writes)
+    dut._log.info("  level writes seen on the bus: %d this test, %d since the "
+                  "run began", h.shadow.test_writes, h.shadow.writes)
 
 
 # ===========================================================================
@@ -195,8 +213,12 @@ async def test_price_ladder(dut):
         report(h, obs, expect_msgs=1)
         await dump_all(h)
 
-    banner(dut, "FINAL STATE - the ladder should be eight adjacent indices",
-           rule="=")
+    banner(dut, "FINAL STATE - eight adjacent indices should carry t3 in the "
+                "'by' column", rule="=")
+    dut._log.info("  index %d is shared with tests 1 and 2, so its quantity "
+                  "includes theirs.", px_index(base))
+    dut._log.info("  The ladder is the RUN of indices tagged t3, not the "
+                  "quantities themselves.")
     await dump_all(h)
 
 
@@ -287,10 +309,12 @@ async def test_back_to_back_packets(dut):
     await dump_all(h, "AFTER THE BURST")
 
     banner(dut, "Same traffic again with a 4-cycle gap, for comparison")
-    dut._log.info("NOTE: order ids are offset by 0x100 for this run. Reset "
-                  "clears the logic but NOT")
-    dut._log.info("      the memories, so reusing the first run's ids would "
-                  "re-add live keys.")
+    dut._log.info("NOTE: order ids are offset by 0x100 for this run. The "
+                  "namespace keeps test 5 clear")
+    dut._log.info("      of other tests, but not of ITSELF - reusing the "
+                  "burst run's ids would")
+    dut._log.info("      re-add keys that are still resting from ten cycles "
+                  "ago.")
     h2 = Harness(dut)
     await h2.start()
     for p in (PX["ref"], PX["mid"]):
@@ -303,8 +327,15 @@ async def test_back_to_back_packets(dut):
                                         100 * (n + 1), price)))
     obs = await run(h2, frames, gap=4, drain=DRAIN_CYCLES * 2)
     report(h2, obs, expect_msgs=len(frames))
-    await dump_all(h2, "AFTER THE GAPPED RUN - levels should be double the "
-                       "burst run, 16 orders resting")
+    await dump_all(h2, "AFTER THE GAPPED RUN - t5 should hold 16 slots, "
+                       "8 from each run")
+    dut._log.info("  The two runs added the same quantities, so t5's share of "
+                  "levels %d and %d",
+                  px_index(PX["mid"]), px_index(PX["ref"]))
+    dut._log.info("  doubled. The printed totals are higher than that - "
+                  "tests 1 to 4 wrote both")
+    dut._log.info("  indices too and none of it was cleared. Check the 'by "
+                  "test' line for 16.")
 
 
 # ===========================================================================
@@ -428,9 +459,13 @@ async def test_out_of_scope_types(dut):
     fires and msg_fields is populated. f_is_scoped does not, so no command is
     emitted and neither memory moves.
 
-    The order tables either side of this test should be identical. Also sends
-    a few types the parser never decodes (T, S, P) so both drop paths appear
-    in one log.
+    The tables are snapshotted after the seed order and compared at the end.
+    That comparison is still valid on a carried-over memory: it is a diff
+    across this test only, and the carried-in slots appear identically in
+    both snapshots. Anything that moves between them is this test's fault.
+
+    Also sends a few types the parser never decodes (T, S, P) so both drop
+    paths appear in one log.
     """
     h = Harness(dut)
     await h.start()
@@ -473,6 +508,10 @@ async def test_out_of_scope_types(dut):
 
     same = (before == after)
     dut._log.info("  order tables unchanged across this test: %s", same)
+    dut._log.info("  (a diff of THIS test only - carried-in slots are in both "
+                  "snapshots, so they")
+    dut._log.info("   cancel. False means an out-of-scope message reached the "
+                  "book.)")
 
 
 # ===========================================================================
@@ -528,8 +567,12 @@ async def test_filtering(dut):
     report(h, obs, expect_msgs=1)
     await dump_all(h)
 
-    banner(dut, "FINAL STATE - only the first order should be resting",
-           rule="=")
+    banner(dut, "FINAL STATE - t9 should hold exactly ONE slot", rule="=")
+    dut._log.info("  Three of this test's four orders were filtered out, so "
+                  "the 'by test' line")
+    dut._log.info("  should read t9=1. The rest of the occupancy belongs to "
+                  "tests 1 to 8 and")
+    dut._log.info("  is none of this test's business.")
     await dump_all(h)
 
 
@@ -625,8 +668,12 @@ async def test_price_aliasing(dut):
 
     banner(dut, f"ADD SELL qty 7 at {off_tick} (off tick by 5, "
                 f"on_tick={px_on_tick(off_tick)})")
-    dut._log.info("    this should land on index %d - the SAME slot - and "
-                  "merge with the 1000", px_index(off_tick))
+    dut._log.info("    this should land on index %d - the SAME slot as the "
+                  "1000 above - and add", px_index(off_tick))
+    dut._log.info("    7 to it. The printed total also carries earlier tests' "
+                  "quantity at this index;")
+    dut._log.info("    the aliasing to look for is the +7 landing here at "
+                  "all, not the total.")
     obs = await run(h, frame_one(msg_add(make_order_id(1), SELL, 7,
                                          off_tick)))
     report(h, obs, expect_msgs=1)
@@ -648,6 +695,10 @@ async def test_price_aliasing(dut):
 
     banner(dut, "FINAL STATE - look at index 0 and at the on-tick index",
            rule="=")
+    dut._log.info("  Index 0 is the interesting one: it is empty until this "
+                  "test, so whatever is")
+    dut._log.info("  there is the over-cap and negative prices landing on a "
+                  "real level at price 0.")
     await dump_all(h)
 
 
@@ -723,7 +774,9 @@ async def test_mixed_session(dut):
 
     banner(dut, "Now the same five packets back to back, no gap", rule="=")
     dut._log.info("NOTE: order ids offset by 0x200 - the memories still hold "
-                  "the gapped run's orders.")
+                  "the gapped run's orders,")
+    dut._log.info("      and the per-test namespace does not separate a test "
+                  "from itself.")
     h2 = Harness(dut)
     await h2.start()
     for p in (PX["low"], PX["mid"], PX["ref"], PX["high"]):
@@ -732,7 +785,12 @@ async def test_mixed_session(dut):
     frames = [frame_many(msgs) for msgs in packets2]
     obs = await run(h2, frames, gap=0, drain=DRAIN_CYCLES * 3)
     report(h2, obs, expect_msgs=sum(len(m) for m in packets2))
-    await dump_all(h2, "AFTER THE BURST - levels should be double the gapped run, 8 orders resting")
+    await dump_all(h2, "AFTER THE BURST - t12 should hold twice what it did "
+                       "after the gapped run")
+    dut._log.info("  Read the 'by test' line, not the occupancy: this is the "
+                  "last test, so the")
+    dut._log.info("  tables hold the leftovers of all eleven before it as "
+                  "well.")
     dut._log.info("  fifo_full=%s fifo_overflow=%s",
                   fmt(safe_int(dut.fifo_full)),
                   fmt(safe_int(dut.fifo_overflow)))

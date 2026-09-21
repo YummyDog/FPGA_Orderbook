@@ -21,6 +21,28 @@ passing verdict is paired with it, so a frame with a wrong CRC produces no
 command at all - a broken encoder looks exactly like a broken engine. The
 FCS gate state is in every PRICE STORAGE dump for that reason.
 
+THE MEMORIES ARE NEVER CLEARED
+
+The whole suite runs in ONE elaboration. resetn clears the logic; it does
+not clear either memory, because neither ram_sdp nor level_array resets its
+array - real block RAM has no reset on its contents, and modelling one would
+make the testbench pass on something the board will not do.
+
+So every dump is CUMULATIVE. A test starts on top of whatever the previous
+eleven left resting, and nothing in here pretends otherwise:
+
+  - the level shadow is a SINGLE object for the whole simulation, not one
+    per test, so a level written in test 1 is still shown in test 12
+  - every order slot and every level carries the number of the test that
+    last wrote it, so "mine" and "carried over" are told apart at a glance
+  - order ids are namespaced per test (see make_order_id), so no two tests
+    can write the same key
+  - each dump prints occupancy split by owning test, and each header prints
+    what was already resting when the test began
+
+To read what one test DID, diff its final dump against the "carried in"
+line in its header. Do not read a dump as that test's whole output.
+
 See README_tests.md for what each test does and what to look for.
 """
 
@@ -162,7 +184,11 @@ KEY_MASK = (1 << KEY_W) - 1
 VAL_MASK = (1 << VAL_W) - 1
 KEY_HEX = (KEY_W + 3) // 4
 
-CELL_W = 5                           # "E5EDS"
+# Grid cell widths. Both are 6 so the keys grid and the quantities grid line
+# up column for column. A key cell is "T:NNNS" - owning test, order number,
+# side - because the memories carry over and a bare order number would be
+# ambiguous between tests.
+CELL_W = 6
 QCELL_W = 6
 
 # --- level tables, from level_pkg -----------------------------------------
@@ -466,11 +492,38 @@ def fmt_key(key):
             f"{'B' if side == BUY else 'S'} =0x{key:0{KEY_HEX}X}")
 
 
+def key_test(key):
+    """
+    The test namespace make_order_id baked into an order id, or None.
+
+    Bits 31:16 of the order id. This is what makes a carried-over slot
+    readable: without it every test's order 0 prints identically and there
+    is no way to tell a slot this test just wrote from one left behind by
+    test 2 nine tests ago.
+    """
+    if key is None:
+        return None
+    return (split_key(key)[0] >> 16) & 0xFFFF
+
+
+def fmt_owner(t, this_test=None):
+    """Grid/row tag for the test that owns something. '*' means this test."""
+    if t is None:
+        return "-"
+    return f"t{t}" + ("*" if this_test is not None and t == this_test else "")
+
+
 def fmt_key_short(key):
+    """
+    One grid cell: T:NNNS - owning test, low 12 bits of the order number,
+    side. '+' in place of T means a namespace above 15, '?' means none.
+    """
     if key is None:
         return "?" * CELL_W
     oid, side = split_key(key)
-    return f"{oid & 0xFFFF:04X}{'B' if side == BUY else 'S'}"
+    t = (oid >> 16) & 0xFFFF
+    tag = "?" if t == 0 else (f"{t:X}" if t <= 0xF else "+")
+    return f"{tag}:{oid & 0xFFF:03X}{'B' if side == BUY else 'S'}"
 
 
 def fmt_value(v):
@@ -540,15 +593,44 @@ class LevelShadow:
     from. This mirrors the write port so the contents can be printed. If the
     two disagreed it would show as price_storage computing from a value the
     log says is not there.
+
+    ONE SHADOW FOR THE WHOLE SIMULATION
+
+    This used to be built per test, which quietly made the level dumps lie:
+    the RTL memory carried test 1's quantities into test 2, but a fresh
+    shadow had never seen those writes and printed qty=0. Every level a
+    previous test had written vanished from the dump the moment the next
+    test started, and tests 5 and 12 - which build a second Harness part way
+    through - lost their own first half the same way.
+
+    The module-level instance below is the only one. It mirrors the write
+    bus for the entire run, which is exactly what the block RAM holds, since
+    nothing ever clears either.
     """
 
     def __init__(self):
         self.reset()
 
     def reset(self):
-        self.mem = [{} for _ in range(NUM_SIDES)]
+        """
+        Wipe the mirror.
+
+        NOT called between tests - the design does not clear its memories
+        between tests either, and the mirror has to match. It is here for a
+        runner that re-elaborates per test, where the RTL memory really does
+        start empty again.
+        """
+        self.mem = [{} for _ in range(NUM_SIDES)]   # addr -> level word
+        self.who = [{} for _ in range(NUM_SIDES)]   # addr -> test that wrote
         self.writes = 0
         self.rejected = 0
+        self.test = 0
+        self.test_writes = 0
+
+    def begin_test(self, number):
+        """Attribute writes from here on to this test. Keeps the contents."""
+        self.test = number
+        self.test_writes = 0
 
     def write(self, wsel, waddr, wdata):
         if (wsel is None or waddr is None or wdata is None
@@ -556,17 +638,43 @@ class LevelShadow:
             self.rejected += 1
             return False
         self.mem[wsel][waddr] = wdata
+        self.who[wsel][waddr] = self.test
         self.writes += 1
+        self.test_writes += 1
         return True
 
     def read(self, side, addr):
         return self.mem[side].get(addr, 0)
 
+    def owner(self, side, addr):
+        return self.who[side].get(addr)
+
     def touched(self):
+        """Every address ever written, live or since emptied."""
         s = set()
         for side in self.mem:
             s.update(side.keys())
         return s
+
+    def live(self):
+        """
+        Addresses holding a non-zero quantity on either side right now.
+
+        This is the book as it actually stands, carried-over levels and all.
+        Levels that have been emptied drop out, so the dump does not grow
+        without bound as the suite runs.
+        """
+        out = set()
+        for s in range(NUM_SIDES):
+            for a, v in self.mem[s].items():
+                d = split_level(v)
+                if d and d["qty"]:
+                    out.add(a)
+        return out
+
+
+# The one shadow. Built at import, so it spans every test in the run.
+LEVELS = LevelShadow()
 
 
 class Harness:
@@ -576,7 +684,11 @@ class Harness:
         self.dut = dut
         self.rams = None
         self.lvls = None
-        self.shadow = LevelShadow()
+
+        # The shadow is shared across every test, NOT built here. The design
+        # carries its memory contents from test to test and so must this.
+        self.shadow = LEVELS
+
         self.watch = set()
         self.cycle = 0
 
@@ -597,6 +709,10 @@ class Harness:
         # 0 marks "in reset" in the waveform, so one test's stretch does not
         # run straight into the next one's.
         set_test_number(dut, 0)
+
+        # Attribute level writes from here on to this test. The CONTENTS are
+        # kept - this only moves the "who wrote it" marker.
+        self.shadow.begin_test(self.number)
 
         # Namespace 0 means make_order_id could not tell which test is
         # running, so this test's keys will collide with every other test's.
@@ -670,7 +786,20 @@ class Harness:
                 for t in range(NUM_TABLES)]
 
     def read_levels(self):
-        wanted = self.watch | self.shadow.touched()
+        """
+        The levels worth printing: the whole live book, plus this test's
+        window.
+
+        "Live book" is every index currently holding a quantity, whichever
+        test put it there - that is what the RAM holds and what a dump has
+        to show. "This test's window" is whatever expect()/note() flagged,
+        included even at zero so an index a test predicts is visible whether
+        or not it was written.
+
+        Emptied levels are left out, so this does not grow with every test -
+        it tracks the size of the book, not the length of the run.
+        """
+        wanted = set(self.watch) | self.shadow.live()
         out = {}
         for a in sorted(wanted):
             if not 0 <= a < LVL_DEPTH:
@@ -681,19 +810,47 @@ class Harness:
                 out[a] = [self.shadow.read(s, a) for s in range(NUM_SIDES)]
         return out
 
+    def level_owners(self, levels):
+        """{addr: [test that last wrote side 0, side 1]} for a level dump."""
+        return {a: [self.shadow.owner(s, a) for s in range(NUM_SIDES)]
+                for a in levels}
+
+    def resting(self):
+        """{test namespace: slots it holds} across the order tables, now."""
+        return owners(self.read_tables())
+
 
 # ===========================================================================
 # Dumps
 # ===========================================================================
-def dump_orders(log, tables, label="    ORDER TABLES"):
+def owners(tables):
+    """{test namespace: valid slots it holds} for a table snapshot."""
+    out = {}
+    for t in range(NUM_TABLES):
+        for s in tables[t]:
+            if s is None or not (s >> VALID_BIT) & 1:
+                continue
+            k = key_test(slot_key(s))
+            out[k] = out.get(k, 0) + 1
+    return out
+
+
+def dump_orders(log, tables, this_test=None, label="    ORDER TABLES"):
     """
     The four order tables, twice - once as keys, once as quantities.
 
     One log call with embedded newlines rather than one per row: cocotb
     prefixes each record with ~50 columns of timestamp and logger name, and
     paying that once keeps the rows from wrapping.
+
+    Every cell names the test that owns it, and the occupancy line is split
+    into this test's slots and the ones carried in, because the tables are
+    never cleared and most of what is on screen usually belongs to tests
+    that finished long ago.
     """
-    lines = [label, "      keys",
+    lines = [label,
+             "      keys   cell = T:NNNS - owning test (hex, so t12 is C), "
+             "order number, side",
              "         " + " ".join(f"{a:>{CELL_W}d}" for a in range(DEPTH))]
     for t in range(NUM_TABLES):
         lines.append(f"      T{t} " + " ".join(fmt_cell(tables[t][a])
@@ -704,35 +861,57 @@ def dump_orders(log, tables, label="    ORDER TABLES"):
     for t in range(NUM_TABLES):
         lines.append(f"      T{t} " + " ".join(fmt_qcell(tables[t][a])
                                                for a in range(DEPTH)))
-    n = sum(1 for t in range(NUM_TABLES) for s in tables[t]
-            if s is not None and (s >> VALID_BIT) & 1)
-    lines.append(f"      occupancy {n}/{CAPACITY}")
+
+    by = owners(tables)
+    n = sum(by.values())
+    occ = f"      occupancy {n}/{CAPACITY}"
+    if this_test:
+        mine = by.get(this_test, 0)
+        occ += f"   this test (t{this_test}) {mine}, carried over {n - mine}"
+    lines.append(occ)
+    if len(by) > 1:
+        lines.append("      by test   " + "  ".join(
+            f"{fmt_owner(k, this_test)}={v}"
+            for k, v in sorted(by.items(), key=lambda kv: (kv[0] is None,
+                                                           kv[0]))))
     log.info("%s", "\n".join(lines))
 
 
-def dump_levels(log, levels, source):
+def dump_levels(log, levels, source, who=None, this_test=None):
     """
-    The level memory, for the watched window.
+    The level memory: the whole live book plus this test's window.
 
     The price each index maps to is printed from the Python band map, so a
     slot whose stored price disagrees with its index is visible at a glance -
     that is what an off-tick or out-of-range price looks like.
+
+    The 'by' column names the test that last wrote that side of that index,
+    with a '*' for this one. Quantities here are AGGREGATES built on top of
+    whatever earlier tests left, so a level can hold more than this test put
+    into it; the tag says whether this test touched it at all.
     """
     lines = [f"    LEVEL MEMORY ({source})"]
     if not levels:
-        lines.append("      no level index touched yet")
+        lines.append("      nothing resting and nothing expected yet")
     else:
+        lines.append("      every level with a live quantity, earlier tests' "
+                     "included, plus this test's")
+        lines.append("      expected indices. by = test that last wrote it, "
+                     "* = this test.")
         lines.append(f"      {'index':>6} {'maps to':>8}  "
-                     f"{'side 0 (buy)':<{LVL_FIELD_W}}  "
-                     f"{'side 1 (sell)':<{LVL_FIELD_W}}")
+                     f"{'side 0 (buy)':<{LVL_FIELD_W}} {'by':>4}  "
+                     f"{'side 1 (sell)':<{LVL_FIELD_W}} {'by':>4}")
         for a, both in levels.items():
             px = "-"
             for b in BAND_MAP:
                 if b["base"] <= a < b["base"] + b["n"]:
                     px = str(b["lo"] + (a - b["base"]) * b["tick"])
                     break
-            lines.append(f"      {a:>6} {px:>8}  {fmt_level(both[0])}  "
-                         f"{fmt_level(both[1])}")
+            w = who.get(a, [None, None]) if who else [None, None]
+            lines.append(
+                f"      {a:>6} {px:>8}  "
+                f"{fmt_level(both[0])} {fmt_owner(w[0], this_test):>4}  "
+                f"{fmt_level(both[1])} {fmt_owner(w[1], this_test):>4}")
     log.info("%s", "\n".join(lines))
 
 
@@ -800,10 +979,11 @@ async def dump_all(h, label=None):
     await ReadOnly()
     tables = h.read_tables()
     levels = h.read_levels()
+    who = h.level_owners(levels)
     if label:
-        h.log.info("    %s", label)
-    dump_orders(h.dut._log, tables)
-    dump_levels(h.dut._log, levels, h.level_source)
+        h.dut._log.info("    %s", label)
+    dump_orders(h.dut._log, tables, h.number)
+    dump_levels(h.dut._log, levels, h.level_source, who, h.number)
     dump_pls(h.dut._log, h.dut)
     await RisingEdge(h.dut.clk)
     return tables, levels
@@ -1071,6 +1251,30 @@ def header(h, title, lines=()):
                   "%d reachable via px_index",
                   NUM_SIDES, LVL_DEPTH, LVL_ADDR_W, N_LEVELS)
     dut._log.info("level source: %s", h.level_source)
+
+    # What this test starts on top of. The memories are never cleared, so
+    # this is not zero for anything after test 1, and every dump below
+    # includes it. Diff the final dump against this line to see what this
+    # test alone did.
+    by = h.resting()
+    n_slots = sum(by.values())
+    n_live = len(h.shadow.live())
+    dut._log.info("carried in  : %d order slot(s) resting and %d live "
+                  "level(s), left by earlier", n_slots, n_live)
+    dut._log.info("              tests. The memories are NEVER cleared - "
+                  "resetn clears the logic,")
+    dut._log.info("              and block RAM has no reset on its contents. "
+                  "Every dump below is")
+    dut._log.info("              CUMULATIVE, not this test's output.")
+    if by:
+        dut._log.info("              slots by test: %s",
+                      "  ".join(f"{fmt_owner(k, h.number)}={v}"
+                                for k, v in sorted(
+                                    by.items(),
+                                    key=lambda kv: (kv[0] is None, kv[0]))))
+    dut._log.info("              order ids are namespaced per test, so "
+                  "nothing here can collide")
+    dut._log.info("              with this test's keys.")
     dut._log.info("book id     : %d   in scope: A U E D   dropped: F C",
                   BOOK_ID)
     dut._log.info("stimulus    : 64-bit XGMII - IDLE / S+preamble+SFD / data "

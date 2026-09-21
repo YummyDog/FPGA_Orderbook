@@ -1,25 +1,17 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1789983180" />
-    <testcase name="test_single_level_traffic" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="40" time="0.9875359535217285" sim_time_ns="15071.67" ratio_time="15261.894968230523" />
-    <testcase name="test_two_sided_book" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="108" time="0.3484776020050049" sim_time_ns="6278.3099999999995" ratio_time="18016.39463735127" />
-    <testcase name="test_price_ladder" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="164" time="0.2400827407836914" sim_time_ns="5061.1500000000015" ratio_time="21080.85730560687" />
-    <testcase name="test_multi_message_packet" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="206" time="0.0760500431060791" sim_time_ns="1307.2050000000017" ratio_time="17188.7476536553">
-      <failure error_type="AttributeError" error_msg="'Harness' object has no attribute 'log'" />
-    </testcase>
-    <testcase name="test_back_to_back_packets" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="252" time="0.24585843086242676" sim_time_ns="1847.4749999999985" ratio_time="7514.385386416856">
-      <failure error_type="AttributeError" error_msg="'Harness' object has no attribute 'log'" />
-    </testcase>
-    <testcase name="test_replace_same_and_new_price" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="313" time="0.2704765796661377" sim_time_ns="2695.1399999999994" ratio_time="9964.411718481286" />
-    <testcase name="test_execution_to_zero" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="377" time="0.25635290145874023" sim_time_ns="3862.6200000000026" ratio_time="15067.588383124612" />
-    <testcase name="test_out_of_scope_types" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="422" time="0.0331110954284668" sim_time_ns="661.364999999998" ratio_time="19974.12019873552">
-      <failure error_type="AttributeError" error_msg="'Harness' object has no attribute 'log'" />
-    </testcase>
-    <testcase name="test_filtering" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="481" time="0.1067819595336914" sim_time_ns="2546.0999999999985" ratio_time="23843.91531227392" />
-    <testcase name="test_qty_saturation" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="539" time="0.11579632759094238" sim_time_ns="2552.3099999999977" ratio_time="22041.37258148798" />
-    <testcase name="test_price_aliasing" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="581" time="0.11967658996582031" sim_time_ns="2552.310000000005" ratio_time="21326.72731341147" />
-    <testcase name="test_mixed_session" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="657" time="0.05446648597717285" sim_time_ns="1214.0550000000003" ratio_time="22289.94542641903">
-      <failure error_type="AttributeError" error_msg="'Harness' object has no attribute 'log'" />
-    </testcase>
+    <property name="random_seed" value="1789984467" />
+    <testcase name="test_single_level_traffic" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="53" time="0.8002068996429443" sim_time_ns="15071.67" ratio_time="18834.716379882557" />
+    <testcase name="test_two_sided_book" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="126" time="0.2642676830291748" sim_time_ns="6278.3099999999995" ratio_time="23757.38844808687" />
+    <testcase name="test_price_ladder" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="182" time="0.20954608917236328" sim_time_ns="5061.1500000000015" ratio_time="24152.920343156224" />
+    <testcase name="test_multi_message_packet" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="228" time="0.06685256958007812" sim_time_ns="1310.3100000000013" ratio_time="19599.994558630548" />
+    <testcase name="test_back_to_back_packets" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="274" time="0.21579790115356445" sim_time_ns="3887.459999999999" ratio_time="18014.355001690376" />
+    <testcase name="test_replace_same_and_new_price" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="344" time="0.1769096851348877" sim_time_ns="2701.350000000002" ratio_time="15269.655801717772" />
+    <testcase name="test_execution_to_zero" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="408" time="0.15549206733703613" sim_time_ns="3862.6199999999953" ratio_time="24841.267250165183" />
+    <testcase name="test_out_of_scope_types" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="453" time="0.12931180000305176" sim_time_ns="3285.090000000004" ratio_time="25404.41011510532" />
+    <testcase name="test_filtering" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="520" time="0.10619974136352539" sim_time_ns="2552.3099999999977" ratio_time="24033.10937701206" />
+    <testcase name="test_qty_saturation" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="582" time="0.11078310012817383" sim_time_ns="2552.3099999999977" ratio_time="23038.802823237715" />
+    <testcase name="test_price_aliasing" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="624" time="0.11481189727783203" sim_time_ns="2552.310000000005" ratio_time="22230.36166560072" />
+    <testcase name="test_mixed_session" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="708" time="0.51521897315979" sim_time_ns="8321.399999999994" ratio_time="16151.190917845322" />
   </testsuite>
 </testsuites>
