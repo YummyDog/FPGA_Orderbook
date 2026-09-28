@@ -47,7 +47,7 @@
 --     $2.00 and above         1c
 --
 -- Laid end to end in index space, each band starting where the previous
--- finished:
+-- finished
 --
 --     band 0   $0.000 - $0.10     0.1c        100 levels   base      0
 --     band 1   $0.100 - $2.00     0.5c        380 levels   base    100
