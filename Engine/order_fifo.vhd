@@ -97,6 +97,10 @@ entity order_fifo is
     overflow   : out   std_logic;  -- sticky: a command or a verdict was dropped
 
     ----------------------------------------------------------------------------
+    -- timestamping
+    ----------------------------------------------------------------------------
+    ts_en : out std_logic;
+    ----------------------------------------------------------------------------
     -- FCS result for the command these flags belong to.
     --
     -- fcs_complete is the strobe: one assertion enqueues one verdict into the
@@ -377,5 +381,7 @@ begin
   assert not (rising_edge(clk) and fcs_push = '1' and fcs_wr_en = '0')
     report "order_fifo: overflow, FCS verdict dropped - increase G_DEPTH"
     severity failure;
+
+  ts_en <= xfer;
 
 end architecture rtl;

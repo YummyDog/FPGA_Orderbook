@@ -109,6 +109,10 @@ entity order_book is
     m_price : out std_logic_vector(31 downto 0) := (others => '0'); -- qualified by s_px_valid
     m_op    : out t_book_op                     := OP_ADD -- ADD / EXEC / REPLACE / DELETE
 
+    --timestamping
+    ts_op : out t_book_op := OP_ADD --for timestamping (sends the original op)
+    ts_en : out std_logic --timestamp enable (first we)
+
   );
 end entity order_book;
 architecture rtl of order_book is
@@ -170,9 +174,10 @@ begin
     if rising_edge(clk) then
       if resetn = '0' then
         table_cnt <= (others => '0');
+        ts_op <= OP_ADD;
       else
         if s_xfer = '1' then
-          table_cnt <= to_unsigned(1,table_cnt'length);
+          table_cnt <= to_unsigned(1, table_cnt'length);
         elsif busy_i = '1' then
           if table_cnt = C_NUM_TABLES - 1 then
             table_cnt <= (others => '0');
@@ -181,6 +186,10 @@ begin
           end if;
         else
           table_cnt <= (others => '0');
+        end if;
+
+        if s_xfer = '1' then --pass op through to ts.
+          ts_op <= s_op;
         end if;
       end if;
     end if;
@@ -288,7 +297,7 @@ begin
               modify_wsel  <= std_logic_vector(to_unsigned(i, modify_wsel'length));
               lookup_store <= rdata(i)(VAL_RANGE);
               side_store   <= rdata(i)(C_VAL_W);
-          
+
             end if;
           end loop;
           looking_r <= '0';
@@ -380,5 +389,6 @@ begin
   -- REPLACE   : Replace is more complex than the other operations. The original order needs to be deleted and the new order added. An ADD op is paired with the incoming message for the first master output.
   --                The following master output is simply another DELETION (see above). This logic is controlled by the "replacing_r" signal.
   ------------------------------------------------------------------------------
+  ts_en <= (we_i and (not evicting_r)); --ts enable on first write only.
 
 end architecture rtl;

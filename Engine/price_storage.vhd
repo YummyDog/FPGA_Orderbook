@@ -75,6 +75,10 @@ entity price_storage is
     m_ask_price : out std_logic_vector(31 downto 0) := (others => '0');
     m_ask_qty   : out std_logic_vector(31 downto 0) := (others => '0');
     m_valid     : out std_logic_vector(1 downto 0)  := (others => '0') -- per side
+    ----------------------------------------------------------------------------
+    -- timestanping
+    ----------------------------------------------------------------------------
+    ts_op : out t_book_op := OP_ADD --timestamping op
   );
 end entity price_storage;
 
@@ -170,6 +174,14 @@ begin
           double <= '0';
         end if;
 
+        if double = '1' then
+          ts_op <= OP_REPLACE;
+        elsif s_tvalid = '1' then
+          ts_op <= s_op;
+        end if;
+        --timestamping logic
+
+        
       end if;
     end if;
   end process storage;
