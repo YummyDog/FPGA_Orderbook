@@ -110,8 +110,9 @@ entity order_book is
     m_op    : out t_book_op                     := OP_ADD -- ADD / EXEC / REPLACE / DELETE
 
     --timestamping
-    ts_op : out t_book_op := OP_ADD --for timestamping (sends the original op)
-    ts_en : out std_logic --timestamp enable (first we)
+    ts_op : out t_book_op := OP_ADD; --for timestamping (sends the original op)
+    ts_en : out std_logic; --timestamp enable (first we)
+    ts_id : out std_logic_vector(63 downto 0) := (others => '0')
 
   );
 end entity order_book;
@@ -190,6 +191,7 @@ begin
 
         if s_xfer = '1' then --pass op through to ts.
           ts_op <= s_op;
+          ts_id <= s_order_id;
         end if;
       end if;
     end if;
