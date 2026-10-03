@@ -107,12 +107,13 @@ entity order_book is
     m_side  : out std_logic                     := '0'; -- 0 = buy, 1 = sell
     m_qty   : out std_logic_vector(31 downto 0) := (others => '0'); -- absolute on ADD/REPLACE, delta on EXEC
     m_price : out std_logic_vector(31 downto 0) := (others => '0'); -- qualified by s_px_valid
-    m_op    : out t_book_op                     := OP_ADD -- ADD / EXEC / REPLACE / DELETE
+    m_op    : out t_book_op                     := OP_ADD; -- ADD / EXEC / REPLACE / DELETE
 
     --timestamping
-    ts_op : out t_book_op := OP_ADD; --for timestamping (sends the original op)
-    ts_en : out std_logic; --timestamp enable (first we)
-    ts_id : out std_logic_vector(63 downto 0) := (others => '0')
+    ts_op   : out t_book_op := OP_ADD; --for timestamping (sends the original op)
+    ts_en   : out std_logic; --timestamp enable (first we)
+    ts_side : out std_logic := '0';
+    ts_id   : out std_logic_vector(63 downto 0) := (others => '0')
 
   );
 end entity order_book;
@@ -175,7 +176,7 @@ begin
     if rising_edge(clk) then
       if resetn = '0' then
         table_cnt <= (others => '0');
-        ts_op <= OP_ADD;
+        ts_op     <= OP_ADD;
       else
         if s_xfer = '1' then
           table_cnt <= to_unsigned(1, table_cnt'length);
@@ -190,8 +191,9 @@ begin
         end if;
 
         if s_xfer = '1' then --pass op through to ts.
-          ts_op <= s_op;
-          ts_id <= s_order_id;
+          ts_op   <= s_op;
+          ts_id   <= s_order_id;
+          ts_side <= s_side;
         end if;
       end if;
     end if;

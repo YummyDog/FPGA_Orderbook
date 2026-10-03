@@ -74,11 +74,12 @@ entity price_storage is
     m_bid_qty   : out std_logic_vector(31 downto 0) := (others => '0');
     m_ask_price : out std_logic_vector(31 downto 0) := (others => '0');
     m_ask_qty   : out std_logic_vector(31 downto 0) := (others => '0');
-    m_valid     : out std_logic_vector(1 downto 0)  := (others => '0') -- per side
+    m_valid     : out std_logic_vector(1 downto 0)  := (others => '0'); -- per side
     ----------------------------------------------------------------------------
     -- timestanping
     ----------------------------------------------------------------------------
-    ts_op : out t_book_op := OP_ADD --timestamping op
+    ts_op   : out t_book_op := OP_ADD; --timestamping op
+    ts_side : out std_logic := '0'
   );
 end entity price_storage;
 
@@ -169,19 +170,19 @@ begin
           else
             lvl_wdata_i <= insert;
           end if;
+
+          if double = '1' then
+            ts_op <= OP_REPLACE;
+          else
+            ts_op <= op_r;
+          end if;
+          ts_side <= side_r;
+          --timestamping logic
+
         else
           lvl_we <= '0';
           double <= '0';
         end if;
-
-        if double = '1' then
-          ts_op <= OP_REPLACE;
-        elsif s_tvalid = '1' then
-          ts_op <= s_op;
-        end if;
-        --timestamping logic
-
-        
       end if;
     end if;
   end process storage;

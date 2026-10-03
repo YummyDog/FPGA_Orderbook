@@ -4,7 +4,6 @@
 -- Events arriving in the same clock are stacked price, order, input, fifo;
 -- output order is first in, first out.
 -- event_type: price "00", order "01", input "10", fifo "11".
--- Each event stores the value of timestamp on the edge it is sampled.
 -- Latency: 1 clock (event sampled on an edge is on the output after that edge).
 -- Throughput: 1 beat per clock. Overflow is not handled.
 --------------------------------------------------------------------------------
@@ -20,29 +19,31 @@ entity time_event_fifo is
     clk          : in  std_logic;
     rst_n        : in  std_logic;   -- synchronous, active low
 
-    timestamp    : in  std_logic_vector(17 downto 0);   -- shared by all sources
-
     price_valid  : in  std_logic;
     price_op     : in  std_logic_vector(1 downto 0);
-    price_data   : in  std_logic_vector(63 downto 0);
+    price_data   : in  std_logic_vector(64 downto 0);
+    price_ts     : in  std_logic_vector(17 downto 0);
 
     order_valid  : in  std_logic;
     order_op     : in  std_logic_vector(1 downto 0);
-    order_data   : in  std_logic_vector(63 downto 0);
+    order_data   : in  std_logic_vector(64 downto 0);
+    order_ts     : in  std_logic_vector(17 downto 0);
 
     input_valid  : in  std_logic;
     input_op     : in  std_logic_vector(1 downto 0);
-    input_data   : in  std_logic_vector(63 downto 0);
+    input_data   : in  std_logic_vector(64 downto 0);
+    input_ts     : in  std_logic_vector(17 downto 0);
 
     fifo_valid   : in  std_logic;
     fifo_op      : in  std_logic_vector(1 downto 0);
-    fifo_data    : in  std_logic_vector(63 downto 0);
+    fifo_data    : in  std_logic_vector(64 downto 0);
+    fifo_ts      : in  std_logic_vector(17 downto 0);
 
     m_valid      : out std_logic;
     m_ready      : in  std_logic;
     m_event_type : out std_logic_vector(1 downto 0);
     m_op         : out std_logic_vector(1 downto 0);
-    m_data       : out std_logic_vector(63 downto 0);
+    m_data       : out std_logic_vector(64 downto 0);
     m_ts         : out std_logic_vector(17 downto 0)
   );
 end entity time_event_fifo;
@@ -69,7 +70,7 @@ architecture rtl of time_event_fifo is
 
   constant ET_W    : natural := 2;
   constant OP_W    : natural := 2;
-  constant DATA_W  : natural := 64;
+  constant DATA_W  : natural := 65;
   constant TS_W    : natural := 18;
   constant PL_W    : natural := ET_W + OP_W + DATA_W + TS_W;
 
@@ -130,10 +131,10 @@ begin
 
   -- Index = priority (0 highest).
   in_v     <= fifo_valid & input_valid & order_valid & price_valid;
-  in_pl(0) <= "00" & price_op & price_data & timestamp;
-  in_pl(1) <= "01" & order_op & order_data & timestamp;
-  in_pl(2) <= "10" & input_op & input_data & timestamp;
-  in_pl(3) <= "11" & fifo_op  & fifo_data  & timestamp;
+  in_pl(0) <= "00" & price_op & price_data & price_ts;
+  in_pl(1) <= "01" & order_op & order_data & order_ts;
+  in_pl(2) <= "10" & input_op & input_data & input_ts;
+  in_pl(3) <= "11" & fifo_op  & fifo_data  & fifo_ts;
 
   any_v    <= in_v(0) or in_v(1) or in_v(2) or in_v(3);
   first_pl <= in_pl(0) when in_v(0) = '1' else

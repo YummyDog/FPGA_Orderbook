@@ -24,6 +24,22 @@
 -- ports are brought out regardless so the interface does not change when it
 -- does.
 --
+-- TIMESTAMPING
+--
+-- Four event sources are stamped from one free-running counter and merged
+-- into time_event_fifo. Internal signals only - no ports were added, so the
+-- event stream is for viewing in simulation (and is trimmed in synthesis,
+-- having no load).
+--
+--   source  valid                  op                   data (65 bits)
+--   price   lvl_we                 price_storage ts_op  qty & price & side
+--   order   order_book ts_en       order_book ts_op     order_id & side
+--   input   in_tvalid              in_op                order_id & side
+--   fifo    order_fifo ts_en       cmd_op               order_id & side
+--
+-- Side is always bit 0. Op is t_book_op'pos: ADD "00", EXEC "01",
+-- REPLACE "10", DELETE "11".
+--
 -- VHDL-2008
 --------------------------------------------------------------------------------
 
@@ -156,6 +172,54 @@ architecture rtl of order_book_engine_top is
   signal lvl_raddr_set : t_lvl_addr_set;
   signal lvl_rdata     : t_level_set;
 
+  ------------------------------------------------------------------------------
+  -- Timestamping
+  --
+  -- C_TS_W must match the 18-bit ts ports on time_event_fifo.
+  ------------------------------------------------------------------------------
+  constant C_TS_W     : positive := 18;
+  constant C_EV_DEPTH : positive := 32;   -- power of two, >= 8
+
+  function f_op (op : t_book_op) return std_logic_vector is
+  begin
+    return std_logic_vector(to_unsigned(t_book_op'pos(op), 2));
+  end function f_op;
+
+  signal ts_count : std_logic_vector(C_TS_W - 1 downto 0);
+
+  -- Raw timestamp taps out of the modules
+  signal fifo_ts_en : std_logic;
+  signal ob_ts_en   : std_logic;
+  signal ob_ts_op   : t_book_op;
+  signal ob_ts_side : std_logic;
+  signal ob_ts_id   : std_logic_vector(63 downto 0);
+  signal ps_ts_op   : t_book_op;
+  signal ps_ts_side : std_logic;
+
+  -- Event FIFO inputs
+  signal price_ev_valid : std_logic;
+  signal price_ev_op    : std_logic_vector(1 downto 0);
+  signal price_ev_data  : std_logic_vector(64 downto 0);
+
+  signal order_ev_valid : std_logic;
+  signal order_ev_op    : std_logic_vector(1 downto 0);
+  signal order_ev_data  : std_logic_vector(64 downto 0);
+
+  signal input_ev_valid : std_logic;
+  signal input_ev_op    : std_logic_vector(1 downto 0);
+  signal input_ev_data  : std_logic_vector(64 downto 0);
+
+  signal fifo_ev_valid  : std_logic;
+  signal fifo_ev_op     : std_logic_vector(1 downto 0);
+  signal fifo_ev_data   : std_logic_vector(64 downto 0);
+
+  -- Event FIFO output, one event per cycle. Viewed in simulation only.
+  signal ev_valid : std_logic;
+  signal ev_type  : std_logic_vector(1 downto 0);
+  signal ev_op    : std_logic_vector(1 downto 0);
+  signal ev_data  : std_logic_vector(64 downto 0);
+  signal ev_ts    : std_logic_vector(C_TS_W - 1 downto 0);
+
 begin
 
   ------------------------------------------------------------------------------
@@ -229,6 +293,8 @@ begin
       full       => fifo_full,
       overflow   => fifo_overflow,
 
+      ts_en      => fifo_ts_en,
+
       fcs_complete => fcs_complete,
       fcs_true     => fcs_true,
       fcs_false    => fcs_false,
@@ -276,7 +342,12 @@ begin
       m_side     => mut_side,
       m_qty      => mut_qty,
       m_price    => mut_price,
-      m_op       => mut_op
+      m_op       => mut_op,
+
+      ts_op      => ob_ts_op,
+      ts_en      => ob_ts_en,
+      ts_side    => ob_ts_side,
+      ts_id      => ob_ts_id
     );
 
   u_ram_array : entity work.ram_array
@@ -329,7 +400,10 @@ begin
       m_bid_qty   => m_bid_qty,
       m_ask_price => m_ask_price,
       m_ask_qty   => m_ask_qty,
-      m_valid     => m_valid
+      m_valid     => m_valid,
+
+      ts_op       => ps_ts_op,
+      ts_side     => ps_ts_side
     );
 
   -- price_storage issues one read address; both sides are read at it.
@@ -344,6 +418,79 @@ begin
       wdata => lvl_wdata,
       raddr => lvl_raddr_set,
       rdata => lvl_rdata
+    );
+
+  ------------------------------------------------------------------------------
+  -- Timestamping
+  ------------------------------------------------------------------------------
+  u_ts_counter : entity work.timestamp_counter
+    generic map (
+      WIDTH => C_TS_W
+    )
+    port map (
+      clk     => clk,
+      rst_n   => resetn,
+      count_o => ts_count
+    );
+
+  -- price: one event per level write. ts_op and ts_side are registered with
+  -- lvl_we, so all three line up with the write on the bus.
+  price_ev_valid <= lvl_we;
+  price_ev_op    <= f_op(ps_ts_op);
+  price_ev_data  <= lvl_wdata(LVL_QTY_RANGE) & lvl_wdata(LVL_PRICE_RANGE) & ps_ts_side;
+
+  -- order: first table write of each command only (eviction hops excluded).
+  -- id, side and op are latched on the order_book slave handshake.
+  order_ev_valid <= ob_ts_en;
+  order_ev_op    <= f_op(ob_ts_op);
+  order_ev_data  <= ob_ts_id & ob_ts_side;
+
+  -- input: the one-cycle command pulse out of book_input_stage.
+  input_ev_valid <= in_tvalid;
+  input_ev_op    <= f_op(in_op);
+  input_ev_data  <= in_order_id & in_side;
+
+  -- fifo: the master handshake, i.e. the cycle order_book takes the command.
+  fifo_ev_valid  <= fifo_ts_en;
+  fifo_ev_op     <= f_op(cmd_op);
+  fifo_ev_data   <= cmd_order_id & cmd_side;
+
+  -- m_ready is tied high: nothing downstream, so the output drains every cycle
+  -- and each event is visible on ev_* for exactly one cycle.
+  u_time_event_fifo : entity work.time_event_fifo
+    generic map (
+      DEPTH => C_EV_DEPTH
+    )
+    port map (
+      clk          => clk,
+      rst_n        => resetn,
+
+      price_valid  => price_ev_valid,
+      price_op     => price_ev_op,
+      price_data   => price_ev_data,
+      price_ts     => ts_count,
+
+      order_valid  => order_ev_valid,
+      order_op     => order_ev_op,
+      order_data   => order_ev_data,
+      order_ts     => ts_count,
+
+      input_valid  => input_ev_valid,
+      input_op     => input_ev_op,
+      input_data   => input_ev_data,
+      input_ts     => ts_count,
+
+      fifo_valid   => fifo_ev_valid,
+      fifo_op      => fifo_ev_op,
+      fifo_data    => fifo_ev_data,
+      fifo_ts      => ts_count,
+
+      m_valid      => ev_valid,
+      m_ready      => '1',
+      m_event_type => ev_type,
+      m_op         => ev_op,
+      m_data       => ev_data,
+      m_ts         => ev_ts
     );
 
 end architecture rtl;
