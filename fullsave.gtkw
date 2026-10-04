@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.118 (w)1999-2023 BSI
-[*] Thu Oct 01 12:55:19 2026
+[*] Sun Oct 04 10:26:20 2026
 [*]
 [dumpfile] "C:\Users\lskje\Desktop\FPGA_Orderbook\market_data_top.fst"
-[dumpfile_mtime] "Thu Oct 01 12:53:13 2026"
+[dumpfile_mtime] "Thu Oct 01 13:53:13 2026"
 [dumpfile_size] 247911
 [savefile] "C:\Users\lskje\Desktop\FPGA_Orderbook\fullsave.gtkw"
-[timestart] 0
+[timestart] 206590000
 [size] 1920 1017
-[pos] -35 -35
-*-34.000000 37736400000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -165 -165
+*-23.000000 226470000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] market_data_top.
 [treeopen] market_data_top.u_engine.
 [treeopen] market_data_top.u_fullparser.
@@ -17,7 +17,7 @@
 [sst_width] 398
 [signals_width] 182
 [sst_expanded] 1
-[sst_vpaned_height] 314
+[sst_vpaned_height] 608
 @28
 market_data_top.u_fullparser.u_itch.clk
 market_data_top.resetn
@@ -54,6 +54,8 @@ market_data_top.u_engine.u_order_book.table_cnt[1:0]
 market_data_top.u_engine.u_order_book.modify_wsel[1:0]
 @200
 -price storage
+@29
+market_data_top.u_engine.u_price_storage.s_tvalid
 @24
 market_data_top.u_engine.u_price_storage.s_price[31:0]
 market_data_top.u_engine.u_price_storage.s_qty[31:0]
@@ -77,7 +79,6 @@ market_data_top.u_engine.u_price_storage.rqty1[31:0]
 market_data_top.u_engine.u_time_event_fifo.input_valid
 market_data_top.u_engine.u_time_event_fifo.fifo_valid
 market_data_top.u_engine.u_time_event_fifo.order_valid
-@29
 market_data_top.u_engine.u_time_event_fifo.price_valid
 [pattern_trace] 1
 [pattern_trace] 0

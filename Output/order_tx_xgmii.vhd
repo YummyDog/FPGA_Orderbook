@@ -1,15 +1,17 @@
 --------------------------------------------------------------------------------
 -- order_tx_xgmii
 --
--- Builds one UDP/IPv4/Ethernet frame per enable pulse and drives it out on a
--- 64-bit XGMII bus, preamble and SFD included, FCS appended, followed by the
--- interpacket gap.
+-- Builds one UDP/IPv4/Ethernet frame per accepted AXI-Stream transfer and
+-- drives it out on a 64-bit XGMII bus, preamble and SFD included, FCS appended,
+-- followed by the interpacket gap.
 --
 -- Everything editable (addresses, ports, payload layout) is in order_tx_pkg.
 --
--- enable is a single-cycle pulse; side, qty and price are sampled with it and
--- ignored while busy is high. The preamble beat goes out one cycle after the
--- pulse is sampled.
+-- Slave side is plain AXI-Stream: one transfer (tvalid and tready both high on
+-- a rising edge) carries the whole payload and launches one frame. tready is
+-- registered, low in reset, low from the cycle after a transfer until the
+-- interpacket gap has been sent, and never waits for tvalid. The preamble beat
+-- goes out one cycle after the transfer.
 --
 -- Frame on the wire:
 --   beat 0        S 55 55 55 55 55 55 D5
@@ -36,17 +38,17 @@ entity order_tx_xgmii is
     G_IPG_WORDS : positive := 2
   );
   port (
-    clk       : in  std_logic;
-    rst       : in  std_logic;                      -- synchronous, active high
+    clk           : in  std_logic;
+    rst           : in  std_logic;                  -- synchronous, active high
 
-    enable    : in  std_logic;                      -- 1-cycle pulse
-    side      : in  std_logic;                      -- '0' buy, '1' sell
-    qty       : in  std_logic_vector(31 downto 0);
-    price     : in  std_logic_vector(31 downto 0);
-    busy      : out std_logic;
+    -- AXI-Stream slave, one transfer per frame
+    s_axis_tvalid : in  std_logic;
+    s_axis_tready : out std_logic;
+    s_axis_tdata  : in  std_logic_vector(C_PAYLOAD_BITS - 1 downto 0);  -- 64:0
 
-    xgmii_txd : out std_logic_vector(63 downto 0);
-    xgmii_txc : out std_logic_vector(7 downto 0)
+    -- XGMII master
+    xgmii_txd     : out std_logic_vector(63 downto 0);
+    xgmii_txc     : out std_logic_vector(7 downto 0)
   );
 end entity order_tx_xgmii;
 
@@ -93,9 +95,9 @@ architecture rtl of order_tx_xgmii is
   signal idx     : natural range 0 to C_WORDS - 1 := 0;
   signal gap_cnt : natural range 0 to G_IPG_WORDS := 0;
 
-  signal side_r  : std_logic_vector(7 downto 0) := (others => '0');
-  signal qty_r   : std_logic_vector(31 downto 0) := (others => '0');
-  signal price_r : std_logic_vector(31 downto 0) := (others => '0');
+  signal ready_r   : std_logic := '0';
+  signal payload_r : std_logic_vector(C_PAYLOAD_BITS - 1 downto 0)
+                   := (others => '0');
 
   signal crc     : std_logic_vector(31 downto 0) := (others => '1');
 
@@ -108,10 +110,10 @@ architecture rtl of order_tx_xgmii is
 begin
 
   ------------------------------------------------------------------------------
-  -- The frame, built combinationally from the sampled fields. Only the nine
+  -- The frame, built combinationally from the sampled payload. Only the nine
   -- payload bytes vary; everything else folds to constants.
   ------------------------------------------------------------------------------
-  frame_c <= f_frame(side_r, qty_r, price_r);
+  frame_c <= f_frame(payload_r);
   word_c  <= f_word(frame_c, idx);
 
   ------------------------------------------------------------------------------
@@ -125,16 +127,17 @@ begin
       case state is
 
         when S_IDLE =>
-          if enable = '1' then
-            side_r  <= C_SIDE_SELL when side = '1' else C_SIDE_BUY;
-            qty_r   <= qty;
-            price_r <= price;
+          ready_r <= '1';
 
-            txd_r   <= C_PRE_D;
-            txc_r   <= "00000001";           -- /S/ in lane 0
-            crc     <= (others => '1');
-            idx     <= 0;
-            state   <= S_DATA;
+          if s_axis_tvalid = '1' and ready_r = '1' then
+            payload_r <= s_axis_tdata;
+            ready_r   <= '0';
+
+            txd_r     <= C_PRE_D;
+            txc_r     <= "00000001";         -- /S/ in lane 0
+            crc       <= (others => '1');
+            idx       <= 0;
+            state     <= S_DATA;
           end if;
 
         when S_DATA =>
@@ -159,7 +162,8 @@ begin
 
         when S_GAP =>
           if gap_cnt = G_IPG_WORDS - 1 then
-            state <= S_IDLE;
+            ready_r <= '1';
+            state   <= S_IDLE;
           else
             gap_cnt <= gap_cnt + 1;
           end if;
@@ -167,17 +171,18 @@ begin
       end case;
 
       if rst = '1' then
-        state <= S_IDLE;
-        idx   <= 0;
-        txd_r <= C_IDLE_D;
-        txc_r <= (others => '1');
+        state   <= S_IDLE;
+        idx     <= 0;
+        ready_r <= '0';
+        txd_r   <= C_IDLE_D;
+        txc_r   <= (others => '1');
       end if;
     end if;
   end process;
 
+  s_axis_tready <= ready_r;
+
   xgmii_txd <= txd_r;
   xgmii_txc <= txc_r;
-
-  busy <= '0' when state = S_IDLE else '1';
 
 end architecture rtl;

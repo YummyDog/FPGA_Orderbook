@@ -8,11 +8,14 @@
 -- from those at elaboration, so changing an address or a payload field needs no
 -- edit to the RTL.
 --
--- Payload layout, as shipped:
---   byte 0      side      (C_SIDE_BUY / C_SIDE_SELL)
---   bytes 1-4   quantity  (big endian, network order)
---   bytes 5-8   price     (big endian, network order)
+-- Payload layout, as shipped (C_PAYLOAD_BITS = 65):
+--   byte 0      "0000000" & payload(64)
+--   bytes 1-8   payload(63 downto 0)  (big endian, network order)
 --   bytes 9..   zero padding
+--
+-- The payload vector is right-justified in the smallest whole number of bytes
+-- and sent most significant byte first; the unused high bits of byte 0 are
+-- zero.
 --
 -- Reshape f_payload to change it. The padding keeps the frame at or above the
 -- 64-byte minimum and makes its length a multiple of 8, which is what lets the
@@ -52,12 +55,8 @@ package order_tx_pkg is
   constant C_UDP_SPORT : std_logic_vector(15 downto 0) := x"C350";  -- 50000
   constant C_UDP_DPORT : std_logic_vector(15 downto 0) := x"C351";  -- 50001
 
-  -- Side byte encoding
-  constant C_SIDE_BUY  : std_logic_vector(7 downto 0) := x"42";     -- 'B'
-  constant C_SIDE_SELL : std_logic_vector(7 downto 0) := x"53";     -- 'S'
-
-  -- Bytes of payload actually used by f_payload before padding
-  constant C_MSG_LEN   : natural := 9;
+  -- Width of the payload vector handed to the transmitter
+  constant C_PAYLOAD_BITS : positive := 65;
 
   ------------------------------------------------------------------------------
   -- Derived. Nothing below needs editing.
@@ -69,6 +68,9 @@ package order_tx_pkg is
   constant C_IP_LEN     : natural := 20;
   constant C_UDP_LEN    : natural := 8;
   constant C_HDR_LEN    : natural := C_ETH_LEN + C_IP_LEN + C_UDP_LEN;   -- 42
+
+  -- Bytes of payload actually used by f_payload before padding
+  constant C_MSG_LEN    : natural := (C_PAYLOAD_BITS + 7) / 8;           -- 9
 
   -- Payload padded to keep the frame >= 60 bytes before the FCS (so the frame
   -- with FCS is >= 64), and to make the pre-FCS length a multiple of 8.
@@ -86,14 +88,10 @@ package order_tx_pkg is
 
   function f_ip_checksum (h : t_bytes) return std_logic_vector;
 
-  function f_payload (side_byte : std_logic_vector(7 downto 0);
-                      qty       : std_logic_vector(31 downto 0);
-                      price     : std_logic_vector(31 downto 0))
+  function f_payload (payload : std_logic_vector(C_PAYLOAD_BITS - 1 downto 0))
     return t_bytes;
 
-  function f_frame (side_byte : std_logic_vector(7 downto 0);
-                    qty       : std_logic_vector(31 downto 0);
-                    price     : std_logic_vector(31 downto 0))
+  function f_frame (payload : std_logic_vector(C_PAYLOAD_BITS - 1 downto 0))
     return t_bytes;
 
 end package order_tx_pkg;
@@ -119,28 +117,23 @@ package body order_tx_pkg is
   end function f_ip_checksum;
 
   ------------------------------------------------------------------------------
-  function f_payload (side_byte : std_logic_vector(7 downto 0);
-                      qty       : std_logic_vector(31 downto 0);
-                      price     : std_logic_vector(31 downto 0))
+  -- Right-justify the payload in C_MSG_LEN bytes, most significant byte first.
+  ------------------------------------------------------------------------------
+  function f_payload (payload : std_logic_vector(C_PAYLOAD_BITS - 1 downto 0))
     return t_bytes is
     variable p : t_bytes(0 to C_PAYLOAD_LEN - 1) := (others => x"00");
+    variable v : std_logic_vector(8 * C_MSG_LEN - 1 downto 0)
+               := (others => '0');
   begin
-    p(0) := side_byte;
-    p(1) := qty(31 downto 24);
-    p(2) := qty(23 downto 16);
-    p(3) := qty(15 downto 8);
-    p(4) := qty(7 downto 0);
-    p(5) := price(31 downto 24);
-    p(6) := price(23 downto 16);
-    p(7) := price(15 downto 8);
-    p(8) := price(7 downto 0);
+    v(C_PAYLOAD_BITS - 1 downto 0) := payload;
+    for i in 0 to C_MSG_LEN - 1 loop
+      p(i) := v(8 * (C_MSG_LEN - i) - 1 downto 8 * (C_MSG_LEN - 1 - i));
+    end loop;
     return p;
   end function f_payload;
 
   ------------------------------------------------------------------------------
-  function f_frame (side_byte : std_logic_vector(7 downto 0);
-                    qty       : std_logic_vector(31 downto 0);
-                    price     : std_logic_vector(31 downto 0))
+  function f_frame (payload : std_logic_vector(C_PAYLOAD_BITS - 1 downto 0))
     return t_bytes is
     variable f      : t_bytes(0 to C_FRAME_LEN - 1) := (others => x"00");
     variable ip     : t_bytes(0 to C_IP_LEN - 1)    := (others => x"00");
@@ -197,7 +190,7 @@ package body order_tx_pkg is
     f(41) := x"00";
 
     -- Payload
-    pl := f_payload(side_byte, qty, price);
+    pl := f_payload(payload);
     for i in 0 to C_PAYLOAD_LEN - 1 loop
       f(C_HDR_LEN + i) := pl(i);
     end loop;
