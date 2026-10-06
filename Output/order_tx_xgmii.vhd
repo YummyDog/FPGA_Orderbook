@@ -44,7 +44,7 @@ entity order_tx_xgmii is
     -- AXI-Stream slave, one transfer per frame
     s_axis_tvalid : in  std_logic;
     s_axis_tready : out std_logic;
-    s_axis_tdata  : in  std_logic_vector(C_PAYLOAD_BITS - 1 downto 0);  -- 64:0
+    s_axis_tdata  : in  std_logic_vector(C_PAYLOAD_BITS - 1 downto 0);  -- 82:0
 
     -- XGMII master
     xgmii_txd     : out std_logic_vector(63 downto 0);
@@ -110,7 +110,7 @@ architecture rtl of order_tx_xgmii is
 begin
 
   ------------------------------------------------------------------------------
-  -- The frame, built combinationally from the sampled payload. Only the nine
+  -- The frame, built combinationally from the sampled payload. Only the eleven
   -- payload bytes vary; everything else folds to constants.
   ------------------------------------------------------------------------------
   frame_c <= f_frame(payload_r);

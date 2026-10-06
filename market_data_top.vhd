@@ -1,9 +1,9 @@
 --------------------------------------------------------------------------------
 -- market_data_top
 --
--- Final top: XGMII in, order book out.
+-- Final top: XGMII in, order book out, timestamp events out on XGMII.
 --
---   input_top -> fullparser -> order_book_engine_top
+--   input_top -> fullparser -> order_book_engine_top -> tx_top
 --
 -- input_top holds the XGMII-to-AXI-Stream converter, the FCS checker and the
 -- pulse extender. The raw XGMII bus feeds the converter and the checker in
@@ -14,7 +14,13 @@
 -- comes back out of fullparser's mold stage, and lands in order_fifo where it
 -- is registered and nothing more. That flop exists so the path can be timed.
 --
--- Single clock. No CDC anywhere.
+-- tx_top frames each timestamp event the engine produces as one UDP/IPv4/
+-- Ethernet frame and drives it out on xgmii_txd / xgmii_txc. The event stream
+-- is a valid/ready link: the transmitter is busy for a whole frame per event,
+-- and the engine's event FIFO holds the rest. Nothing on the transmit side
+-- pushes back into the book.
+--
+-- Single clock. No CDC anywhere - the transmit XGMII is on clk as well.
 --
 -- VHDL-2008
 --------------------------------------------------------------------------------
@@ -30,7 +36,8 @@ entity market_data_top is
     G_ORDER_BOOK_ID  : natural                       := 85603;
     G_FIFO_DEPTH     : positive                      := 16;
     G_MAX_ORDERS     : natural                       := 16384;
-    G_CHECK_PREAMBLE : boolean                       := true
+    G_CHECK_PREAMBLE : boolean                       := true;
+    G_TX_IPG_WORDS   : positive                      := 2
   );
   port (
     clk              : in    std_logic;
@@ -41,6 +48,12 @@ entity market_data_top is
     ----------------------------------------------------------------------------
     xgmii_rxd        : in    std_logic_vector(63 downto 0);
     xgmii_rxc        : in    std_logic_vector(7 downto 0);
+
+    ----------------------------------------------------------------------------
+    -- Master: 64-bit XGMII to the PCS, one frame per timestamp event
+    ----------------------------------------------------------------------------
+    xgmii_txd        : out   std_logic_vector(63 downto 0);
+    xgmii_txc        : out   std_logic_vector(7 downto 0);
 
     ----------------------------------------------------------------------------
     -- Master: packet passthrough, taken from the input stage
@@ -126,6 +139,18 @@ architecture rtl of market_data_top is
   signal fcs_complete_i : std_logic;
   signal fcs_true_i     : std_logic;
   signal fcs_false_i    : std_logic;
+
+  ------------------------------------------------------------------------------
+  -- engine -> tx_top : timestamp event stream
+  --
+  -- payload (MSB first): event_type(2) op(2) data(64) side(1) ts(18)
+  --
+  -- 87 bits, the event FIFO's own width. tx_top takes C_PAYLOAD_BITS from
+  -- order_tx_pkg, so a mismatch between the two stops elaboration here.
+  ------------------------------------------------------------------------------
+  signal ev_valid_i   : std_logic;
+  signal ev_ready_i   : std_logic;
+  signal ev_payload_i : std_logic_vector(86 downto 0);
 
 begin
 
@@ -243,6 +268,10 @@ begin
       m_ask_qty     => m_ask_qty,
       m_valid       => m_valid,
 
+      ev_valid      => ev_valid_i,
+      ev_ready      => ev_ready_i,
+      ev_payload    => ev_payload_i,
+
       book_busy     => book_busy,
       level_busy    => level_busy,
       oor           => oor,
@@ -250,6 +279,25 @@ begin
       fifo_overflow => fifo_overflow,
       stat_bad_side => stat_bad_side,
       stat_qty_ovf  => stat_qty_ovf
+    );
+
+  ------------------------------------------------------------------------------
+  -- Transmit : one frame per timestamp event
+  ------------------------------------------------------------------------------
+  u_tx : entity work.tx_top
+    generic map (
+      G_IPG_WORDS => G_TX_IPG_WORDS
+    )
+    port map (
+      clk       => clk,
+      resetn    => resetn,
+
+      s_valid   => ev_valid_i,
+      s_ready   => ev_ready_i,
+      s_payload => ev_payload_i,
+
+      xgmii_txd => xgmii_txd,
+      xgmii_txc => xgmii_txc
     );
 
 end architecture rtl;

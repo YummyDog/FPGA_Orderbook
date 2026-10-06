@@ -10,11 +10,16 @@
                                   ram_array     level_array
 
     market_data_top.vhd sits beside this script; everything else is in
-    Input\, Parser\, Engine\ or Timestamping\.
+    Input\, Parser\, Engine\, Timestamping\ or Output\.
 
     Timestamping\ holds time_counter.vhd (entity timestamp_counter) and
     time_event_fifo.vhd. Both are instantiated inside order_book_engine_top,
     so they are compiled ahead of the engine.
+
+    Output\ holds the transmit side - order_tx_pkg.vhd, order_tx_xgmii.vhd
+    and tx_top.vhd. It is compiled because market_data_top instantiates it,
+    and for no other reason. The tests do not drive it, read it or check it:
+    xgmii_txd and xgmii_txc are outputs nothing in the testbench looks at.
 
 
     MEMORIES ARE NOT CLEARED BETWEEN TESTS
@@ -75,15 +80,16 @@ $ParserDir    = Join-Path $Root "Parser"
 $EngineDir    = Join-Path $Root "Engine"
 $InputDir     = Join-Path $Root "Input"
 $TimestampDir = Join-Path $Root "Timestamping"
+$OutputDir    = Join-Path $Root "Output"
 
-foreach ($d in @($ParserDir, $EngineDir, $TimestampDir)) {
+foreach ($d in @($ParserDir, $EngineDir, $TimestampDir, $OutputDir)) {
     if (-not (Test-Path $d)) { throw "Missing source folder: $d" }
 }
 
 # The XGMII front end may live in its own folder or alongside the engine, so
 # resolve each file by searching rather than assuming. Keeps the script from
 # caring how the tree is laid out.
-$SearchDirs = @($InputDir, $TimestampDir, $EngineDir, $ParserDir, $Root) |
+$SearchDirs = @($InputDir, $OutputDir, $TimestampDir, $EngineDir, $ParserDir, $Root) |
               Where-Object { Test-Path $_ }
 
 function Find-Source {
@@ -98,13 +104,18 @@ function Find-Source {
 
 # Compile order matters: package before the entity that uses it.
 #
-# Parser first, then timestamping, then the engine, then the toplevel.
-# itch_parser_pkg MUST come before the engine - book_input_stage takes
-# msg_fields directly, so order_book_engine_top depends on C_MSG_FIELDS_W.
+# Parser first, then timestamping, then the engine, then the transmit side,
+# then the toplevel. itch_parser_pkg MUST come before the engine -
+# book_input_stage takes msg_fields directly, so order_book_engine_top depends
+# on C_MSG_FIELDS_W.
 #
 # The timestamping entities are instantiated by order_book_engine_top through
 # direct entity instantiation, so they have to be analysed before it. They use
 # nothing but ieee, so anywhere ahead of the engine works.
+#
+# The transmit side depends on nothing but its own package, and only
+# market_data_top instantiates it, so it goes last before the toplevel:
+# order_tx_pkg, then order_tx_xgmii, then the tx_top wrapper.
 #
 # level_pkg.vhd holds THREE packages in one file - level_cfg_pkg, then
 # level_band_pkg, then level_pkg - because a package cannot call its own
@@ -153,8 +164,14 @@ $EngineSources = @(
     "order_book_engine_top.vhd"
 ) | ForEach-Object { Find-Source $_ }
 
+$OutputSources = @(
+    "order_tx_pkg.vhd",
+    "order_tx_xgmii.vhd",
+    "tx_top.vhd"
+) | ForEach-Object { Find-Source $_ }
+
 $Sources = $InputSources + $ParserSources + $TimestampSources +
-           $EngineSources + @(Find-Source "$Toplevel.vhd")
+           $EngineSources + $OutputSources + @(Find-Source "$Toplevel.vhd")
 
 foreach ($p in @("$Module.py", "md_harness.py", "xgmii.py", "asx_packets.py",
                  "book_model.py")) {
@@ -213,6 +230,7 @@ Write-Host "parser   : $ParserDir"
 Write-Host "engine   : $EngineDir"
 Write-Host "input    : $(Split-Path $InputSources[0] -Parent)"
 Write-Host "timestamp: $(Split-Path $TimestampSources[0] -Parent)"
+Write-Host "output   : $(Split-Path $OutputSources[0] -Parent)  (compiled, not tested)"
 Write-Host "toplevel : $Toplevel  (XGMII in)"
 if ($Test) {
     Write-Host "filter   : $Test  (memories clear - single test, single elaboration)"

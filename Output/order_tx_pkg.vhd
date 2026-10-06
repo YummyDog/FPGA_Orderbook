@@ -8,10 +8,10 @@
 -- from those at elaboration, so changing an address or a payload field needs no
 -- edit to the RTL.
 --
--- Payload layout, as shipped (C_PAYLOAD_BITS = 65):
---   byte 0      "0000000" & payload(64)
---   bytes 1-8   payload(63 downto 0)  (big endian, network order)
---   bytes 9..   zero padding
+-- Payload layout, as shipped (C_PAYLOAD_BITS = 83):
+--   byte 0       "00000" & payload(82 downto 80)
+--   bytes 1-10   payload(79 downto 0)  (big endian, network order)
+--   bytes 11..   zero padding
 --
 -- The payload vector is right-justified in the smallest whole number of bytes
 -- and sent most significant byte first; the unused high bits of byte 0 are
@@ -56,7 +56,7 @@ package order_tx_pkg is
   constant C_UDP_DPORT : std_logic_vector(15 downto 0) := x"C351";  -- 50001
 
   -- Width of the payload vector handed to the transmitter
-  constant C_PAYLOAD_BITS : positive := 65;
+  constant C_PAYLOAD_BITS : positive := 87;
 
   ------------------------------------------------------------------------------
   -- Derived. Nothing below needs editing.
@@ -70,7 +70,7 @@ package order_tx_pkg is
   constant C_HDR_LEN    : natural := C_ETH_LEN + C_IP_LEN + C_UDP_LEN;   -- 42
 
   -- Bytes of payload actually used by f_payload before padding
-  constant C_MSG_LEN    : natural := (C_PAYLOAD_BITS + 7) / 8;           -- 9
+  constant C_MSG_LEN    : natural := (C_PAYLOAD_BITS + 7) / 8;           -- 11
 
   -- Payload padded to keep the frame >= 60 bytes before the FCS (so the frame
   -- with FCS is >= 64), and to make the pre-FCS length a multiple of 8.
