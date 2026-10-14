@@ -10,6 +10,351 @@
       "tool_version": "2026.1",
       "validated": "true"
     },
-    "design_tree": {}
+    "design_tree": {
+      "market_data_top_0": "",
+      "ten_gig_eth_pcs_pma_0": ""
+    },
+    "components": {
+      "market_data_top_0": {
+        "vlnv": "xilinx.com:module_ref:market_data_top:1.0",
+        "ip_revision": "1",
+        "xci_name": "top_market_data_top_0_0",
+        "xci_path": "ip\\top_market_data_top_0_0\\top_market_data_top_0_0.xci",
+        "inst_hier_path": "market_data_top_0",
+        "has_run_ip_tcl": "true",
+        "reference_info": {
+          "ref_type": "hdl",
+          "ref_name": "market_data_top",
+          "boundary_crc": "0x0"
+        },
+        "interface_ports": {
+          "m": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "parameters": {
+              "TDATA_NUM_BYTES": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TDEST_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TUSER_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TREADY": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TSTRB": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TKEEP": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TLAST": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "156250000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "top_ten_gig_eth_pcs_pma_0_0_coreclk_out",
+                "value_src": "default_prop"
+              }
+            },
+            "port_maps": {
+              "TVALID": {
+                "physical_name": "m_tvalid",
+                "direction": "O"
+              },
+              "TREADY": {
+                "physical_name": "m_tready",
+                "direction": "I"
+              }
+            }
+          },
+          "m_axis": {
+            "mode": "Master",
+            "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
+            "vlnv": "xilinx.com:interface:axis_rtl:1.0",
+            "parameters": {
+              "TDATA_NUM_BYTES": {
+                "value": "8",
+                "value_src": "constant"
+              },
+              "TDEST_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TID_WIDTH": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "TUSER_WIDTH": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TREADY": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TSTRB": {
+                "value": "0",
+                "value_src": "constant"
+              },
+              "HAS_TKEEP": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "HAS_TLAST": {
+                "value": "1",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "156250000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "top_ten_gig_eth_pcs_pma_0_0_coreclk_out",
+                "value_src": "default_prop"
+              }
+            },
+            "port_maps": {
+              "TDATA": {
+                "physical_name": "m_axis_tdata",
+                "direction": "O",
+                "left": "63",
+                "right": "0"
+              },
+              "TKEEP": {
+                "physical_name": "m_axis_tkeep",
+                "direction": "O",
+                "left": "7",
+                "right": "0"
+              },
+              "TLAST": {
+                "physical_name": "m_axis_tlast",
+                "direction": "O"
+              },
+              "TUSER": {
+                "physical_name": "m_axis_tuser",
+                "direction": "O",
+                "left": "0",
+                "right": "0"
+              },
+              "TVALID": {
+                "physical_name": "m_axis_tvalid",
+                "direction": "O"
+              },
+              "TREADY": {
+                "physical_name": "m_axis_tready",
+                "direction": "I"
+              }
+            }
+          }
+        },
+        "ports": {
+          "clk": {
+            "type": "clk",
+            "direction": "I",
+            "parameters": {
+              "ASSOCIATED_BUSIF": {
+                "value": "m:m_axis",
+                "value_src": "constant"
+              },
+              "ASSOCIATED_RESET": {
+                "value": "resetn",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "156250000",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "top_ten_gig_eth_pcs_pma_0_0_coreclk_out",
+                "value_src": "default_prop"
+              }
+            }
+          },
+          "resetn": {
+            "type": "rst",
+            "direction": "I",
+            "parameters": {
+              "POLARITY": {
+                "value": "ACTIVE_LOW",
+                "value_src": "constant"
+              }
+            }
+          },
+          "xgmii_rxd": {
+            "direction": "I",
+            "left": "63",
+            "right": "0"
+          },
+          "xgmii_rxc": {
+            "direction": "I",
+            "left": "7",
+            "right": "0"
+          },
+          "xgmii_txd": {
+            "direction": "O",
+            "left": "63",
+            "right": "0"
+          },
+          "xgmii_txc": {
+            "direction": "O",
+            "left": "7",
+            "right": "0"
+          },
+          "base_price": {
+            "direction": "I",
+            "left": "31",
+            "right": "0"
+          },
+          "test_number": {
+            "direction": "I",
+            "left": "4",
+            "right": "0"
+          },
+          "m_bid_price": {
+            "direction": "O",
+            "left": "31",
+            "right": "0"
+          },
+          "m_bid_qty": {
+            "direction": "O",
+            "left": "31",
+            "right": "0"
+          },
+          "m_ask_price": {
+            "direction": "O",
+            "left": "31",
+            "right": "0"
+          },
+          "m_ask_qty": {
+            "direction": "O",
+            "left": "31",
+            "right": "0"
+          },
+          "m_valid": {
+            "direction": "O",
+            "left": "1",
+            "right": "0"
+          },
+          "exchange_seconds": {
+            "direction": "O",
+            "left": "31",
+            "right": "0"
+          },
+          "pkt_done": {
+            "direction": "O"
+          },
+          "pkt_msg_count": {
+            "direction": "O",
+            "left": "15",
+            "right": "0"
+          },
+          "msg_status": {
+            "direction": "O",
+            "left": "5",
+            "right": "0"
+          },
+          "book_busy": {
+            "direction": "O"
+          },
+          "level_busy": {
+            "direction": "O"
+          },
+          "oor": {
+            "direction": "O"
+          },
+          "fifo_full": {
+            "direction": "O"
+          },
+          "fifo_overflow": {
+            "direction": "O"
+          },
+          "stat_bad_side": {
+            "direction": "O"
+          },
+          "stat_qty_ovf": {
+            "direction": "O"
+          },
+          "axis_overflow": {
+            "direction": "O"
+          },
+          "fcs_pair_err": {
+            "direction": "O"
+          },
+          "fcs_flags": {
+            "direction": "O",
+            "left": "2",
+            "right": "0"
+          }
+        }
+      },
+      "ten_gig_eth_pcs_pma_0": {
+        "vlnv": "xilinx.com:ip:ten_gig_eth_pcs_pma:6.0",
+        "ip_revision": "33",
+        "xci_name": "top_ten_gig_eth_pcs_pma_0_0",
+        "xci_path": "ip\\top_ten_gig_eth_pcs_pma_0_0\\top_ten_gig_eth_pcs_pma_0_0.xci",
+        "inst_hier_path": "ten_gig_eth_pcs_pma_0",
+        "has_run_ip_tcl": "true",
+        "parameters": {
+          "SupportLevel": {
+            "value": "1"
+          },
+          "base_kr": {
+            "value": "BASE-R"
+          }
+        }
+      }
+    },
+    "nets": {
+      "market_data_top_0_xgmii_txc": {
+        "ports": [
+          "market_data_top_0/xgmii_txc",
+          "ten_gig_eth_pcs_pma_0/xgmii_txc"
+        ]
+      },
+      "market_data_top_0_xgmii_txd": {
+        "ports": [
+          "market_data_top_0/xgmii_txd",
+          "ten_gig_eth_pcs_pma_0/xgmii_txd"
+        ]
+      },
+      "ten_gig_eth_pcs_pma_0_coreclk_out": {
+        "ports": [
+          "ten_gig_eth_pcs_pma_0/coreclk_out",
+          "market_data_top_0/clk",
+          "ten_gig_eth_pcs_pma_0/dclk",
+          "ten_gig_eth_pcs_pma_0/refclk_n"
+        ]
+      },
+      "ten_gig_eth_pcs_pma_0_xgmii_rxc": {
+        "ports": [
+          "ten_gig_eth_pcs_pma_0/xgmii_rxc",
+          "market_data_top_0/xgmii_rxc"
+        ]
+      },
+      "ten_gig_eth_pcs_pma_0_xgmii_rxd": {
+        "ports": [
+          "ten_gig_eth_pcs_pma_0/xgmii_rxd",
+          "market_data_top_0/xgmii_rxd"
+        ]
+      }
+    }
   }
 }

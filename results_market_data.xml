@@ -1,17 +1,17 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1791118184" />
-    <testcase name="test_single_level_traffic" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="53" time="1.0288312435150146" sim_time_ns="15071.67" ratio_time="14649.3121150826" />
-    <testcase name="test_two_sided_book" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="126" time="0.29517555236816406" sim_time_ns="6278.3099999999995" ratio_time="21269.749305556452" />
-    <testcase name="test_price_ladder" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="182" time="0.23089051246643066" sim_time_ns="5061.1500000000015" ratio_time="21920.129787644895" />
-    <testcase name="test_multi_message_packet" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="228" time="0.09980177879333496" sim_time_ns="1310.3100000000013" ratio_time="13129.12470942359" />
-    <testcase name="test_back_to_back_packets" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="274" time="0.466566801071167" sim_time_ns="3887.459999999999" ratio_time="8332.054469102768" />
-    <testcase name="test_replace_same_and_new_price" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="344" time="0.17495489120483398" sim_time_ns="2701.350000000002" ratio_time="15440.265667321704" />
-    <testcase name="test_execution_to_zero" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="408" time="0.2766530513763428" sim_time_ns="3862.6199999999953" ratio_time="13961.96420311848" />
-    <testcase name="test_out_of_scope_types" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="453" time="0.13453269004821777" sim_time_ns="3285.090000000004" ratio_time="24418.526075874917" />
-    <testcase name="test_filtering" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="520" time="0.1100001335144043" sim_time_ns="2552.3099999999977" ratio_time="23202.790019030093" />
-    <testcase name="test_qty_saturation" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="582" time="0.1196756362915039" sim_time_ns="2552.3099999999977" ratio_time="21326.897262389513" />
-    <testcase name="test_price_aliasing" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="624" time="0.12004637718200684" sim_time_ns="2552.310000000005" ratio_time="21261.03310998175" />
-    <testcase name="test_mixed_session" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="708" time="0.6177845001220703" sim_time_ns="8321.399999999994" ratio_time="13469.745515395316" />
+    <property name="random_seed" value="1791889309" />
+    <testcase name="test_single_level_traffic" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="53" time="0.8331925868988037" sim_time_ns="15071.67" ratio_time="18089.059164697712" />
+    <testcase name="test_two_sided_book" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="126" time="0.3250844478607178" sim_time_ns="6278.3099999999995" ratio_time="19312.858678154724" />
+    <testcase name="test_price_ladder" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="182" time="0.21074414253234863" sim_time_ns="5061.1500000000015" ratio_time="24015.61409576605" />
+    <testcase name="test_multi_message_packet" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="228" time="0.06260919570922852" sim_time_ns="1310.3100000000013" ratio_time="20928.39534443761" />
+    <testcase name="test_back_to_back_packets" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="274" time="0.2426438331604004" sim_time_ns="3887.459999999999" ratio_time="16021.260253625249" />
+    <testcase name="test_replace_same_and_new_price" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="344" time="0.11522293090820312" sim_time_ns="2701.350000000002" ratio_time="23444.552041052826" />
+    <testcase name="test_execution_to_zero" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="408" time="0.14934587478637695" sim_time_ns="3862.6199999999953" ratio_time="25863.586828394513" />
+    <testcase name="test_out_of_scope_types" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="453" time="0.11912751197814941" sim_time_ns="3285.090000000004" ratio_time="27576.249561919507" />
+    <testcase name="test_filtering" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="520" time="0.10151410102844238" sim_time_ns="2552.3099999999977" ratio_time="25142.418384662516" />
+    <testcase name="test_qty_saturation" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="582" time="0.14455318450927734" sim_time_ns="2552.3099999999977" ratio_time="17656.546333894097" />
+    <testcase name="test_price_aliasing" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="624" time="0.10335636138916016" sim_time_ns="2552.310000000005" ratio_time="24694.27102208038" />
+    <testcase name="test_mixed_session" classname="test_market_data" file="C:\Users\lskje\Desktop\FPGA_Orderbook\test_market_data.py" lineno="708" time="0.5062053203582764" sim_time_ns="8321.399999999994" ratio_time="16438.784156022633" />
   </testsuite>
 </testsuites>

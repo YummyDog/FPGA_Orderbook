@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2026.1 (64-bit)
+# SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+# IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+# SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+# Start of session at: Wed Oct 14 22:51:44 2026
+# Process ID         : 14244
+# Current directory  : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/top_market_data_top_0_0_synth_1
+# Command line       : vivado.exe -log top_market_data_top_0_0.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source top_market_data_top_0_0.tcl
+# Log file           : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/top_market_data_top_0_0_synth_1/top_market_data_top_0_0.vds
+# Journal file       : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/top_market_data_top_0_0_synth_1\vivado.jou
+# Running On         : DESKTOP-MB4FOM3
+# Platform           : Windows 10
+# Operating System   : 19045
+# Processor Detail   : Intel(R) Core(TM) i5-8600 CPU @ 3.10GHz
+# CPU Frequency      : 3096 MHz
+# CPU Physical cores : 6
+# CPU Logical cores  : 6
+# Host memory        : 17119 MB
+# Swap memory        : 8912 MB
+# Total Virtual      : 26031 MB
+# Available Virtual  : 5257 MB
+#-----------------------------------------------------------
+source top_market_data_top_0_0.tcl -notrace

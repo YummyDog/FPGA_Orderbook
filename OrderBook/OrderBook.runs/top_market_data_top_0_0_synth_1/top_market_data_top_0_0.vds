@@ -1,0 +1,674 @@
+INFO: [Common 17-3922] A valid Vivado Design Suite BASIC license has been detected. Your current license is active and will expire on 07-sep-2027.
+#-----------------------------------------------------------
+# Vivado v2026.1 (64-bit)
+# SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+# IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+# SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+# Start of session at: Wed Oct 14 22:51:44 2026
+# Process ID         : 14244
+# Current directory  : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/top_market_data_top_0_0_synth_1
+# Command line       : vivado.exe -log top_market_data_top_0_0.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source top_market_data_top_0_0.tcl
+# Log file           : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/top_market_data_top_0_0_synth_1/top_market_data_top_0_0.vds
+# Journal file       : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/top_market_data_top_0_0_synth_1\vivado.jou
+# Running On         : DESKTOP-MB4FOM3
+# Platform           : Windows 10
+# Operating System   : 19045
+# Processor Detail   : Intel(R) Core(TM) i5-8600 CPU @ 3.10GHz
+# CPU Frequency      : 3096 MHz
+# CPU Physical cores : 6
+# CPU Logical cores  : 6
+# Host memory        : 17119 MB
+# Swap memory        : 8912 MB
+# Total Virtual      : 26031 MB
+# Available Virtual  : 5257 MB
+#-----------------------------------------------------------
+source top_market_data_top_0_0.tcl -notrace
+create_project: Time (s): cpu = 00:00:11 ; elapsed = 00:00:09 . Memory (MB): peak = 583.398 ; gain = 268.156
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'D:/AMDDesignTools/2026.1/Vivado/data/ip'.
+Command: synth_design -top top_market_data_top_0_0 -part xc7vx690tffg1157-2 -incremental_mode off -mode out_of_context
+Starting synth_design
+Attempting to get a license for feature 'Vivado_Synthesis' and/or device 'xc7vx690t'
+INFO: [Common 17-349] Got license for feature 'Vivado_Synthesis' and/or device 'xc7vx690t'
+INFO: [Designutils 20-5008] Incremental synthesis strategy off
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 17852
+---------------------------------------------------------------------------------
+Starting Synthesize : Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 1172.465 ; gain = 570.449
+---------------------------------------------------------------------------------
+INFO: [Synth 8-638] synthesizing module 'top_market_data_top_0_0' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_market_data_top_0_0/synth/top_market_data_top_0_0.vhd:96]
+	Parameter G_TPID bound to: 16'b1000000100000000 
+	Parameter G_ORDER_BOOK_ID bound to: 85603 - type: integer 
+	Parameter G_FIFO_DEPTH bound to: 16 - type: integer 
+	Parameter G_MAX_ORDERS bound to: 16384 - type: integer 
+	Parameter G_CHECK_PREAMBLE bound to: 1 - type: bool 
+	Parameter G_TX_IPG_WORDS bound to: 2 - type: integer 
+INFO: [Synth 8-3491] module 'market_data_top' declared at 'C:/Users/lskje/Desktop/FPGA_Orderbook/market_data_top.vhd:33' bound to instance 'U0' of component 'market_data_top' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_market_data_top_0_0/synth/top_market_data_top_0_0.vhd:176]
+INFO: [Synth 8-638] synthesizing module 'market_data_top' [C:/Users/lskje/Desktop/FPGA_Orderbook/market_data_top.vhd:113]
+INFO: [Synth 8-638] synthesizing module 'input_top' [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/input_top.vhd:74]
+INFO: [Synth 8-638] synthesizing module 'xgmii64_to_axis' [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/xgmii64_to_axis.vhd:40]
+INFO: [Synth 8-256] done synthesizing module 'xgmii64_to_axis' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/xgmii64_to_axis.vhd:40]
+INFO: [Synth 8-638] synthesizing module 'xgmii_crc32_rx64' [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/xgmii_crc32_rx64.vhd:36]
+INFO: [Synth 8-256] done synthesizing module 'xgmii_crc32_rx64' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/xgmii_crc32_rx64.vhd:36]
+INFO: [Synth 8-638] synthesizing module 'fcs_msg_extend_sync' [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/fcs_msg_extend_sync.vhd:41]
+INFO: [Synth 8-256] done synthesizing module 'fcs_msg_extend_sync' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/fcs_msg_extend_sync.vhd:41]
+INFO: [Synth 8-256] done synthesizing module 'input_top' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/input_top.vhd:74]
+INFO: [Synth 8-638] synthesizing module 'fullparser' [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/fullparser.vhd:86]
+INFO: [Synth 8-638] synthesizing module 'eth_parser' [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/eth_parser.vhd:76]
+INFO: [Synth 8-256] done synthesizing module 'eth_parser' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/eth_parser.vhd:76]
+INFO: [Synth 8-638] synthesizing module 'ipv4_parser' [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/ipv4_parser.vhd:91]
+INFO: [Synth 8-256] done synthesizing module 'ipv4_parser' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/ipv4_parser.vhd:91]
+INFO: [Synth 8-638] synthesizing module 'udp_parser' [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/udp_parser.vhd:78]
+INFO: [Synth 8-256] done synthesizing module 'udp_parser' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/udp_parser.vhd:78]
+INFO: [Synth 8-638] synthesizing module 'mold_parser' [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/mold_parser.vhd:87]
+INFO: [Synth 8-256] done synthesizing module 'mold_parser' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/mold_parser.vhd:87]
+INFO: [Synth 8-638] synthesizing module 'itch_parser' [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/itch_parser.vhd:129]
+INFO: [Synth 8-256] done synthesizing module 'itch_parser' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/itch_parser.vhd:129]
+INFO: [Synth 8-256] done synthesizing module 'fullparser' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/fullparser.vhd:86]
+INFO: [Synth 8-638] synthesizing module 'order_book_engine_top' [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book_engine_top.vhd:127]
+INFO: [Synth 8-638] synthesizing module 'book_input_stage' [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/book_input_stage.vhd:104]
+INFO: [Synth 8-256] done synthesizing module 'book_input_stage' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/book_input_stage.vhd:104]
+INFO: [Synth 8-638] synthesizing module 'order_fifo' [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_fifo.vhd:118]
+INFO: [Synth 8-256] done synthesizing module 'order_fifo' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_fifo.vhd:118]
+INFO: [Synth 8-638] synthesizing module 'order_book' [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book.vhd:120]
+INFO: [Synth 8-256] done synthesizing module 'order_book' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book.vhd:120]
+INFO: [Synth 8-638] synthesizing module 'ram_array' [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/ram_array.vhd:70]
+INFO: [Synth 8-638] synthesizing module 'ram_sdp' [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/ram_sdp.vhd:69]
+INFO: [Synth 8-256] done synthesizing module 'ram_sdp' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/ram_sdp.vhd:69]
+INFO: [Synth 8-256] done synthesizing module 'ram_array' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/ram_array.vhd:70]
+INFO: [Synth 8-638] synthesizing module 'price_storage' [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/price_storage.vhd:86]
+INFO: [Synth 8-256] done synthesizing module 'price_storage' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/price_storage.vhd:86]
+INFO: [Synth 8-638] synthesizing module 'level_array' [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/level_array.vhd:125]
+INFO: [Synth 8-638] synthesizing module 'ram_sdp__parameterized0' [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/ram_sdp.vhd:69]
+INFO: [Synth 8-256] done synthesizing module 'ram_sdp__parameterized0' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/ram_sdp.vhd:69]
+INFO: [Synth 8-256] done synthesizing module 'level_array' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/level_array.vhd:125]
+INFO: [Synth 8-638] synthesizing module 'timestamp_counter' [C:/Users/lskje/Desktop/FPGA_Orderbook/Timestamping/time_counter.vhd:16]
+INFO: [Synth 8-256] done synthesizing module 'timestamp_counter' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Timestamping/time_counter.vhd:16]
+INFO: [Synth 8-638] synthesizing module 'time_event_fifo' [C:/Users/lskje/Desktop/FPGA_Orderbook/Timestamping/time_event_fifo.vhd:52]
+INFO: [Synth 8-256] done synthesizing module 'time_event_fifo' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Timestamping/time_event_fifo.vhd:52]
+INFO: [Synth 8-256] done synthesizing module 'order_book_engine_top' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book_engine_top.vhd:127]
+INFO: [Synth 8-638] synthesizing module 'tx_top' [C:/Users/lskje/Desktop/FPGA_Orderbook/Output/tx_top.vhd:57]
+INFO: [Synth 8-638] synthesizing module 'order_tx_xgmii' [C:/Users/lskje/Desktop/FPGA_Orderbook/Output/order_tx_xgmii.vhd:55]
+INFO: [Synth 8-256] done synthesizing module 'order_tx_xgmii' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Output/order_tx_xgmii.vhd:55]
+INFO: [Synth 8-256] done synthesizing module 'tx_top' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Output/tx_top.vhd:57]
+INFO: [Synth 8-256] done synthesizing module 'market_data_top' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/market_data_top.vhd:113]
+INFO: [Synth 8-256] done synthesizing module 'top_market_data_top_0_0' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_market_data_top_0_0/synth/top_market_data_top_0_0.vhd:96]
+WARNING: [Synth 8-6014] Unused sequential element r_cmd_reg[valid] was removed.  [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/book_input_stage.vhd:197]
+WARNING: [Synth 8-6014] Unused sequential element r_cmd_reg[side_ok] was removed.  [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/book_input_stage.vhd:197]
+WARNING: [Synth 8-6014] Unused sequential element r_cmd_reg[qty_ovf] was removed.  [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/book_input_stage.vhd:197]
+WARNING: [Synth 8-6014] Unused sequential element r_cmd_reg[position] was removed.  [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/book_input_stage.vhd:197]
+WARNING: [Synth 8-3848] Net s_tready in module/entity price_storage does not have driver. [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/price_storage.vhd:41]
+WARNING: [Synth 8-3848] Net oor in module/entity price_storage does not have driver. [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/price_storage.vhd:52]
+WARNING: [Synth 8-3848] Net busy in module/entity price_storage does not have driver. [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/price_storage.vhd:54]
+INFO: [Synth 8-7129] Port s_tready in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port oor in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port busy in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[31] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[30] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[29] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[28] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[27] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[26] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[25] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[24] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[23] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[22] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[21] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[20] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[19] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[18] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[17] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[16] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[15] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[14] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[13] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[12] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[11] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[10] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[9] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[8] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[7] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[6] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[5] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[4] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[3] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[2] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[1] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port base_price[0] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port lvl_rdata[0][64] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port lvl_rdata[1][64] in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port m_tready in module price_storage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[31] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[30] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[29] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[28] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[27] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[26] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[25] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[24] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[23] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[22] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[21] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[20] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[19] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[18] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[17] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[16] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[15] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[14] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[13] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[12] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[11] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[10] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[9] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[8] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[7] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[6] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[5] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[4] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[3] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[2] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[1] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_book_id[0] in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_px_valid in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port m_tready in module order_book is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[511] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[510] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[509] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[508] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[507] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[506] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[505] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[504] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[503] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[502] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[501] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[500] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[499] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[498] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[497] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[496] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[495] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[494] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[493] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[492] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[491] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[490] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[489] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[488] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[487] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[486] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[485] in module book_input_stage is either unconnected or has no load
+INFO: [Synth 8-7129] Port s_fields[484] in module book_input_stage is either unconnected or has no load
+INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+---------------------------------------------------------------------------------
+Finished Synthesize : Time (s): cpu = 00:00:17 ; elapsed = 00:00:19 . Memory (MB): peak = 1476.094 ; gain = 874.078
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:18 ; elapsed = 00:00:20 . Memory (MB): peak = 1476.094 ; gain = 874.078
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7vx690tffg1157-2
+---------------------------------------------------------------------------------
+INFO: [Device 21-403] Loading part xc7vx690tffg1157-2
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:18 ; elapsed = 00:00:21 . Memory (MB): peak = 1476.094 ; gain = 874.078
+---------------------------------------------------------------------------------
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'order_tx_xgmii'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                  s_idle |                               00 |                               00
+                  s_data |                               01 |                               01
+                   s_fcs |                               10 |                               10
+                   s_gap |                               11 |                               11
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'order_tx_xgmii'
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:28 ; elapsed = 00:00:27 . Memory (MB): peak = 1635.949 ; gain = 1033.934
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input   64 Bit       Adders := 2     
+	   3 Input   32 Bit       Adders := 2     
+	   2 Input   32 Bit       Adders := 1     
+	   2 Input   17 Bit       Adders := 1     
+	   2 Input   16 Bit       Adders := 2     
+	   2 Input   14 Bit       Adders := 1     
+	   2 Input   11 Bit       Adders := 1     
+	   2 Input   10 Bit       Adders := 17    
+	   2 Input    7 Bit       Adders := 1     
+	   2 Input    6 Bit       Adders := 3     
+	   2 Input    5 Bit       Adders := 2     
+	   2 Input    4 Bit       Adders := 6     
+	   2 Input    3 Bit       Adders := 4     
+	   3 Input    3 Bit       Adders := 1     
+	   2 Input    2 Bit       Adders := 6     
+	   3 Input    2 Bit       Adders := 1     
+	   4 Input    2 Bit       Adders := 1     
++---XORs : 
+	   2 Input     32 Bit         XORs := 128   
+	  57 Input      1 Bit         XORs := 8     
+	  58 Input      1 Bit         XORs := 8     
+	  59 Input      1 Bit         XORs := 8     
+	  60 Input      1 Bit         XORs := 8     
+	  61 Input      1 Bit         XORs := 8     
+	  62 Input      1 Bit         XORs := 8     
+	  63 Input      1 Bit         XORs := 8     
+	  64 Input      1 Bit         XORs := 8     
+	  65 Input      1 Bit         XORs := 17    
+	   2 Input      1 Bit         XORs := 128   
++---Registers : 
+	              523 Bit    Registers := 3     
+	              512 Bit    Registers := 1     
+	              360 Bit    Registers := 1     
+	              294 Bit    Registers := 1     
+	              166 Bit    Registers := 16    
+	              132 Bit    Registers := 6     
+	              130 Bit    Registers := 1     
+	               87 Bit    Registers := 34    
+	               80 Bit    Registers := 1     
+	               66 Bit    Registers := 4     
+	               65 Bit    Registers := 5     
+	               64 Bit    Registers := 27    
+	               48 Bit    Registers := 2     
+	               32 Bit    Registers := 27    
+	               16 Bit    Registers := 26    
+	               14 Bit    Registers := 2     
+	                9 Bit    Registers := 3     
+	                8 Bit    Registers := 27    
+	                7 Bit    Registers := 9     
+	                6 Bit    Registers := 3     
+	                5 Bit    Registers := 2     
+	                4 Bit    Registers := 6     
+	                3 Bit    Registers := 24    
+	                2 Bit    Registers := 26    
+	                1 Bit    Registers := 94    
++---RAMs : 
+	            1040K Bit	(16384 X 65 bit)          RAMs := 2     
+	              66K Bit	(512 X 132 bit)          RAMs := 4     
++---Muxes : 
+	   2 Input  512 Bit        Muxes := 1     
+	   2 Input  166 Bit        Muxes := 31    
+	   4 Input  132 Bit        Muxes := 1     
+	   2 Input  132 Bit        Muxes := 4     
+	   4 Input  131 Bit        Muxes := 1     
+	   5 Input  131 Bit        Muxes := 1     
+	   2 Input   87 Bit        Muxes := 16    
+	   4 Input   87 Bit        Muxes := 1     
+	   2 Input   80 Bit        Muxes := 3     
+	   7 Input   80 Bit        Muxes := 1     
+	   6 Input   80 Bit        Muxes := 1     
+	   2 Input   66 Bit        Muxes := 9     
+	   4 Input   66 Bit        Muxes := 1     
+	   2 Input   65 Bit        Muxes := 2     
+	   4 Input   65 Bit        Muxes := 9     
+	   2 Input   64 Bit        Muxes := 10    
+	   6 Input   64 Bit        Muxes := 2     
+	   4 Input   64 Bit        Muxes := 1     
+	   5 Input   48 Bit        Muxes := 1     
+	   2 Input   32 Bit        Muxes := 13    
+	   7 Input   32 Bit        Muxes := 2     
+	   6 Input   32 Bit        Muxes := 2     
+	   4 Input   32 Bit        Muxes := 2     
+	   2 Input   16 Bit        Muxes := 22    
+	   4 Input   16 Bit        Muxes := 3     
+	   6 Input   16 Bit        Muxes := 2     
+	   2 Input   14 Bit        Muxes := 3     
+	   2 Input   10 Bit        Muxes := 6     
+	   2 Input    9 Bit        Muxes := 23    
+	   2 Input    8 Bit        Muxes := 12    
+	   6 Input    8 Bit        Muxes := 4     
+	   4 Input    8 Bit        Muxes := 1     
+	   2 Input    7 Bit        Muxes := 1     
+	   3 Input    6 Bit        Muxes := 1     
+	   2 Input    4 Bit        Muxes := 6     
+	   6 Input    3 Bit        Muxes := 1     
+	   2 Input    3 Bit        Muxes := 11    
+	   4 Input    3 Bit        Muxes := 1     
+	   2 Input    2 Bit        Muxes := 44    
+	   3 Input    2 Bit        Muxes := 1     
+	   4 Input    2 Bit        Muxes := 3     
+	   2 Input    1 Bit        Muxes := 209   
+	   4 Input    1 Bit        Muxes := 20    
+	   6 Input    1 Bit        Muxes := 15    
+	   3 Input    1 Bit        Muxes := 1     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 3600 (col length:200)
+BRAMs: 2940 (col length: RAMB18 200 RAMB36 100)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_0 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_0 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_1 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_1 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_2 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_2 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_3 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_3 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_4 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_4 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_5 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_5 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_6 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_6 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_7 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_7 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_8 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_8 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_9 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_9 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_10 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_10 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_11 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_11 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_12 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_12 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_13 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_13 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_14 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_14 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_15 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_15 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_32 , of type : RAMB18E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_32 , of type : RAMB18E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_0 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_0 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_1 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_1 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_2 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_2 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_3 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_3 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_4 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_4 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_5 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_5 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_6 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_6 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_7 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_7 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_8 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_8 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_9 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_9 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_10 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_10 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_11 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_11 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_12 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_12 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_13 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_13 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_14 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_14 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_15 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_15 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_32 , of type : RAMB18E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_32 , of type : RAMB18E1 in constant propagation
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:02:47 ; elapsed = 00:02:55 . Memory (MB): peak = 2591.754 ; gain = 1989.738
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Preliminary Mapping Report (see note below)
++------------------------+----------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name             | RTL Object                             | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++------------------------+----------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|top_market_data_top_0_0 | u_ram_array/g_tables[0].u_ram/ram_reg  | 512 x 132(READ_FIRST)  | W |   | 512 x 132(WRITE_FIRST) |   | R | Port A and B     | 0      | 2      | 
+|top_market_data_top_0_0 | u_ram_array/g_tables[1].u_ram/ram_reg  | 512 x 132(READ_FIRST)  | W |   | 512 x 132(WRITE_FIRST) |   | R | Port A and B     | 0      | 2      | 
+|top_market_data_top_0_0 | u_ram_array/g_tables[2].u_ram/ram_reg  | 512 x 132(READ_FIRST)  | W |   | 512 x 132(WRITE_FIRST) |   | R | Port A and B     | 0      | 2      | 
+|top_market_data_top_0_0 | u_ram_array/g_tables[3].u_ram/ram_reg  | 512 x 132(READ_FIRST)  | W |   | 512 x 132(WRITE_FIRST) |   | R | Port A and B     | 0      | 2      | 
+|top_market_data_top_0_0 | u_level_array/g_sides[0].u_ram/ram_reg | 16 K x 65(READ_FIRST)  | W |   | 16 K x 65(WRITE_FIRST) |   | R | Port A and B     | 1      | 32     | 
+|top_market_data_top_0_0 | u_level_array/g_sides[1].u_ram/ram_reg | 16 K x 65(READ_FIRST)  | W |   | 16 K x 65(WRITE_FIRST) |   | R | Port A and B     | 1      | 32     | 
++------------------------+----------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+Note: The table above is a preliminary report that shows the Block RAMs at the current stage of the synthesis flow. Some Block RAMs may be reimplemented as non Block RAM primitives later in the synthesis flow. Multiple instantiated Block RAMs are reported only once. 
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:02:48 ; elapsed = 00:02:56 . Memory (MB): peak = 2591.754 ; gain = 1989.738
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Final Mapping Report
++------------------------+----------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name             | RTL Object                             | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++------------------------+----------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|top_market_data_top_0_0 | u_ram_array/g_tables[0].u_ram/ram_reg  | 512 x 132(READ_FIRST)  | W |   | 512 x 132(WRITE_FIRST) |   | R | Port A and B     | 0      | 2      | 
+|top_market_data_top_0_0 | u_ram_array/g_tables[1].u_ram/ram_reg  | 512 x 132(READ_FIRST)  | W |   | 512 x 132(WRITE_FIRST) |   | R | Port A and B     | 0      | 2      | 
+|top_market_data_top_0_0 | u_ram_array/g_tables[2].u_ram/ram_reg  | 512 x 132(READ_FIRST)  | W |   | 512 x 132(WRITE_FIRST) |   | R | Port A and B     | 0      | 2      | 
+|top_market_data_top_0_0 | u_ram_array/g_tables[3].u_ram/ram_reg  | 512 x 132(READ_FIRST)  | W |   | 512 x 132(WRITE_FIRST) |   | R | Port A and B     | 0      | 2      | 
+|top_market_data_top_0_0 | u_level_array/g_sides[0].u_ram/ram_reg | 16 K x 65(READ_FIRST)  | W |   | 16 K x 65(WRITE_FIRST) |   | R | Port A and B     | 1      | 32     | 
+|top_market_data_top_0_0 | u_level_array/g_sides[1].u_ram/ram_reg | 16 K x 65(READ_FIRST)  | W |   | 16 K x 65(WRITE_FIRST) |   | R | Port A and B     | 1      | 32     | 
++------------------------+----------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_ram_array/g_tables[0].u_ram/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_ram_array/g_tables[0].u_ram/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_ram_array/g_tables[1].u_ram/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_ram_array/g_tables[1].u_ram/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_ram_array/g_tables[2].u_ram/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_ram_array/g_tables[2].u_ram/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_ram_array/g_tables[3].u_ram/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_ram_array/g_tables[3].u_ram/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_16 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_17 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_18 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_19 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_20 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_21 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_22 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_23 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_24 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_25 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_26 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_27 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_28 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_29 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_30 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_31 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_16 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_17 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_18 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_19 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_20 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_21 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_22 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_23 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_24 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_25 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_26 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_27 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_28 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_29 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_30 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_31 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:02:54 ; elapsed = 00:03:02 . Memory (MB): peak = 2591.754 ; gain = 1989.738
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:03:01 ; elapsed = 00:03:10 . Memory (MB): peak = 2591.754 ; gain = 1989.738
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:03:01 ; elapsed = 00:03:10 . Memory (MB): peak = 2591.754 ; gain = 1989.738
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:03:02 ; elapsed = 00:03:11 . Memory (MB): peak = 2591.754 ; gain = 1989.738
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:03:02 ; elapsed = 00:03:11 . Memory (MB): peak = 2591.754 ; gain = 1989.738
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:03:04 ; elapsed = 00:03:12 . Memory (MB): peak = 2591.754 ; gain = 1989.738
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:03:04 ; elapsed = 00:03:12 . Memory (MB): peak = 2591.754 ; gain = 1989.738
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+
+Static Shift Register Report:
++------------------------+----------------------------------------+--------+-------+--------------+--------------------+-------------------+--------+---------+
+|Module Name             | RTL Name                               | Length | Width | Reset Signal | Pull out first Reg | Pull out last Reg | SRL16E | SRLC32E | 
++------------------------+----------------------------------------+--------+-------+--------------+--------------------+-------------------+--------+---------+
+|top_market_data_top_0_0 | U0/u_fullparser/u_mold/tdata_r_reg[63] | 4      | 32    | YES          | NO                 | YES               | 32     | 0       | 
+|top_market_data_top_0_0 | U0/u_fullparser/u_mold/tkeep_r_reg[7]  | 4      | 8     | YES          | NO                 | YES               | 8      | 0       | 
++------------------------+----------------------------------------+--------+-------+--------------+--------------------+-------------------+--------+---------+
+
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+---------+------+
+|      |Cell     |Count |
++------+---------+------+
+|1     |CARRY4   |    95|
+|2     |LUT1     |    23|
+|3     |LUT2     |  1969|
+|4     |LUT3     |  1378|
+|5     |LUT4     |   680|
+|6     |LUT5     |  1779|
+|7     |LUT6     |  6493|
+|8     |MUXF7    |   621|
+|9     |RAMB36E1 |    40|
+|10    |SRL16E   |    40|
+|11    |FDRE     |  8575|
+|12    |FDSE     |    94|
++------+---------+------+
+
+Report Instance Areas: 
++------+----------------------------+--------------------------+------+
+|      |Instance                    |Module                    |Cells |
++------+----------------------------+--------------------------+------+
+|1     |top                         |                          | 21787|
+|2     |  U0                        |market_data_top           | 21787|
+|3     |    u_engine                |order_book_engine_top     | 14190|
+|4     |      u_level_array         |level_array               |    32|
+|5     |        \g_sides[0].u_ram   |ram_sdp__parameterized0   |    16|
+|6     |        \g_sides[1].u_ram   |ram_sdp__parameterized0_3 |    16|
+|7     |      u_book_input_stage    |book_input_stage          |   272|
+|8     |      u_order_book          |order_book                |  1416|
+|9     |      u_order_fifo          |order_fifo                |  6664|
+|10    |      u_price_storage       |price_storage             |   396|
+|11    |      u_ram_array           |ram_array                 |   798|
+|12    |        \g_tables[0].u_ram  |ram_sdp                   |    35|
+|13    |        \g_tables[1].u_ram  |ram_sdp_0                 |   100|
+|14    |        \g_tables[2].u_ram  |ram_sdp_1                 |   563|
+|15    |        \g_tables[3].u_ram  |ram_sdp_2                 |    98|
+|16    |      u_time_event_fifo     |time_event_fifo           |  4588|
+|17    |      u_ts_counter          |timestamp_counter         |    24|
+|18    |    u_fullparser            |fullparser                |  5527|
+|19    |      u_eth                 |eth_parser                |    41|
+|20    |      u_ipv4                |ipv4_parser               |    77|
+|21    |      u_itch                |itch_parser               |  4927|
+|22    |      u_mold                |mold_parser               |   348|
+|23    |      u_udp                 |udp_parser                |   134|
+|24    |    u_input                 |input_top                 |  1509|
+|25    |      u_axis                |xgmii64_to_axis           |   794|
+|26    |      u_crc                 |xgmii_crc32_rx64          |   629|
+|27    |      u_extend              |fcs_msg_extend_sync       |    86|
+|28    |    u_tx                    |tx_top                    |   561|
+|29    |      u_order_tx_xgmii      |order_tx_xgmii            |   561|
++------+----------------------------+--------------------------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:03:04 ; elapsed = 00:03:12 . Memory (MB): peak = 2591.754 ; gain = 1989.738
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 75 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:03:04 ; elapsed = 00:03:12 . Memory (MB): peak = 2591.754 ; gain = 1989.738
+Synthesis Optimization Complete : Time (s): cpu = 00:03:04 ; elapsed = 00:03:12 . Memory (MB): peak = 2591.754 ; gain = 1989.738
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.169 . Memory (MB): peak = 2591.754 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 756 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.010 . Memory (MB): peak = 2591.754 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Synth Design complete | Checksum: cc618b29
+INFO: [Common 17-83] Releasing license: Vivado_Synthesis
+210 Infos, 75 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:03:15 ; elapsed = 00:03:28 . Memory (MB): peak = 2591.754 ; gain = 1989.773
+INFO: [Coretcl 2-1174] Renamed 28 cell refs.
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.194 . Memory (MB): peak = 2591.754 ; gain = 0.000
+INFO: [Common 17-1381] The checkpoint 'C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/top_market_data_top_0_0_synth_1/top_market_data_top_0_0.dcp' has been generated.
+write_checkpoint: Time (s): cpu = 00:00:12 ; elapsed = 00:00:14 . Memory (MB): peak = 2591.754 ; gain = 0.000
+INFO: [Vivado 12-24828] Executing command : report_utilization -file top_market_data_top_0_0_utilization_synth.rpt -pb top_market_data_top_0_0_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Wed Oct 14 22:55:50 2026...

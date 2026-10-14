@@ -1,0 +1,301 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Wed Oct 14 23:06:10 2026" VIVADOVERSION="2026.1">
+
+  <SYSTEMINFO ARCH="virtex7" DEVICE="7vx690t" NAME="top" PACKAGE="ffg1157" SPEEDGRADE="-2"/>
+
+  <EXTERNALPORTS/>
+
+  <EXTERNALINTERFACES/>
+
+  <MODULES>
+    <MODULE COREREVISION="1" FULLNAME="/market_data_top_0" HWVERSION="1.0" INSTANCE="market_data_top_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="market_data_top" VLNV="xilinx.com:module_ref:market_data_top:1.0">
+      <DOCUMENTS>
+        <DOCUMENT SOURCE="https://support.amd.com/documentation/ipcores/market_data_top/1_0"/>
+      </DOCUMENTS>
+      <PARAMETERS>
+        <PARAMETER NAME="G_CHECK_PREAMBLE" VALUE="true"/>
+        <PARAMETER NAME="G_FIFO_DEPTH" VALUE="16"/>
+        <PARAMETER NAME="G_MAX_ORDERS" VALUE="16384"/>
+        <PARAMETER NAME="G_ORDER_BOOK_ID" VALUE="85603"/>
+        <PARAMETER NAME="G_TPID" VALUE="0x8100"/>
+        <PARAMETER NAME="G_TX_IPG_WORDS" VALUE="2"/>
+        <PARAMETER NAME="Component_Name" VALUE="top_market_data_top_0_0"/>
+        <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
+      </PARAMETERS>
+      <PORTS>
+        <PORT DIR="O" NAME="axis_overflow" SIGIS="undef"/>
+        <PORT DIR="I" LEFT="31" NAME="base_price" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" NAME="book_busy" SIGIS="undef"/>
+        <PORT CLKFREQUENCY="156250000" DIR="I" NAME="clk" SIGIS="clk" SIGNAME="ten_gig_eth_pcs_pma_0_coreclk_out">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="ten_gig_eth_pcs_pma_0" PORT="coreclk_out"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" LEFT="31" NAME="exchange_seconds" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="2" NAME="fcs_flags" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" NAME="fcs_pair_err" SIGIS="undef"/>
+        <PORT DIR="O" NAME="fifo_full" SIGIS="undef"/>
+        <PORT DIR="O" NAME="fifo_overflow" SIGIS="undef"/>
+        <PORT DIR="O" NAME="level_busy" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="31" NAME="m_ask_price" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="31" NAME="m_ask_qty" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="63" NAME="m_axis_tdata" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="7" NAME="m_axis_tkeep" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" NAME="m_axis_tlast" SIGIS="undef"/>
+        <PORT DIR="I" NAME="m_axis_tready" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="0" NAME="m_axis_tuser" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" NAME="m_axis_tvalid" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="31" NAME="m_bid_price" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="31" NAME="m_bid_qty" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="I" NAME="m_tready" SIGIS="undef"/>
+        <PORT DIR="O" NAME="m_tvalid" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="1" NAME="m_valid" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="5" NAME="msg_status" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" NAME="oor" SIGIS="undef"/>
+        <PORT DIR="O" NAME="pkt_done" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="15" NAME="pkt_msg_count" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="I" NAME="resetn" POLARITY="ACTIVE_LOW" SIGIS="rst"/>
+        <PORT DIR="O" NAME="stat_bad_side" SIGIS="undef"/>
+        <PORT DIR="O" NAME="stat_qty_ovf" SIGIS="undef"/>
+        <PORT DIR="I" LEFT="4" NAME="test_number" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="I" LEFT="7" NAME="xgmii_rxc" RIGHT="0" SIGIS="undef" SIGNAME="ten_gig_eth_pcs_pma_0_xgmii_rxc">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="ten_gig_eth_pcs_pma_0" PORT="xgmii_rxc"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" LEFT="63" NAME="xgmii_rxd" RIGHT="0" SIGIS="undef" SIGNAME="ten_gig_eth_pcs_pma_0_xgmii_rxd">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="ten_gig_eth_pcs_pma_0" PORT="xgmii_rxd"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" LEFT="7" NAME="xgmii_txc" RIGHT="0" SIGIS="undef" SIGNAME="market_data_top_0_xgmii_txc">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="ten_gig_eth_pcs_pma_0" PORT="xgmii_txc"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" LEFT="63" NAME="xgmii_txd" RIGHT="0" SIGIS="undef" SIGNAME="market_data_top_0_xgmii_txd">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="ten_gig_eth_pcs_pma_0" PORT="xgmii_txd"/>
+          </CONNECTIONS>
+        </PORT>
+      </PORTS>
+      <BUSINTERFACES>
+        <BUSINTERFACE BUSNAME="__NOC__" NAME="m" TYPE="INITIATOR" VLNV="xilinx.com:interface:axis:1.0">
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="top_ten_gig_eth_pcs_pma_0_0_coreclk_out"/>
+          <PARAMETER NAME="FREQ_HZ" VALUE="156250000"/>
+          <PARAMETER NAME="HAS_TKEEP" VALUE="0"/>
+          <PARAMETER NAME="HAS_TLAST" VALUE="0"/>
+          <PARAMETER NAME="HAS_TREADY" VALUE="1"/>
+          <PARAMETER NAME="HAS_TSTRB" VALUE="0"/>
+          <PARAMETER NAME="INSERT_VIP" VALUE="0"/>
+          <PARAMETER NAME="LAYERED_METADATA" VALUE="undef"/>
+          <PARAMETER NAME="PHASE" VALUE="0.0"/>
+          <PARAMETER NAME="TDATA_NUM_BYTES" VALUE="0"/>
+          <PARAMETER NAME="TDEST_WIDTH" VALUE="0"/>
+          <PARAMETER NAME="TID_WIDTH" VALUE="0"/>
+          <PARAMETER NAME="TUSER_WIDTH" VALUE="0"/>
+          <PORTMAPS>
+            <PORTMAP LOGICAL="TREADY" PHYSICAL="m_tready"/>
+            <PORTMAP LOGICAL="TVALID" PHYSICAL="m_tvalid"/>
+          </PORTMAPS>
+        </BUSINTERFACE>
+        <BUSINTERFACE BUSNAME="__NOC__" NAME="m_axis" TYPE="INITIATOR" VLNV="xilinx.com:interface:axis:1.0">
+          <PARAMETER NAME="CLK_DOMAIN" VALUE="top_ten_gig_eth_pcs_pma_0_0_coreclk_out"/>
+          <PARAMETER NAME="FREQ_HZ" VALUE="156250000"/>
+          <PARAMETER NAME="HAS_TKEEP" VALUE="1"/>
+          <PARAMETER NAME="HAS_TLAST" VALUE="1"/>
+          <PARAMETER NAME="HAS_TREADY" VALUE="1"/>
+          <PARAMETER NAME="HAS_TSTRB" VALUE="0"/>
+          <PARAMETER NAME="INSERT_VIP" VALUE="0"/>
+          <PARAMETER NAME="LAYERED_METADATA" VALUE="undef"/>
+          <PARAMETER NAME="PHASE" VALUE="0.0"/>
+          <PARAMETER NAME="TDATA_NUM_BYTES" VALUE="8"/>
+          <PARAMETER NAME="TDEST_WIDTH" VALUE="0"/>
+          <PARAMETER NAME="TID_WIDTH" VALUE="0"/>
+          <PARAMETER NAME="TUSER_WIDTH" VALUE="1"/>
+          <PORTMAPS>
+            <PORTMAP LOGICAL="TDATA" PHYSICAL="m_axis_tdata"/>
+            <PORTMAP LOGICAL="TKEEP" PHYSICAL="m_axis_tkeep"/>
+            <PORTMAP LOGICAL="TLAST" PHYSICAL="m_axis_tlast"/>
+            <PORTMAP LOGICAL="TREADY" PHYSICAL="m_axis_tready"/>
+            <PORTMAP LOGICAL="TUSER" PHYSICAL="m_axis_tuser"/>
+            <PORTMAP LOGICAL="TVALID" PHYSICAL="m_axis_tvalid"/>
+          </PORTMAPS>
+        </BUSINTERFACE>
+      </BUSINTERFACES>
+    </MODULE>
+    <MODULE COREREVISION="33" FULLNAME="/ten_gig_eth_pcs_pma_0" HWVERSION="6.0" INSTANCE="ten_gig_eth_pcs_pma_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="ten_gig_eth_pcs_pma" VLNV="xilinx.com:ip:ten_gig_eth_pcs_pma:6.0">
+      <DOCUMENTS>
+        <DOCUMENT SOURCE="https://support.amd.com/documentation/ipcores/ten_gig_eth_pcs_pma/6_0"/>
+      </DOCUMENTS>
+      <PARAMETERS>
+        <PARAMETER NAME="c_1588" VALUE="0"/>
+        <PARAMETER NAME="c_component_name" VALUE="top_ten_gig_eth_pcs_pma_0_0"/>
+        <PARAMETER NAME="c_dclkrate" VALUE="100.00"/>
+        <PARAMETER NAME="c_family" VALUE="virtex7"/>
+        <PARAMETER NAME="c_gt_loc" VALUE="X0Y0"/>
+        <PARAMETER NAME="c_gtif_width" VALUE="32"/>
+        <PARAMETER NAME="c_gttype" VALUE="1"/>
+        <PARAMETER NAME="c_has_an" VALUE="false"/>
+        <PARAMETER NAME="c_has_fec" VALUE="false"/>
+        <PARAMETER NAME="c_has_mdio" VALUE="true"/>
+        <PARAMETER NAME="c_is_32bit" VALUE="false"/>
+        <PARAMETER NAME="c_is_kr" VALUE="false"/>
+        <PARAMETER NAME="c_no_ebuff" VALUE="false"/>
+        <PARAMETER NAME="c_refclk" VALUE="clk0"/>
+        <PARAMETER NAME="c_refclkrate" VALUE="156"/>
+        <PARAMETER NAME="c_speed10_25" VALUE="10"/>
+        <PARAMETER NAME="c_sub_core_name" VALUE="top_ten_gig_eth_pcs_pma_0_0_gt"/>
+        <PARAMETER NAME="Component_Name" VALUE="top_ten_gig_eth_pcs_pma_0_0"/>
+        <PARAMETER NAME="DClkRate" VALUE="100.00"/>
+        <PARAMETER NAME="IEEE_1588" VALUE="None"/>
+        <PARAMETER NAME="Locations" VALUE="X0Y0"/>
+        <PARAMETER NAME="MDIO_Management" VALUE="true"/>
+        <PARAMETER NAME="RefClk" VALUE="clk0"/>
+        <PARAMETER NAME="RefClkRate" VALUE="156.25"/>
+        <PARAMETER NAME="SupportLevel" VALUE="1"/>
+        <PARAMETER NAME="Timer_Format" VALUE="Time_of_day"/>
+        <PARAMETER NAME="TransceiverControl" VALUE="false"/>
+        <PARAMETER NAME="TransceiverInExample" VALUE="false"/>
+        <PARAMETER NAME="autonegotiation" VALUE="false"/>
+        <PARAMETER NAME="base_kr" VALUE="BASE-R"/>
+        <PARAMETER NAME="baser32" VALUE="64bit"/>
+        <PARAMETER NAME="fec" VALUE="false"/>
+        <PARAMETER NAME="no_ebuff" VALUE="false"/>
+        <PARAMETER NAME="speed10_25" VALUE="10Gig"/>
+        <PARAMETER NAME="vu_gt_type" VALUE="GTH"/>
+        <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
+      </PARAMETERS>
+      <PORTS>
+        <PORT DIR="O" NAME="areset_datapathclk_out" POLARITY="ACTIVE_HIGH" SIGIS="rst"/>
+        <PORT DIR="O" LEFT="7" NAME="core_status" RIGHT="0" SIGIS="undef"/>
+        <PORT CLKFREQUENCY="156250000" DIR="O" NAME="coreclk_out" SIGIS="clk" SIGNAME="ten_gig_eth_pcs_pma_0_coreclk_out">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="market_data_top_0" PORT="clk"/>
+            <CONNECTION INSTANCE="ten_gig_eth_pcs_pma_0" PORT="dclk"/>
+            <CONNECTION INSTANCE="ten_gig_eth_pcs_pma_0" PORT="refclk_n"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT CLKFREQUENCY="156250000" DIR="I" NAME="dclk" SIGIS="clk" SIGNAME="ten_gig_eth_pcs_pma_0_coreclk_out">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="ten_gig_eth_pcs_pma_0" PORT="coreclk_out"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" LEFT="15" NAME="drp_daddr_i" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="15" NAME="drp_daddr_o" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="I" NAME="drp_den_i" SIGIS="undef"/>
+        <PORT DIR="O" NAME="drp_den_o" SIGIS="undef"/>
+        <PORT DIR="I" LEFT="15" NAME="drp_di_i" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="15" NAME="drp_di_o" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="I" NAME="drp_drdy_i" SIGIS="undef"/>
+        <PORT DIR="O" NAME="drp_drdy_o" SIGIS="undef"/>
+        <PORT DIR="I" LEFT="15" NAME="drp_drpdo_i" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" LEFT="15" NAME="drp_drpdo_o" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="I" NAME="drp_dwe_i" SIGIS="undef"/>
+        <PORT DIR="O" NAME="drp_dwe_o" SIGIS="undef"/>
+        <PORT DIR="I" NAME="drp_gnt" SIGIS="undef"/>
+        <PORT DIR="O" NAME="drp_req" SIGIS="undef"/>
+        <PORT DIR="O" NAME="gtrxreset_out" POLARITY="ACTIVE_HIGH" SIGIS="rst"/>
+        <PORT DIR="O" NAME="gttxreset_out" POLARITY="ACTIVE_HIGH" SIGIS="rst"/>
+        <PORT DIR="I" NAME="mdc" SIGIS="clk"/>
+        <PORT DIR="I" NAME="mdio_in" SIGIS="undef"/>
+        <PORT DIR="O" NAME="mdio_out" SIGIS="undef"/>
+        <PORT DIR="O" NAME="mdio_tri" SIGIS="undef"/>
+        <PORT DIR="I" LEFT="2" NAME="pma_pmd_type" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="I" LEFT="4" NAME="prtad" RIGHT="0" SIGIS="undef"/>
+        <PORT DIR="O" NAME="qplllock_out" SIGIS="undef"/>
+        <PORT CLKFREQUENCY="156250000" DIR="O" NAME="qplloutclk_out" SIGIS="clk"/>
+        <PORT CLKFREQUENCY="156250000" DIR="O" NAME="qplloutrefclk_out" SIGIS="clk"/>
+        <PORT CLKFREQUENCY="156250000" DIR="I" NAME="refclk_n" SIGIS="clk" SIGNAME="ten_gig_eth_pcs_pma_0_coreclk_out">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="ten_gig_eth_pcs_pma_0" PORT="coreclk_out"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT CLKFREQUENCY="156250000" DIR="I" NAME="refclk_p" SIGIS="clk"/>
+        <PORT DIR="I" NAME="reset" POLARITY="ACTIVE_HIGH" SIGIS="rst"/>
+        <PORT DIR="O" NAME="reset_counter_done_out" SIGIS="undef"/>
+        <PORT DIR="O" NAME="resetdone_out" SIGIS="undef"/>
+        <PORT DIR="I" NAME="rxn" SIGIS="undef"/>
+        <PORT DIR="I" NAME="rxp" SIGIS="undef"/>
+        <PORT CLKFREQUENCY="322265625" DIR="O" NAME="rxrecclk_out" SIGIS="clk"/>
+        <PORT DIR="I" NAME="signal_detect" SIGIS="undef"/>
+        <PORT DIR="I" NAME="sim_speedup_control" SIGIS="undef"/>
+        <PORT DIR="O" NAME="tx_disable" SIGIS="undef"/>
+        <PORT DIR="I" NAME="tx_fault" SIGIS="undef"/>
+        <PORT DIR="O" NAME="txn" SIGIS="undef"/>
+        <PORT DIR="O" NAME="txp" SIGIS="undef"/>
+        <PORT DIR="O" NAME="txuserrdy_out" SIGIS="undef"/>
+        <PORT CLKFREQUENCY="322265625" DIR="O" NAME="txusrclk2_out" SIGIS="clk"/>
+        <PORT CLKFREQUENCY="322265625" DIR="O" NAME="txusrclk_out" SIGIS="clk"/>
+        <PORT DIR="O" LEFT="7" NAME="xgmii_rxc" RIGHT="0" SIGIS="undef" SIGNAME="ten_gig_eth_pcs_pma_0_xgmii_rxc">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="market_data_top_0" PORT="xgmii_rxc"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" LEFT="63" NAME="xgmii_rxd" RIGHT="0" SIGIS="undef" SIGNAME="ten_gig_eth_pcs_pma_0_xgmii_rxd">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="market_data_top_0" PORT="xgmii_rxd"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" LEFT="7" NAME="xgmii_txc" RIGHT="0" SIGIS="undef" SIGNAME="market_data_top_0_xgmii_txc">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="market_data_top_0" PORT="xgmii_txc"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" LEFT="63" NAME="xgmii_txd" RIGHT="0" SIGIS="undef" SIGNAME="market_data_top_0_xgmii_txd">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="market_data_top_0" PORT="xgmii_txd"/>
+          </CONNECTIONS>
+        </PORT>
+      </PORTS>
+      <BUSINTERFACES>
+        <BUSINTERFACE BUSNAME="__NOC__" NAME="mdio_interface" TYPE="TARGET" VLNV="xilinx.com:interface:mdio:1.0">
+          <PARAMETER NAME="CAN_DEBUG" VALUE="false"/>
+          <PORTMAPS>
+            <PORTMAP LOGICAL="MDC" PHYSICAL="mdc"/>
+            <PORTMAP LOGICAL="MDIO_I" PHYSICAL="mdio_in"/>
+            <PORTMAP LOGICAL="MDIO_O" PHYSICAL="mdio_out"/>
+            <PORTMAP LOGICAL="MDIO_T" PHYSICAL="mdio_tri"/>
+          </PORTMAPS>
+        </BUSINTERFACE>
+        <BUSINTERFACE BUSNAME="__NOC__" NAME="xgmii_interface" TYPE="TARGET" VLNV="xilinx.com:interface:xgmii:1.0">
+          <PORTMAPS>
+            <PORTMAP LOGICAL="RXC" PHYSICAL="xgmii_rxc"/>
+            <PORTMAP LOGICAL="RXD" PHYSICAL="xgmii_rxd"/>
+            <PORTMAP LOGICAL="TXC" PHYSICAL="xgmii_txc"/>
+            <PORTMAP LOGICAL="TXD" PHYSICAL="xgmii_txd"/>
+          </PORTMAPS>
+        </BUSINTERFACE>
+        <BUSINTERFACE BUSNAME="__NOC__" NAME="refclk_diff_port" TYPE="TARGET" VLNV="xilinx.com:interface:diff_clock:1.0">
+          <PARAMETER NAME="CAN_DEBUG" VALUE="false"/>
+          <PARAMETER NAME="FREQ_HZ" VALUE="156250000"/>
+          <PORTMAPS>
+            <PORTMAP LOGICAL="CLK_N" PHYSICAL="refclk_n"/>
+            <PORTMAP LOGICAL="CLK_P" PHYSICAL="refclk_p"/>
+          </PORTMAPS>
+        </BUSINTERFACE>
+        <BUSINTERFACE BUSNAME="__NOC__" NAME="core_gt_drp_interface" TYPE="INITIATOR" VLNV="xilinx.com:interface:drp:1.0">
+          <PORTMAPS>
+            <PORTMAP LOGICAL="DADDR" PHYSICAL="drp_daddr_o"/>
+            <PORTMAP LOGICAL="DEN" PHYSICAL="drp_den_o"/>
+            <PORTMAP LOGICAL="DI" PHYSICAL="drp_di_o"/>
+            <PORTMAP LOGICAL="DO" PHYSICAL="drp_drpdo_i"/>
+            <PORTMAP LOGICAL="DRDY" PHYSICAL="drp_drdy_i"/>
+            <PORTMAP LOGICAL="DWE" PHYSICAL="drp_dwe_o"/>
+          </PORTMAPS>
+        </BUSINTERFACE>
+        <BUSINTERFACE BUSNAME="__NOC__" NAME="user_gt_drp_interface" TYPE="TARGET" VLNV="xilinx.com:interface:drp:1.0">
+          <PORTMAPS>
+            <PORTMAP LOGICAL="DADDR" PHYSICAL="drp_daddr_i"/>
+            <PORTMAP LOGICAL="DEN" PHYSICAL="drp_den_i"/>
+            <PORTMAP LOGICAL="DI" PHYSICAL="drp_di_i"/>
+            <PORTMAP LOGICAL="DO" PHYSICAL="drp_drpdo_o"/>
+            <PORTMAP LOGICAL="DRDY" PHYSICAL="drp_drdy_o"/>
+            <PORTMAP LOGICAL="DWE" PHYSICAL="drp_dwe_i"/>
+          </PORTMAPS>
+        </BUSINTERFACE>
+      </BUSINTERFACES>
+    </MODULE>
+  </MODULES>
+
+</EDKSYSTEM>

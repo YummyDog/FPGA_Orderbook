@@ -1,0 +1,248 @@
+
+*** Running vivado
+    with args -log top_wrapper.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source top_wrapper.tcl
+
+
+INFO: [Common 17-3922] A valid Vivado Design Suite BASIC license has been detected. Your current license is active and will expire on 07-sep-2027.
+#-----------------------------------------------------------
+# Vivado v2026.1 (64-bit)
+# SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+# IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+# SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+# Start of session at: Wed Oct 14 23:08:36 2026
+# Process ID         : 2220
+# Current directory  : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1
+# Command line       : vivado.exe -log top_wrapper.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source top_wrapper.tcl
+# Log file           : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/top_wrapper.vds
+# Journal file       : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1\vivado.jou
+# Running On         : DESKTOP-MB4FOM3
+# Platform           : Windows 10
+# Operating System   : 19045
+# Processor Detail   : Intel(R) Core(TM) i5-8600 CPU @ 3.10GHz
+# CPU Frequency      : 3096 MHz
+# CPU Physical cores : 6
+# CPU Logical cores  : 6
+# Host memory        : 17119 MB
+# Swap memory        : 9656 MB
+# Total Virtual      : 26776 MB
+# Available Virtual  : 5136 MB
+#-----------------------------------------------------------
+
+****** Vivado v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Wed Oct 14 23:08:36 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source top_wrapper.tcl -notrace
+create_project: Time (s): cpu = 00:00:11 ; elapsed = 00:00:07 . Memory (MB): peak = 583.473 ; gain = 269.348
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'D:/AMDDesignTools/2026.1/Vivado/data/ip'.
+Command: synth_design -top top_wrapper -part xc7vx690tffg1157-2 -mode out_of_context
+Starting synth_design
+Attempting to get a license for feature 'Vivado_Synthesis' and/or device 'xc7vx690t'
+INFO: [Common 17-349] Got license for feature 'Vivado_Synthesis' and/or device 'xc7vx690t'
+INFO: [Device 21-403] Loading part xc7vx690tffg1157-2
+INFO: [Designutils 20-5008] Incremental synthesis strategy default
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 13080
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:07 ; elapsed = 00:00:07 . Memory (MB): peak = 1708.691 ; gain = 576.652
+---------------------------------------------------------------------------------
+INFO: [Synth 8-638] synthesizing module 'top_wrapper' [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/hdl/top_wrapper.vhd:18]
+INFO: [Synth 8-3491] module 'top' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/synth/top.vhd:15' bound to instance 'top_i' of component 'top' [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/hdl/top_wrapper.vhd:22]
+INFO: [Synth 8-638] synthesizing module 'top' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/synth/top.vhd:22]
+INFO: [Synth 8-3491] module 'top_market_data_top_0_0' declared at 'C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/.Xil/Vivado-2220-DESKTOP-MB4FOM3/realtime/top_market_data_top_0_0_stub.vhdl:6' bound to instance 'market_data_top_0' of component 'top_market_data_top_0_0' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/synth/top.vhd:172]
+INFO: [Synth 8-638] synthesizing module 'top_market_data_top_0_0' [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/.Xil/Vivado-2220-DESKTOP-MB4FOM3/realtime/top_market_data_top_0_0_stub.vhdl:55]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0' declared at 'C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/.Xil/Vivado-2220-DESKTOP-MB4FOM3/realtime/top_ten_gig_eth_pcs_pma_0_0_stub.vhdl:6' bound to instance 'ten_gig_eth_pcs_pma_0' of component 'top_ten_gig_eth_pcs_pma_0_0' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/synth/top.vhd:210]
+INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0' [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/.Xil/Vivado-2220-DESKTOP-MB4FOM3/realtime/top_ten_gig_eth_pcs_pma_0_0_stub.vhdl:66]
+INFO: [Synth 8-256] done synthesizing module 'top' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/synth/top.vhd:22]
+INFO: [Synth 8-256] done synthesizing module 'top_wrapper' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/hdl/top_wrapper.vhd:18]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:09 ; elapsed = 00:00:09 . Memory (MB): peak = 1828.977 ; gain = 696.938
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 1828.977 ; gain = 696.938
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 1828.977 ; gain = 696.938
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 1828.977 ; gain = 0.000
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_market_data_top_0_0/top_market_data_top_0_0/top_market_data_top_0_0_in_context.xdc] for cell 'top_i/market_data_top_0'
+Finished Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_market_data_top_0_0/top_market_data_top_0_0/top_market_data_top_0_0_in_context.xdc] for cell 'top_i/market_data_top_0'
+Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/top_ten_gig_eth_pcs_pma_0_0/top_ten_gig_eth_pcs_pma_0_0_in_context.xdc] for cell 'top_i/ten_gig_eth_pcs_pma_0'
+Finished Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/top_ten_gig_eth_pcs_pma_0_0/top_ten_gig_eth_pcs_pma_0_0_in_context.xdc] for cell 'top_i/ten_gig_eth_pcs_pma_0'
+Parsing XDC File [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/orderbook.xdc]
+WARNING: [Vivado 12-584] No ports matched 'clk'. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/orderbook.xdc:10]
+Finished Parsing XDC File [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/orderbook.xdc]
+WARNING: [Project 1-498] One or more constraints failed evaluation while reading constraint file [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/orderbook.xdc] and the design contains unresolved black boxes. These constraints will be read post-synthesis (as long as their source constraint file is marked as used_in_implementation) and should be applied correctly then. You should review the constraints listed in the file [.Xil/top_wrapper_propImpl.xdc] and check the run log file to verify that these constraints were correctly applied.
+Parsing XDC File [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/dont_touch.xdc]
+Finished Parsing XDC File [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/dont_touch.xdc]
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1832.617 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 1832.633 ; gain = 0.000
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:23 ; elapsed = 00:00:24 . Memory (MB): peak = 1832.633 ; gain = 700.594
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7vx690tffg1157-2
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:23 ; elapsed = 00:00:24 . Memory (MB): peak = 1832.633 ; gain = 700.594
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:23 ; elapsed = 00:00:24 . Memory (MB): peak = 1832.633 ; gain = 700.594
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:23 ; elapsed = 00:00:24 . Memory (MB): peak = 1832.633 ; gain = 700.594
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 3600 (col length:200)
+BRAMs: 2940 (col length: RAMB18 200 RAMB36 100)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:26 ; elapsed = 00:00:27 . Memory (MB): peak = 1878.824 ; gain = 746.785
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:35 ; elapsed = 00:00:37 . Memory (MB): peak = 2039.391 ; gain = 907.352
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:35 ; elapsed = 00:00:37 . Memory (MB): peak = 2039.391 ; gain = 907.352
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:00:35 ; elapsed = 00:00:37 . Memory (MB): peak = 2049.172 ; gain = 917.133
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:00:42 ; elapsed = 00:00:43 . Memory (MB): peak = 2324.730 ; gain = 1192.691
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:42 ; elapsed = 00:00:43 . Memory (MB): peak = 2324.730 ; gain = 1192.691
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:42 ; elapsed = 00:00:43 . Memory (MB): peak = 2324.730 ; gain = 1192.691
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:42 ; elapsed = 00:00:43 . Memory (MB): peak = 2324.730 ; gain = 1192.691
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:42 ; elapsed = 00:00:43 . Memory (MB): peak = 2324.730 ; gain = 1192.691
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:42 ; elapsed = 00:00:43 . Memory (MB): peak = 2324.730 ; gain = 1192.691
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++------+----------------------------+----------+
+|      |BlackBox name               |Instances |
++------+----------------------------+----------+
+|1     |top_market_data_top_0_0     |         1|
+|2     |top_ten_gig_eth_pcs_pma_0_0 |         1|
++------+----------------------------+----------+
+
+Report Cell Usage: 
++------+---------------------------------+------+
+|      |Cell                             |Count |
++------+---------------------------------+------+
+|1     |top_market_data_top_0_0_bbox     |     1|
+|2     |top_ten_gig_eth_pcs_pma_0_0_bbox |     1|
++------+---------------------------------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:42 ; elapsed = 00:00:43 . Memory (MB): peak = 2324.730 ; gain = 1192.691
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 0 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:27 ; elapsed = 00:00:37 . Memory (MB): peak = 2324.730 ; gain = 1189.035
+Synthesis Optimization Complete : Time (s): cpu = 00:00:42 ; elapsed = 00:00:43 . Memory (MB): peak = 2324.730 ; gain = 1192.691
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 2324.730 ; gain = 0.000
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2349.543 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Synth Design complete | Checksum: 12c9477
+INFO: [Common 17-83] Releasing license: Vivado_Synthesis
+25 Infos, 2 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:00:55 ; elapsed = 00:01:00 . Memory (MB): peak = 2353.555 ; gain = 1760.176
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+INFO: [Common 17-1381] The checkpoint 'C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/top_wrapper.dcp' has been generated.
+write_checkpoint: Time (s): cpu = 00:00:10 ; elapsed = 00:00:10 . Memory (MB): peak = 2353.555 ; gain = 0.000
+INFO: [Vivado 12-24828] Executing command : report_utilization -file top_wrapper_utilization_synth.rpt -pb top_wrapper_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Wed Oct 14 23:09:57 2026...

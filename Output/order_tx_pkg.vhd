@@ -8,14 +8,14 @@
 -- from those at elaboration, so changing an address or a payload field needs no
 -- edit to the RTL.
 --
--- Payload layout, as shipped (C_PAYLOAD_BITS = 83):
---   byte 0       "00000" & payload(82 downto 80)
---   bytes 1-10   payload(79 downto 0)  (big endian, network order)
+-- Payload layout, as shipped (C_PAYLOAD_BITS = 87, 88 bits on the wire):
+--   bytes 0-9    payload(86 downto 7)  (big endian, network order)
+--   byte 10      payload(6 downto 0) & '0'   -- one padding bit in the LSB
 --   bytes 11..   zero padding
 --
--- The payload vector is right-justified in the smallest whole number of bytes
--- and sent most significant byte first; the unused high bits of byte 0 are
--- zero.
+-- The payload vector is left-justified in the smallest whole number of bytes
+-- and sent most significant byte first; the unused low bits of the last byte
+-- are zero.
 --
 -- Reshape f_payload to change it. The padding keeps the frame at or above the
 -- 64-byte minimum and makes its length a multiple of 8, which is what lets the
@@ -43,8 +43,8 @@ package order_tx_pkg is
   constant C_MAC_SRC   : t_bytes(0 to 5) := (x"00", x"0A", x"35", x"AA", x"BB", x"CC");
 
   -- IPv4, byte 0 first on the wire: 192.168.10.20 -> 192.168.10.1
-  constant C_IP_SRC    : t_bytes(0 to 3) := (x"C0", x"A8", x"0A", x"14");
-  constant C_IP_DST    : t_bytes(0 to 3) := (x"C0", x"A8", x"0A", x"01");
+  constant C_IP_SRC    : t_bytes(0 to 3) := (x"A9", x"FE", x"F2", x"5C");
+  constant C_IP_DST    : t_bytes(0 to 3) := (x"C0", x"A8", x"00", x"50");
 
   constant C_IP_TTL    : std_logic_vector(7 downto 0)  := x"40";
   constant C_IP_DSCP   : std_logic_vector(7 downto 0)  := x"00";
@@ -117,7 +117,8 @@ package body order_tx_pkg is
   end function f_ip_checksum;
 
   ------------------------------------------------------------------------------
-  -- Right-justify the payload in C_MSG_LEN bytes, most significant byte first.
+  -- Left-justify the payload in C_MSG_LEN bytes, most significant byte first,
+  -- zero-filling the unused low bits of the last byte (one bit at 87).
   ------------------------------------------------------------------------------
   function f_payload (payload : std_logic_vector(C_PAYLOAD_BITS - 1 downto 0))
     return t_bytes is
@@ -125,7 +126,7 @@ package body order_tx_pkg is
     variable v : std_logic_vector(8 * C_MSG_LEN - 1 downto 0)
                := (others => '0');
   begin
-    v(C_PAYLOAD_BITS - 1 downto 0) := payload;
+    v(8 * C_MSG_LEN - 1 downto 8 * C_MSG_LEN - C_PAYLOAD_BITS) := payload;
     for i in 0 to C_MSG_LEN - 1 loop
       p(i) := v(8 * (C_MSG_LEN - i) - 1 downto 8 * (C_MSG_LEN - 1 - i));
     end loop;
