@@ -9,8 +9,8 @@ INFO: [Common 17-3922] A valid Vivado Design Suite BASIC license has been detect
 # SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
 # IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
 # SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
-# Start of session at: Wed Oct 14 23:10:04 2026
-# Process ID         : 20752
+# Start of session at: Thu Oct 22 23:43:19 2026
+# Process ID         : 15724
 # Current directory  : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/impl_1
 # Command line       : vivado.exe -log top_wrapper.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source top_wrapper.tcl -notrace
 # Log file           : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/impl_1/top_wrapper.vdi
@@ -23,32 +23,32 @@ INFO: [Common 17-3922] A valid Vivado Design Suite BASIC license has been detect
 # CPU Physical cores : 6
 # CPU Logical cores  : 6
 # Host memory        : 17119 MB
-# Swap memory        : 9656 MB
-# Total Virtual      : 26776 MB
-# Available Virtual  : 5343 MB
+# Swap memory        : 5637 MB
+# Total Virtual      : 22756 MB
+# Available Virtual  : 14430 MB
 #-----------------------------------------------------------
 
 ****** Vivado v2026.1 (64-bit)
   **** SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
   **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
   **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
-  **** Start of session at: Wed Oct 14 23:10:04 2026
+  **** Start of session at: Thu Oct 22 23:43:19 2026
     ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
     ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 
 source top_wrapper.tcl -notrace
-create_project: Time (s): cpu = 00:00:11 ; elapsed = 00:00:07 . Memory (MB): peak = 582.523 ; gain = 267.410
+create_project: Time (s): cpu = 00:00:11 ; elapsed = 00:00:07 . Memory (MB): peak = 582.891 ; gain = 269.562
 INFO: [IP_Flow 19-234] Refreshing IP repositories
 INFO: [IP_Flow 19-1704] No user IP repositories specified
 INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'D:/AMDDesignTools/2026.1/Vivado/data/ip'.
-Command: link_design -top top_wrapper -part xc7vx690tffg1157-2
+Command: link_design -top top_wrapper -part xc7vx690tffg1157-2 -mode out_of_context
 Design is defaulting to srcset: sources_1
 Design is defaulting to constrset: constrs_1
 INFO: [Device 21-403] Loading part xc7vx690tffg1157-2
 INFO: [Project 1-5699] Read binary netlist with skipMacroContent - 1
 INFO: [Project 1-454] Reading design checkpoint 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_market_data_top_0_0/top_market_data_top_0_0.dcp' for cell 'top_i/market_data_top_0'
 INFO: [Project 1-454] Reading design checkpoint 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/top_ten_gig_eth_pcs_pma_0_0.dcp' for cell 'top_i/ten_gig_eth_pcs_pma_0'
-Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.139 . Memory (MB): peak = 1192.688 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.137 . Memory (MB): peak = 1187.027 ; gain = 0.000
 INFO: [Netlist 29-17] Analyzing 863 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-479] Netlist was created with Vivado 2026.1
@@ -61,7 +61,7 @@ WARNING: [Constraints 18-550] Could not create 'IBUF_LOW_PWR' constraint because
 WARNING: [Constraints 18-550] Could not create 'IBUF_LOW_PWR' constraint because net 'top_i/ten_gig_eth_pcs_pma_0/refclk_p' is not directly connected to top level port. 'IBUF_LOW_PWR' is ignored for synthesis but preserved for implementation.
 Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.xdc] for cell 'top_i/ten_gig_eth_pcs_pma_0/U0'
 INFO: [Timing 38-35] Done setting XDC timing constraints. [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.xdc:70]
-all_fanout: Time (s): cpu = 00:00:11 ; elapsed = 00:00:10 . Memory (MB): peak = 2162.102 ; gain = 812.262
+all_fanout: Time (s): cpu = 00:00:10 ; elapsed = 00:00:12 . Memory (MB): peak = 2153.664 ; gain = 808.871
 Finished Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.xdc] for cell 'top_i/ten_gig_eth_pcs_pma_0/U0'
 Parsing XDC File [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/orderbook.xdc]
 WARNING: [Vivado 12-584] No ports matched 'clk'. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/orderbook.xdc:10]
@@ -78,7 +78,7 @@ INFO: [Vivado 12-626] No clocks found. Please use 'create_clock' or 'create_gene
 Finished Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_clocks.xdc] for cell 'top_i/ten_gig_eth_pcs_pma_0/U0'
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
 INFO: [Project 1-1687] 1 scoped IP constraints or related sub-commands were skipped due to synthesis logic optimizations usually triggered by constant connectivity or unconnected output pins. To review the skipped constraints and messages, run the command 'set_param netlist.IPMsgFiltering false' before opening the design.
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.013 . Memory (MB): peak = 2162.102 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.014 . Memory (MB): peak = 2153.664 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
   A total of 25 instances were transformed.
   RAM32M => RAM32M (RAMD32(x6), RAMS32(x2)): 23 instances
@@ -86,7 +86,7 @@ INFO: [Project 1-111] Unisim Transformation Summary:
 
 17 Infos, 7 Warnings, 1 Critical Warnings and 0 Errors encountered.
 link_design completed successfully
-link_design: Time (s): cpu = 00:00:45 ; elapsed = 00:00:46 . Memory (MB): peak = 2162.102 ; gain = 1562.906
+link_design: Time (s): cpu = 00:00:47 ; elapsed = 00:01:23 . Memory (MB): peak = 2153.664 ; gain = 1554.176
 Command: opt_design
 Attempting to get a license for feature 'Vivado_Implementation' and/or device 'xc7vx690t'
 INFO: [Common 17-349] Got license for feature 'Vivado_Implementation' and/or device 'xc7vx690t'
@@ -98,13 +98,13 @@ WARNING: [DRC 23-814] Not all possible (connectivity based) DRCs may have been r
 INFO: [Project 1-461] DRC finished with 0 Errors
 INFO: [Project 1-462] Please refer to the DRC report (report_drc) for more information.
 
-Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.688 . Memory (MB): peak = 2162.102 ; gain = 0.000
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.965 . Memory (MB): peak = 2153.664 ; gain = 0.000
 
 Starting Cache Timing Information Task
 INFO: [Timing 38-35] Done setting XDC timing constraints.
 Ending Cache Timing Information Task | Checksum: 274376a5c
 
-Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.835 . Memory (MB): peak = 2162.102 ; gain = 0.000
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.870 . Memory (MB): peak = 2153.664 ; gain = 0.000
 
 Starting Logic Optimization Task
 
@@ -113,35 +113,35 @@ Phase 1 Initialization
 Phase 1.1 Core Generation And Design Setup
 Phase 1.1 Core Generation And Design Setup | Checksum: 274376a5c
 
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.055 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.056 . Memory (MB): peak = 2617.539 ; gain = 0.000
 
 Phase 1.2 Setup Constraints And Sort Netlist
 Phase 1.2 Setup Constraints And Sort Netlist | Checksum: 274376a5c
 
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.127 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.110 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Phase 1 Initialization | Checksum: 274376a5c
 
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.130 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.113 . Memory (MB): peak = 2617.539 ; gain = 0.000
 
 Phase 2 Timer Update And Timing Data Collection
 
 Phase 2.1 Detect if minReqCache needed
 Phase 2.1 Detect if minReqCache needed | Checksum: 274376a5c
 
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.196 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.182 . Memory (MB): peak = 2617.539 ; gain = 0.000
 
 Phase 2.2 Timer Update
 Phase 2.2 Timer Update | Checksum: 274376a5c
 
-Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.537 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.526 . Memory (MB): peak = 2617.539 ; gain = 0.000
 
 Phase 2.3 Timing Data Collection
 Phase 2.3 Timing Data Collection | Checksum: 274376a5c
 
-Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.550 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.539 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Phase 2 Timer Update And Timing Data Collection | Checksum: 274376a5c
 
-Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.553 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.542 . Memory (MB): peak = 2617.539 ; gain = 0.000
 
 Phase 3 Retarget
 INFO: [Opt 31-1851] Number of loadless carry chains removed were: 0
@@ -151,7 +151,7 @@ INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
 INFO: [Opt 31-49] Retargeted 0 cell(s).
 Phase 3 Retarget | Checksum: 1a9e9e92b
 
-Time (s): cpu = 00:00:01 ; elapsed = 00:00:01 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:01 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Retarget | Checksum: 1a9e9e92b
 INFO: [Opt 31-389] Phase Retarget created 28 cells and removed 48 cells
 INFO: [Opt 31-1021] In phase Retarget, 3 netlist objects are constrained preventing optimization. Please run opt_design with -debug_log to get more detail. 
@@ -160,19 +160,19 @@ Phase 4 Constant propagation
 INFO: [Opt 31-138] Pushed 35 inverter(s) to 373 load pin(s).
 Phase 4 Constant propagation | Checksum: 24f8e2986
 
-Time (s): cpu = 00:00:07 ; elapsed = 00:00:07 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Constant propagation | Checksum: 24f8e2986
 INFO: [Opt 31-389] Phase Constant propagation created 620 cells and removed 20371 cells
 INFO: [Opt 31-1021] In phase Constant propagation, 96 netlist objects are constrained preventing optimization. Please run opt_design with -debug_log to get more detail. 
 
 Phase 5 Sweep
 INFO: [Constraints 18-11670] Building netlist checker database with flags, 0x8
-Done building netlist checker database: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.005 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Done building netlist checker database: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.006 . Memory (MB): peak = 2617.539 ; gain = 0.000
 INFO: [Constraints 18-11670] Building netlist checker database with flags, 0x8
-Done building netlist checker database: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.002 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Done building netlist checker database: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.003 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Phase 5 Sweep | Checksum: 243efafbb
 
-Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Sweep | Checksum: 243efafbb
 INFO: [Opt 31-389] Phase Sweep created 0 cells and removed 2325 cells
 INFO: [Opt 31-1021] In phase Sweep, 471 netlist objects are constrained preventing optimization. Please run opt_design with -debug_log to get more detail. 
@@ -180,7 +180,7 @@ INFO: [Opt 31-1021] In phase Sweep, 471 netlist objects are constrained preventi
 Phase 6 BUFG optimization
 Phase 6 BUFG optimization | Checksum: 243efafbb
 
-Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2617.539 ; gain = 0.000
 BUFG optimization | Checksum: 243efafbb
 INFO: [Opt 31-662] Phase BUFG optimization created 0 cells of which 0 are BUFGs and removed 0 cells.
 
@@ -188,14 +188,14 @@ Phase 7 Shift Register Optimization
 INFO: [Opt 31-1064] SRL Remap converted 0 SRLs to 0 registers and converted 0 registers of register chains to 0 SRLs
 Phase 7 Shift Register Optimization | Checksum: 243efafbb
 
-Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Shift Register Optimization | Checksum: 243efafbb
 INFO: [Opt 31-389] Phase Shift Register Optimization created 0 cells and removed 0 cells
 
 Phase 8 Post Processing Netlist
 Phase 8 Post Processing Netlist | Checksum: 299de11c0
 
-Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Post Processing Netlist | Checksum: 299de11c0
 INFO: [Opt 31-389] Phase Post Processing Netlist created 0 cells and removed 0 cells
 INFO: [Opt 31-1021] In phase Post Processing Netlist, 72 netlist objects are constrained preventing optimization. Please run opt_design with -debug_log to get more detail. 
@@ -205,19 +205,19 @@ Phase 9 Finalization
 Phase 9.1 Finalizing Design Cores and Updating Shapes
 Phase 9.1 Finalizing Design Cores and Updating Shapes | Checksum: 2129d2d3f
 
-Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2617.539 ; gain = 0.000
 
 Phase 9.2 Verifying Netlist Connectivity
 
 Starting Connectivity Check Task
 
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.018 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.021 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Phase 9.2 Verifying Netlist Connectivity | Checksum: 2129d2d3f
 
-Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Phase 9 Finalization | Checksum: 2129d2d3f
 
-Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Opt_design Change Summary
 =========================
 
@@ -236,23 +236,23 @@ Opt_design Change Summary
 
 Ending Logic Optimization Task | Checksum: 2129d2d3f
 
-Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2617.539 ; gain = 0.000
 
 Starting Power Optimization Task
 INFO: [Pwropt 34-132] Skipping clock gating for clocks with a period < 2.00 ns.
 Ending Power Optimization Task | Checksum: 2129d2d3f
 
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.122 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.116 . Memory (MB): peak = 2617.539 ; gain = 0.000
 
 Starting Final Cleanup Task
 Ending Final Cleanup Task | Checksum: 2129d2d3f
 
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.002 . Memory (MB): peak = 2625.117 ; gain = 0.000
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.005 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.007 . Memory (MB): peak = 2617.539 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.005 . Memory (MB): peak = 2617.539 ; gain = 0.000
 INFO: [Common 17-83] Releasing license: Vivado_Implementation
 43 Infos, 8 Warnings, 1 Critical Warnings and 0 Errors encountered.
 opt_design completed successfully
-opt_design: Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 2625.117 ; gain = 463.016
+opt_design: Time (s): cpu = 00:00:13 ; elapsed = 00:00:15 . Memory (MB): peak = 2617.539 ; gain = 463.875
 INFO: [Vivado 12-24828] Executing command : report_drc -file top_wrapper_drc_opted.rpt -pb top_wrapper_drc_opted.pb -rpx top_wrapper_drc_opted.rpx
 Command: report_drc -file top_wrapper_drc_opted.rpt -pb top_wrapper_drc_opted.pb -rpx top_wrapper_drc_opted.rpx
 INFO: [IP_Flow 19-1839] IP Catalog is up to date.
@@ -262,7 +262,7 @@ INFO: [Vivado_Tcl 2-168] The results of DRC are in file C:/Users/lskje/Desktop/F
 report_drc completed successfully
 INFO: [Timing 38-35] Done setting XDC timing constraints.
 INFO: [Timing 38-480] Writing timing data to binary archive.
-Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.009 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.008 . Memory (MB): peak = 2617.539 ; gain = 0.000
 INFO: [Common 17-1381] The checkpoint 'C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/impl_1/top_wrapper_opt.dcp' has been generated.
 Command: place_design
 Attempting to get a license for feature 'Vivado_Implementation' and/or device 'xc7vx690t'
@@ -282,11 +282,11 @@ Starting Placer Task
 Phase 1 Placer Initialization
 
 Phase 1.1 Placer Initialization Netlist Sorting
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.005 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Phase 1.1 Placer Initialization Netlist Sorting | Checksum: 13d0f3c8f
 
-Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.112 . Memory (MB): peak = 2625.117 ; gain = 0.000
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.005 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.104 . Memory (MB): peak = 2617.539 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.006 . Memory (MB): peak = 2617.539 ; gain = 0.000
 
 Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device
 ERROR: [Place 30-143] Sub-optimal placement for an IBUFDS / GT component pair. If this sub optimal condition is acceptable for this design, you may use the CLOCK_DEDICATED_ROUTE constraint in the .xdc file to demote this message to a WARNING. However, the use of this override is highly discouraged. These examples can be used directly in the .xdc file to override this clock rule.
@@ -341,16 +341,16 @@ ERROR: [Place 30-143] Sub-optimal placement for an IBUFDS / GT component pair. I
 Resolution: Since the IBUFDS connects to the GT in intelligent pin mode, to ensure that jitter margins for the GT clock input are met, the GT must be placed in the same clock region as, or the clock region immediately above, or the clock region immediately below the IBUFDS. Please ensure that location constraints on the IBUFDS and/or the GT are in compliance with this rule.
 Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device | Checksum: 1638f11db
 
-Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:02 . Memory (MB): peak = 2617.539 ; gain = 0.000
 Phase 1 Placer Initialization | Checksum: 1638f11db
 
-Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:02 . Memory (MB): peak = 2617.539 ; gain = 0.000
 ERROR: [Place 30-99] Placer failed with error: 'IO Clock Placer failed'
 Please review all ERROR, CRITICAL WARNING, and WARNING messages during placement to understand the cause for failure.
 Ending Placer Task | Checksum: 1638f11db
 
-Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 2625.117 ; gain = 0.000
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:02 . Memory (MB): peak = 2617.539 ; gain = 0.000
 56 Infos, 10 Warnings, 3 Critical Warnings and 3 Errors encountered.
 place_design failed
 ERROR: [Common 17-69] Command failed: Placer could not place all instances
-INFO: [Common 17-206] Exiting Vivado at Wed Oct 14 23:11:24 2026...
+INFO: [Common 17-206] Exiting Vivado at Thu Oct 22 23:45:19 2026...

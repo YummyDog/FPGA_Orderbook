@@ -132,7 +132,7 @@ OPTRACE "read constraints: implementation_pre" END { }
 OPTRACE "add files" END { }
 OPTRACE "link_design" START { }
   set_param project.isImplRun true
-  link_design -top top_wrapper -part xc7vx690tffg1157-2 
+  link_design -top top_wrapper -part xc7vx690tffg1157-2 -mode out_of_context 
 OPTRACE "link_design" END { }
   set_param project.isImplRun false
 OPTRACE "gray box cells" START { }

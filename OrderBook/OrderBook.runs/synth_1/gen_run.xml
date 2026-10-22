@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GenRun Id="synth_1" LaunchPart="xc7vx690tffg1157-2" LaunchTime="1791979570">
-  <File Type="PA-TCL" Name="top_wrapper.tcl"/>
   <File Type="REPORTS-TCL" Name="top_wrapper_reports.tcl"/>
-  <File Type="RDS-RDS" Name="top_wrapper.vds"/>
-  <File Type="RDS-PROPCONSTRS" Name="top_wrapper_drc_synth.rpt"/>
   <File Type="RDS-UTIL" Name="top_wrapper_utilization_synth.rpt"/>
   <File Type="RDS-UTIL-PB" Name="top_wrapper_utilization_synth.pb"/>
+  <File Type="PA-TCL" Name="top_wrapper.tcl"/>
+  <File Type="RDS-RDS" Name="top_wrapper.vds"/>
   <File Type="RDS-DCP" Name="top_wrapper.dcp"/>
-  <File Type="VDS-TIMINGSUMMARY" Name="top_wrapper_timing_summary_synth.rpt"/>
-  <File Type="VDS-TIMING-PB" Name="top_wrapper_timing_summary_synth.pb"/>
   <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
     <Filter Type="Srcs"/>
     <File Path="$PPRDIR/../Engine/ram_pkg.vhd">
@@ -258,6 +255,6 @@
       <Option Id="MoreOptsStr"><![CDATA[-mode out_of_context]]></Option>
     </Step>
   </Strategy>
-  <BlockFileSet Type="BlockSrcs" Name="top_ten_gig_eth_pcs_pma_0_0"/>
   <BlockFileSet Type="BlockSrcs" Name="top_market_data_top_0_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="top_ten_gig_eth_pcs_pma_0_0"/>
 </GenRun>
