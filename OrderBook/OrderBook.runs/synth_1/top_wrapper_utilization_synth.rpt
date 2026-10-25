@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Wed Oct 14 23:09:57 2026
+| Date         : Sun Oct 25 23:22:59 2026
 | Host         : DESKTOP-MB4FOM3 running 64-bit major release  (build 9200)
 | Command      : report_utilization -file top_wrapper_utilization_synth.rpt -pb top_wrapper_utilization_synth.pb
 | Design       : top_wrapper
@@ -95,7 +95,7 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +-----------------------------+------+-------+------------+-----------+-------+
 |          Site Type          | Used | Fixed | Prohibited | Available | Util% |
 +-----------------------------+------+-------+------------+-----------+-------+
-| Bonded IOB                  |    0 |     0 |          0 |       600 |  0.00 |
+| Bonded IOB                  |    6 |     0 |          0 |       600 |  1.00 |
 | Bonded IPADs                |    0 |     0 |          0 |        62 |  0.00 |
 | Bonded OPADs                |    0 |     0 |          0 |        40 |  0.00 |
 | PHY_CONTROL                 |    0 |     0 |          0 |        20 |  0.00 |
@@ -155,6 +155,9 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +----------+------+---------------------+
 | Ref Name | Used | Functional Category |
 +----------+------+---------------------+
+| OBUF     |    3 |                  IO |
+| IBUF     |    3 |                  IO |
++----------+------+---------------------+
 
 
 8. Black Boxes
@@ -165,6 +168,7 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +-----------------------------+------+
 | top_ten_gig_eth_pcs_pma_0_0 |    1 |
 | top_market_data_top_0_0     |    1 |
+| top_fan_pwm_0_0             |    1 |
 +-----------------------------+------+
 
 

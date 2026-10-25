@@ -1,19 +1,38 @@
 {
    "ActiveEmotionalView":"Default View",
    "Default View_ScaleFactor":"0.888288",
-   "Default View_TopLeft":"-393,87",
+   "Default View_TopLeft":"-205,285",
    "ExpandedHierarchyInLayout":"",
    "guistr":"# # String gsaved with Nlview 7.8.0 2024-04-26 e1825d835c VDI=44 GEI=38 GUI=JA:24.0
 #  -string -flagsOSRD
-preplace inst market_data_top_0 -pg 1 -lvl 2 -x 440 -y 300 -defaultsOSRD
-preplace inst ten_gig_eth_pcs_pma_0 -pg 1 -lvl 1 -x 50 -y 400 -defaultsOSRD
-preplace netloc ten_gig_eth_pcs_pma_0_coreclk_out 1 0 2 -170 130 260
-preplace netloc ten_gig_eth_pcs_pma_0_xgmii_rxc 1 0 2 -150 140 250
-preplace netloc ten_gig_eth_pcs_pma_0_xgmii_rxd 1 0 2 -140 150 240
-preplace netloc market_data_top_0_xgmii_txc 1 0 3 -180 10 NJ 10 630
-preplace netloc market_data_top_0_xgmii_txd 1 0 3 -160 20 NJ 20 620
-levelinfo -pg 1 -200 50 440 650
-pagesize -pg 1 -db -bbox -sgen -210 -50 650 1140
+preplace port gt_refclk -pg 1 -lvl 0 -x -280 -y 350 -defaultsOSRD
+preplace port port-id_sfp_rxp -pg 1 -lvl 0 -x -280 -y 420 -defaultsOSRD
+preplace port port-id_sfp_rxn -pg 1 -lvl 0 -x -280 -y 450 -defaultsOSRD
+preplace port port-id_sfp_txp -pg 1 -lvl 4 -x 800 -y 560 -defaultsOSRD
+preplace port port-id_sfp_txn -pg 1 -lvl 4 -x 800 -y 590 -defaultsOSRD
+preplace port port-id_clk25in -pg 1 -lvl 0 -x -280 -y -160 -defaultsOSRD
+preplace port port-id_fan -pg 1 -lvl 4 -x 800 -y -160 -defaultsOSRD
+preplace inst market_data_top_0 -pg 1 -lvl 3 -x 570 -y 300 -defaultsOSRD
+preplace inst ten_gig_eth_pcs_pma_0 -pg 1 -lvl 1 -x -20 -y 400 -defaultsOSRD
+preplace inst const_one -pg 1 -lvl 1 -x -20 -y 70 -defaultsOSRD
+preplace inst fan_pwm_0 -pg 1 -lvl 2 -x 280 -y -160 -defaultsOSRD
+preplace netloc const_one_dout 1 1 2 NJ 70 380
+preplace netloc market_data_top_0_xgmii_txc 1 0 4 -260 -10 NJ -10 N -10 760
+preplace netloc market_data_top_0_xgmii_txd 1 0 4 -250 0 NJ 0 N 0 750
+preplace netloc sfp_rxn_1 1 0 1 NJ 450
+preplace netloc sfp_rxp_1 1 0 1 -210J 420n
+preplace netloc ten_gig_eth_pcs_pma_0_coreclk_out 1 0 3 -220 150 180 250 N
+preplace netloc ten_gig_eth_pcs_pma_0_drp_req 1 0 2 -210 640 170
+preplace netloc ten_gig_eth_pcs_pma_0_txn 1 1 3 190J 10 N 10 780J
+preplace netloc ten_gig_eth_pcs_pma_0_txp 1 1 3 200J 20 N 20 770J
+preplace netloc ten_gig_eth_pcs_pma_0_xgmii_rxc 1 0 3 -230 140 N 140 360
+preplace netloc ten_gig_eth_pcs_pma_0_xgmii_rxd 1 0 3 -240 130 N 130 370
+preplace netloc clk25in_1 1 0 2 NJ -160 NJ
+preplace netloc fan_pwm_0_fan 1 2 2 NJ -160 NJ
+preplace netloc gt_refclk_1 1 0 1 NJ 350
+preplace netloc ten_gig_eth_pcs_pma_0_core_gt_drp_interface 1 0 2 -210 160 170
+levelinfo -pg 1 -280 -20 280 570 800
+pagesize -pg 1 -db -bbox -sgen -390 -220 950 1140
 "
 }
 0

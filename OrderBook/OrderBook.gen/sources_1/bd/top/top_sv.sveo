@@ -66,7 +66,14 @@
 
 // INST_TAG     ------ Begin cut for WRAPPER INSTANTIATION Template ------
 top_sv your_instance_name (
-
+  .gt_refclk_clk_n(gt_refclk_clk_n), // input wire gt_refclk_clk_n
+  .gt_refclk_clk_p(gt_refclk_clk_p), // input wire gt_refclk_clk_p
+  .sfp_rxp(sfp_rxp), // input wire sfp_rxp
+  .sfp_rxn(sfp_rxn), // input wire sfp_rxn
+  .sfp_txp(sfp_txp), // output wire sfp_txp
+  .sfp_txn(sfp_txn), // output wire sfp_txn
+  .clk25in(clk25in), // input wire clk25in
+  .fan(fan) // output wire fan
 );
 // INST_TAG_END ------  End cut for WRAPPER INSTANTIATION Template  ------
 

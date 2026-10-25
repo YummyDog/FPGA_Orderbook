@@ -53,11 +53,33 @@
 `include "vivado_interfaces.svh"
 
 module top_sv (
-
+  (* X_INTERFACE_IGNORE = "true" *)
+  input wire gt_refclk_clk_n,
+  (* X_INTERFACE_IGNORE = "true" *)
+  input wire gt_refclk_clk_p,
+  (* X_INTERFACE_IGNORE = "true" *)
+  input wire sfp_rxp,
+  (* X_INTERFACE_IGNORE = "true" *)
+  input wire sfp_rxn,
+  (* X_INTERFACE_IGNORE = "true" *)
+  output wire sfp_txp,
+  (* X_INTERFACE_IGNORE = "true" *)
+  output wire sfp_txn,
+  (* X_INTERFACE_IGNORE = "true" *)
+  input wire clk25in,
+  (* X_INTERFACE_IGNORE = "true" *)
+  output wire fan
 );
 
   top inst (
-
+    .gt_refclk_clk_n(gt_refclk_clk_n),
+    .gt_refclk_clk_p(gt_refclk_clk_p),
+    .sfp_rxp(sfp_rxp),
+    .sfp_rxn(sfp_rxn),
+    .sfp_txp(sfp_txp),
+    .sfp_txn(sfp_txn),
+    .clk25in(clk25in),
+    .fan(fan)
   );
 
 endmodule

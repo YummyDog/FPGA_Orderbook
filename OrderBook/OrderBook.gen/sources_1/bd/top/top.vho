@@ -53,7 +53,14 @@
 -- COMP_TAG     ------ Begin cut for COMPONENT Declaration ------
 COMPONENT top
   PORT (
-
+    gt_refclk_clk_n : IN STD_LOGIC;
+    gt_refclk_clk_p : IN STD_LOGIC;
+    sfp_rxp : IN STD_LOGIC;
+    sfp_rxn : IN STD_LOGIC;
+    sfp_txp : OUT STD_LOGIC;
+    sfp_txn : OUT STD_LOGIC;
+    clk25in : IN STD_LOGIC;
+    fan : OUT STD_LOGIC
   );
 END COMPONENT;
 -- COMP_TAG_END ------  End cut for COMPONENT Declaration  ------
@@ -64,7 +71,14 @@ END COMPONENT;
 -- INST_TAG     ------ Begin cut for INSTANTIATION Template ------
 your_instance_name : top
   PORT MAP (
-
+    gt_refclk_clk_n => gt_refclk_clk_n,
+    gt_refclk_clk_p => gt_refclk_clk_p,
+    sfp_rxp => sfp_rxp,
+    sfp_rxn => sfp_rxn,
+    sfp_txp => sfp_txp,
+    sfp_txn => sfp_txn,
+    clk25in => clk25in,
+    fan => fan
   );
 -- INST_TAG_END ------  End cut for INSTANTIATION Template  ------
 

@@ -12,4 +12,10 @@ set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_market_
 # IP: bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/top_ten_gig_eth_pcs_pma_0_0.xci
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_ten_gig_eth_pcs_pma_0_0 || ORIG_REF_NAME==top_ten_gig_eth_pcs_pma_0_0} -quiet] -quiet
 
+# IP: bd/top/ip/top_const_one_1/top_const_one_1.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_const_one_1 || ORIG_REF_NAME==top_const_one_1} -quiet] -quiet
+
+# IP: bd/top/ip/top_fan_pwm_0_0/top_fan_pwm_0_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_fan_pwm_0_0 || ORIG_REF_NAME==top_fan_pwm_0_0} -quiet] -quiet
+
 # XDC: c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/top_ooc.xdc
