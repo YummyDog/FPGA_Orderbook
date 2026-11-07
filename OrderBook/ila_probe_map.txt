@@ -1,0 +1,102 @@
+ILA u_ila_valids   clock: top_i/market_data_top_0/U0/u_input/u_axis/clk (gt_refclk)   depth: 4096   633 bits in 82 probes
+Probe names in Hardware Manager are the net names in the right-hand column.
+
+== Input stage
+  probe0   u_input/u_axis/h_v                   1  top_i/market_data_top_0/U0/u_input/u_axis/h_v
+  probe1   p_tvalid                             1  top_i/market_data_top_0/U0/u_fullparser/s_axis_tvalid
+  probe2   u_input/crc_done                     1  top_i/market_data_top_0/U0/u_input/crc_done
+  probe3   u_input/u_extend/res_v               1  top_i/market_data_top_0/U0/u_input/u_extend/res_v
+  probe4   u_input/u_extend/cnt_v               1  top_i/market_data_top_0/U0/u_input/u_extend/cnt_v
+  probe5   mold_cnt_v                           1  top_i/market_data_top_0/U0/mold_cnt_v
+  probe6   fcs_complete_i                       1  top_i/market_data_top_0/U0/fcs_complete_i
+  probe7   fcs_true_i                           1  top_i/market_data_top_0/U0/fcs_true_i
+  probe8   fcs_false_i                          1  top_i/market_data_top_0/U0/fcs_false_i
+
+== Parser stages: master tvalid + m_fields_valid
+  probe9   u_fullparser/e_tvalid                1  top_i/market_data_top_0/U0/u_fullparser/e_tvalid
+  probe10  u_fullparser/e_fvalid                1  top_i/market_data_top_0/U0/u_fullparser/u_eth/fields_valid_r
+  probe11  u_fullparser/i_tvalid                1  top_i/market_data_top_0/U0/u_fullparser/i_tvalid
+  probe12  u_fullparser/i_fvalid                1  top_i/market_data_top_0/U0/u_fullparser/u_ipv4/fields_valid_r
+  probe13  u_fullparser/u_ipv4/ihl_invalid_r    1  top_i/market_data_top_0/U0/u_fullparser/u_ipv4/ihl_invalid_r
+  probe14  u_fullparser/u_ipv4/ver_invalid_r    1  top_i/market_data_top_0/U0/u_fullparser/u_ipv4/ver_invalid_r
+  probe15  u_fullparser/u_tvalid                1  top_i/market_data_top_0/U0/u_fullparser/u_tvalid
+  probe16  u_fullparser/u_fvalid                1  top_i/market_data_top_0/U0/u_fullparser/u_udp/fields_valid_r
+  probe17  u_fullparser/u_udp/len_invalid_r     1  top_i/market_data_top_0/U0/u_fullparser/u_udp/len_invalid_r
+  probe18  u_fullparser/d_tvalid                1  top_i/market_data_top_0/U0/u_fullparser/d_tvalid
+  probe19  eng_valid                            1  top_i/market_data_top_0/U0/eng_valid
+
+== ITCH slave AXI-Stream (s_axis_tready is tied '1' in the RTL - nothing to probe)
+  probe20  u_fullparser/u_itch/s_axis_tlast     1  top_i/market_data_top_0/U0/u_fullparser/u_itch/s_axis_tlast
+  probe21  u_fullparser/u_itch/s_axis_tkeep[7:0]   8  top_i/market_data_top_0/U0/u_fullparser/u_itch/s_axis_tkeep[7:0]
+  probe22  u_fullparser/u_itch/s_axis_tdata[63:0]  64  top_i/market_data_top_0/U0/u_fullparser/u_itch/s_axis_tdata[63:0]
+
+== ITCH internal: window / framing valids
+  probe23  u_fullparser/u_itch/adv_c            1  top_i/market_data_top_0/U0/u_fullparser/u_itch/adv_c
+  probe24  u_fullparser/u_itch/flush_r          1  top_i/market_data_top_0/U0/u_fullparser/u_itch/flush_r
+  probe25  u_fullparser/u_itch/fv_valid         1  top_i/market_data_top_0/U0/u_fullparser/u_itch/fv_valid
+  probe26  u_fullparser/u_itch/k1_last          1  top_i/market_data_top_0/U0/u_fullparser/u_itch/k1_last
+  probe27  u_fullparser/u_itch/fv_last          1  top_i/market_data_top_0/U0/u_fullparser/u_itch/fv_last
+  probe28  u_fullparser/u_itch/fv_keep[7:0]     8  top_i/market_data_top_0/U0/u_fullparser/u_itch/fv_keep_reg_n_0_[7:0]
+  probe29  u_fullparser/u_itch/active_r         1  top_i/market_data_top_0/U0/u_fullparser/u_itch/active_r
+  probe30  u_fullparser/u_itch/armed_r          1  top_i/market_data_top_0/U0/u_fullparser/u_itch/armed_r
+  probe31  u_fullparser/u_itch/pay_arm_c        1  top_i/market_data_top_0/U0/u_fullparser/u_itch/pay_arm_c
+  probe32  u_fullparser/u_itch/rem_r[6:0]       7  top_i/market_data_top_0/U0/u_fullparser/u_itch/rem_r[6:0]
+  probe33  u_fullparser/u_itch/lane_r[2:0]      3  top_i/market_data_top_0/U0/u_fullparser/u_itch/lane_r[2:0]
+  probe34  u_fullparser/u_itch/fl_typ_r[7:0]    8  top_i/market_data_top_0/U0/u_fullparser/u_itch/fl_typ_r[7:0]
+  probe35  u_fullparser/u_itch/fl_scope_r       1  top_i/market_data_top_0/U0/u_fullparser/u_itch/fl_scope_r
+  probe36  u_fullparser/u_itch/fl_lenok_r       1  top_i/market_data_top_0/U0/u_fullparser/u_itch/fl_lenok_r
+  probe37  u_fullparser/u_itch/t0_hit_r         1  top_i/market_data_top_0/U0/u_fullparser/u_itch/t0_hit_r
+  probe38  u_fullparser/u_itch/tb_scope[7:0]    8  top_i/market_data_top_0/U0/u_fullparser/u_itch/tb_scope[7:0]
+  probe39  u_fullparser/u_itch/tb_ist[7:0]      8  top_i/market_data_top_0/U0/u_fullparser/u_itch/tb_ist[7:0]
+  probe40  u_fullparser/u_itch/tb_lenok[7:0]    8  top_i/market_data_top_0/U0/u_fullparser/u_itch/tb_lenok[7:0]
+  probe41  u_fullparser/u_itch/tb_two[7:0]      8  top_i/market_data_top_0/U0/u_fullparser/u_itch/tb_two[7:0]
+
+== ITCH internal: retire decisions (combinational - see note on timing)
+  probe42  u_fullparser/u_itch/start_ok_c       1  top_i/market_data_top_0/U0/u_fullparser/u_itch/start_ok_c
+  probe43  u_fullparser/u_itch/end_ok_c         1  top_i/market_data_top_0/U0/u_fullparser/u_itch/end_ok_c
+  probe44  u_fullparser/u_itch/surv_ok_c        1  top_i/market_data_top_0/U0/u_fullparser/u_itch/surv_ok_c
+  probe45  u_fullparser/u_itch/first_ok_c       1  top_i/market_data_top_0/U0/u_fullparser/u_itch/first_ok_c
+  probe46  u_fullparser/u_itch/load_c           1  top_i/market_data_top_0/U0/u_fullparser/u_itch/load_c
+  probe47  u_fullparser/u_itch/ret_norm_c       1  top_i/market_data_top_0/U0/u_fullparser/u_itch/ret_norm_c
+  probe48  u_fullparser/u_itch/ret_tail_c       1  top_i/market_data_top_0/U0/u_fullparser/u_itch/ret_tail_c
+  probe49  u_fullparser/u_itch/retire_c         1  top_i/market_data_top_0/U0/u_fullparser/u_itch/retire_c
+
+== ITCH master: message bus (the itch parser has no AXI master)
+  probe50  u_fullparser/u_itch/msg_type[7:0]    8  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_type[7:0]
+  probe51  msg_fields.ts_ns                    32  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_[31:0]
+  probe52  msg_fields.order_id                 64  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields[63:0]
+  probe53  msg_fields.book_id                  32  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields[31:0]
+  probe54  msg_fields.side                      8  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields[7:0]
+  probe55  msg_fields.position                 32  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_[31:0]
+  probe56  msg_fields.qty                      64  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields[63:0]
+  probe57  msg_fields.price                    32  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields[31:0]
+  probe58  msg_fields.extype                   16  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_[15:0]
+  probe59  msg_fields.lot                       8  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_[7:0]
+  probe60  u_fullparser/u_itch/msg_index[15:0]  16  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_index_r_reg_n_0_[15:0]
+  probe61  u_fullparser/u_itch/msg_seqnum[63:0]  64  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_seq_r[63:0]
+  probe62  u_fullparser/u_itch/msg_length[15:0]  16  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_len_r[15:0]
+  probe63  u_fullparser/u_itch/msg_status[5:0]   6  top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_stat_r[5:0]
+  probe64  u_fullparser/u_itch/exchange_seconds[31:0]  32  top_i/market_data_top_0/U0/u_fullparser/u_itch/seconds_r[31:0]
+  probe65  u_fullparser/u_itch/pkt_done         1  top_i/market_data_top_0/U0/u_fullparser/u_itch/pkt_done_r
+  probe66  u_fullparser/u_itch/pkt_msg_count[15:0]  16  top_i/market_data_top_0/U0/u_fullparser/u_itch/pkt_count_r[15:0]
+
+== Engine
+  probe67  u_engine/in_tvalid                   1  top_i/market_data_top_0/U0/u_engine/in_tvalid
+  probe68  u_engine/in_px_valid                 1  top_i/market_data_top_0/U0/u_engine/in_px_valid
+  probe69  u_engine/u_book_input_stage/r_tvalid   1  top_i/market_data_top_0/U0/u_engine/u_book_input_stage/r_tvalid
+  probe70  u_engine/cmd_tvalid                  1  top_i/market_data_top_0/U0/u_engine/cmd_tvalid
+  probe71  u_engine/cmd_px_valid                1  top_i/market_data_top_0/U0/u_engine/cmd_px_valid
+  probe72  u_engine/mut_tvalid                  1  top_i/market_data_top_0/U0/u_engine/mut_tvalid
+  probe73  u_engine/price_ev_valid              1  top_i/market_data_top_0/U0/u_engine/price_ev_valid
+  probe74  u_engine/order_ev_valid              1  top_i/market_data_top_0/U0/u_engine/ob_ts_en
+  probe75  u_engine/fifo_ev_valid               1  top_i/market_data_top_0/U0/u_engine/fifo_ts_en
+  probe76  u_engine/u_time_event_fifo/any_v     1  top_i/market_data_top_0/U0/u_engine/u_time_event_fifo/any_v
+  probe77  u_engine/u_time_event_fifo/out_v     1  top_i/market_data_top_0/U0/u_engine/u_time_event_fifo/out_v
+  probe78  m_tvalid                             1  top_i/market_data_top_0/U0/u_engine/m_tvalid
+  probe79  m_valid[1:0]                         2  top_i/market_data_top_0/U0/u_engine/m_valid[1:0]
+  probe80  ev_valid_i                           1  top_i/market_data_top_0/U0/ev_valid_i
+  probe81  ev_ready_i                           1  top_i/market_data_top_0/U0/ev_ready_i
+
+== Same wire as a probe above (not added twice)
+  u_fullparser/u_itch/s_axis_tvalid = u_fullparser/d_tvalid
+  u_fullparser/u_itch/msg_valid = eng_valid

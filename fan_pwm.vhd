@@ -31,7 +31,7 @@ entity fan_pwm is
   generic (
     G_CLK_HZ       : positive               := 25_000_000;
     G_PWM_HZ       : positive               := 25_000;
-    G_DUTY_PCT     : natural range 0 to 100 := 100;  -- always on for now
+    G_DUTY_PCT     : natural range 0 to 100 := 0;  -- always on for now
     G_MIN_DUTY_PCT : natural range 0 to 100 := 30;
     G_ACTIVE_HIGH  : boolean                := true   -- false if the board inverts
   );

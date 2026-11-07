@@ -1,38 +1,75 @@
 {
    "ActiveEmotionalView":"Default View",
-   "Default View_ScaleFactor":"0.888288",
-   "Default View_TopLeft":"-205,285",
+   "Default View_ScaleFactor":"2.38929",
+   "Default View_TopLeft":"801,-217",
    "ExpandedHierarchyInLayout":"",
    "guistr":"# # String gsaved with Nlview 7.8.0 2024-04-26 e1825d835c VDI=44 GEI=38 GUI=JA:24.0
 #  -string -flagsOSRD
 preplace port gt_refclk -pg 1 -lvl 0 -x -280 -y 350 -defaultsOSRD
 preplace port port-id_sfp_rxp -pg 1 -lvl 0 -x -280 -y 420 -defaultsOSRD
 preplace port port-id_sfp_rxn -pg 1 -lvl 0 -x -280 -y 450 -defaultsOSRD
-preplace port port-id_sfp_txp -pg 1 -lvl 4 -x 800 -y 560 -defaultsOSRD
-preplace port port-id_sfp_txn -pg 1 -lvl 4 -x 800 -y 590 -defaultsOSRD
+preplace port port-id_sfp_txp -pg 1 -lvl 5 -x 1770 -y 560 -defaultsOSRD
+preplace port port-id_sfp_txn -pg 1 -lvl 5 -x 1770 -y 590 -defaultsOSRD
 preplace port port-id_clk25in -pg 1 -lvl 0 -x -280 -y -160 -defaultsOSRD
-preplace port port-id_fan -pg 1 -lvl 4 -x 800 -y -160 -defaultsOSRD
-preplace inst market_data_top_0 -pg 1 -lvl 3 -x 570 -y 300 -defaultsOSRD
-preplace inst ten_gig_eth_pcs_pma_0 -pg 1 -lvl 1 -x -20 -y 400 -defaultsOSRD
-preplace inst const_one -pg 1 -lvl 1 -x -20 -y 70 -defaultsOSRD
-preplace inst fan_pwm_0 -pg 1 -lvl 2 -x 280 -y -160 -defaultsOSRD
-preplace netloc const_one_dout 1 1 2 NJ 70 380
-preplace netloc market_data_top_0_xgmii_txc 1 0 4 -260 -10 NJ -10 N -10 760
-preplace netloc market_data_top_0_xgmii_txd 1 0 4 -250 0 NJ 0 N 0 750
-preplace netloc sfp_rxn_1 1 0 1 NJ 450
-preplace netloc sfp_rxp_1 1 0 1 -210J 420n
-preplace netloc ten_gig_eth_pcs_pma_0_coreclk_out 1 0 3 -220 150 180 250 N
-preplace netloc ten_gig_eth_pcs_pma_0_drp_req 1 0 2 -210 640 170
-preplace netloc ten_gig_eth_pcs_pma_0_txn 1 1 3 190J 10 N 10 780J
-preplace netloc ten_gig_eth_pcs_pma_0_txp 1 1 3 200J 20 N 20 770J
-preplace netloc ten_gig_eth_pcs_pma_0_xgmii_rxc 1 0 3 -230 140 N 140 360
-preplace netloc ten_gig_eth_pcs_pma_0_xgmii_rxd 1 0 3 -240 130 N 130 370
-preplace netloc clk25in_1 1 0 2 NJ -160 NJ
-preplace netloc fan_pwm_0_fan 1 2 2 NJ -160 NJ
-preplace netloc gt_refclk_1 1 0 1 NJ 350
-preplace netloc ten_gig_eth_pcs_pma_0_core_gt_drp_interface 1 0 2 -210 160 170
-levelinfo -pg 1 -280 -20 280 570 800
-pagesize -pg 1 -db -bbox -sgen -390 -220 950 1140
+preplace port port-id_fan -pg 1 -lvl 5 -x 1770 -y -160 -defaultsOSRD
+preplace port port-id_sfp1_txp -pg 1 -lvl 5 -x 1770 -y 1650 -defaultsOSRD
+preplace port port-id_sfp1_txn -pg 1 -lvl 5 -x 1770 -y 1680 -defaultsOSRD
+preplace port port-id_sfp1_rxp -pg 1 -lvl 0 -x -280 -y 1820 -defaultsOSRD
+preplace port port-id_sfp1_rxn -pg 1 -lvl 0 -x -280 -y 1850 -defaultsOSRD
+preplace portBus QSFP_RESET -pg 1 -lvl 5 -x 1770 -y 0 -defaultsOSRD
+preplace portBus SFP_OR_OPT -pg 1 -lvl 5 -x 1770 -y 890 -defaultsOSRD
+preplace inst market_data_top_0 -pg 1 -lvl 4 -x 1540 -y 300 -defaultsOSRD
+preplace inst ten_gig_eth_pcs_pma_0 -pg 1 -lvl 2 -x 690 -y 620 -defaultsOSRD
+preplace inst const_one -pg 1 -lvl 2 -x 690 -y 70 -defaultsOSRD
+preplace inst fan_pwm_0 -pg 1 -lvl 3 -x 1170 -y -160 -defaultsOSRD
+preplace inst xlconstant_0 -pg 1 -lvl 1 -x 220 -y 540 -defaultsOSRD
+preplace inst xlconstant_1 -pg 1 -lvl 1 -x 220 -y 640 -defaultsOSRD
+preplace inst ten_gig_eth_pcs_pma_1 -pg 1 -lvl 2 -x 690 -y 1690 -defaultsOSRD
+preplace inst vio_link -pg 1 -lvl 3 -x 1170 -y 630 -defaultsOSRD
+preplace inst por_0 -pg 1 -lvl 4 -x 1540 -y 660 -defaultsOSRD
+preplace netloc clk25in_1 1 0 4 NJ -160 N -160 990J -100 1350
+preplace netloc const_one_dout 1 2 2 NJ 70 1360
+preplace netloc fan_pwm_0_fan 1 3 2 NJ -160 NJ
+preplace netloc market_data_top_0_xgmii_txc 1 1 4 360 -20 NJ -20 N -20 1730
+preplace netloc market_data_top_0_xgmii_txd 1 1 4 430 10 NJ 10 N 10 1720
+preplace netloc sfp_rxn_1 1 0 2 NJ 450 330
+preplace netloc sfp_rxp_1 1 0 2 NJ 420 340
+preplace netloc ten_gig_eth_pcs_pma_0_coreclk_out 1 1 3 460 370 1020 250 N
+preplace netloc ten_gig_eth_pcs_pma_0_drp_req 1 1 2 480 870 880
+preplace netloc ten_gig_eth_pcs_pma_0_txn 1 2 3 980J 520 1330 590 NJ
+preplace netloc ten_gig_eth_pcs_pma_0_txp 1 2 3 970J 510 1340 580 1750J
+preplace netloc xlconstant_0_dout 1 1 4 320 0 N 0 N 0 N
+preplace netloc xlconstant_1_dout 1 1 4 350 890 N 890 N 890 N
+preplace netloc ten_gig_eth_pcs_pma_0_txusrclk_out 1 1 2 450 970 980
+preplace netloc ten_gig_eth_pcs_pma_0_txusrclk2_out 1 1 2 480 980 970
+preplace netloc ten_gig_eth_pcs_pma_0_areset_datapathclk_out 1 1 2 410 920 930
+preplace netloc ten_gig_eth_pcs_pma_0_gttxreset_out 1 1 2 330 880 900
+preplace netloc ten_gig_eth_pcs_pma_0_gtrxreset_out 1 1 2 340 900 890
+preplace netloc ten_gig_eth_pcs_pma_0_txuserrdy_out 1 1 2 430 960 960
+preplace netloc ten_gig_eth_pcs_pma_0_reset_counter_done_out 1 1 2 400 950 950
+preplace netloc ten_gig_eth_pcs_pma_0_qplllock_out 1 1 2 380 910 1010
+preplace netloc ten_gig_eth_pcs_pma_0_qplloutclk_out 1 1 2 360 930 940
+preplace netloc ten_gig_eth_pcs_pma_0_qplloutrefclk_out 1 1 2 370 940 920
+preplace netloc ten_gig_eth_pcs_pma_1_drp_req 1 1 2 500 2040 910
+preplace netloc ten_gig_eth_pcs_pma_1_xgmii_rxd 1 1 3 420 290 NJ 290 N
+preplace netloc ten_gig_eth_pcs_pma_1_xgmii_rxc 1 1 3 440 310 NJ 310 N
+preplace netloc ten_gig_eth_pcs_pma_1_txp 1 2 3 1030J 1650 NJ 1650 NJ
+preplace netloc ten_gig_eth_pcs_pma_1_txn 1 2 3 NJ 1680 NJ 1680 NJ
+preplace netloc sfp1_rxp_1 1 0 2 NJ 1820 320J
+preplace netloc sfp1_rxn_1 1 0 2 NJ 1850 490J
+preplace netloc ten_gig_eth_pcs_pma_0_core_status 1 2 1 1000 600n
+preplace netloc ten_gig_eth_pcs_pma_1_core_status 1 2 1 1020 620n
+preplace netloc ten_gig_eth_pcs_pma_0_resetdone_out 1 2 1 990 460n
+preplace netloc ten_gig_eth_pcs_pma_1_gt0_rxresetdone 1 1 2 490 990 1030
+preplace netloc vio_link_probe_out0 1 1 3 450 360 NJ 360 1320
+preplace netloc vio_link_probe_out1 1 1 3 470 380 NJ 380 1310
+preplace netloc vio_link_probe_out2 1 3 1 1320 650n
+preplace netloc por_0_rst_out 1 1 4 390 -10 NJ -10 NJ -10 1740
+preplace netloc gt_refclk_1 1 0 2 NJ 350 370
+preplace netloc ten_gig_eth_pcs_pma_0_core_gt_drp_interface 1 1 2 490 860 910
+preplace netloc ten_gig_eth_pcs_pma_1_core_gt_drp_interface 1 1 2 500 1340 910
+levelinfo -pg 1 -280 220 690 1170 1540 1770
+pagesize -pg 1 -db -bbox -sgen -400 -220 1940 2210
 "
 }
 0

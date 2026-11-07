@@ -82,6 +82,28 @@ entity top_ten_gig_eth_pcs_pma_0_0 is
       txuserrdy_out      : out std_logic;
       reset_counter_done_out : out std_logic;
       reset              : in  std_logic;
+      gt0_eyescanreset     : in  std_logic;
+      gt0_eyescantrigger   : in  std_logic;
+      gt0_rxcdrhold        : in  std_logic;
+      gt0_txprbsforceerr   : in  std_logic;
+      gt0_txpolarity       : in  std_logic;
+      gt0_rxpolarity       : in  std_logic;
+      gt0_rxrate           : in  std_logic_vector(2 downto 0);
+      gt0_txpmareset       : in  std_logic;
+      gt0_rxpmareset       : in  std_logic;
+      gt0_rxdfelpmreset    : in  std_logic;
+      gt0_txprecursor      : in  std_logic_vector(4 downto 0);
+      gt0_txpostcursor     : in  std_logic_vector(4 downto 0);
+      gt0_txdiffctrl       : in  std_logic_vector(3 downto 0);
+      gt0_rxlpmen          : in  std_logic;
+      gt0_eyescandataerror : out std_logic;
+      gt0_txbufstatus      : out std_logic_vector(1 downto 0);
+      gt0_txresetdone      : out std_logic;
+      gt0_rxpmaresetdone   : out std_logic;
+      gt0_rxresetdone      : out std_logic;
+      gt0_rxbufstatus      : out std_logic_vector(2 downto 0);
+      gt0_rxprbserr        : out std_logic;
+      gt0_dmonitorout      : out std_logic_vector(14 downto 0);
       xgmii_txd        : in  std_logic_vector(63 downto 0);
       xgmii_txc        : in  std_logic_vector(7 downto 0);
       xgmii_rxd        : out std_logic_vector(63 downto 0);
@@ -168,6 +190,28 @@ architecture wrapper of top_ten_gig_eth_pcs_pma_0_0 is
       drp_di_i             : in  std_logic_vector(15 downto 0);
       drp_drdy_o           : out std_logic;
       drp_drpdo_o          : out std_logic_vector(15 downto 0);
+      gt0_eyescanreset     : in  std_logic;
+      gt0_eyescantrigger   : in  std_logic;
+      gt0_rxcdrhold        : in  std_logic;
+      gt0_txprbsforceerr   : in  std_logic;
+      gt0_txpolarity       : in  std_logic;
+      gt0_rxpolarity       : in  std_logic;
+      gt0_rxrate           : in  std_logic_vector(2 downto 0);
+      gt0_txpmareset       : in  std_logic;
+      gt0_rxpmareset       : in  std_logic;
+      gt0_rxdfelpmreset    : in  std_logic;
+      gt0_txprecursor      : in  std_logic_vector(4 downto 0);
+      gt0_txpostcursor     : in  std_logic_vector(4 downto 0);
+      gt0_txdiffctrl       : in  std_logic_vector(3 downto 0);
+      gt0_rxlpmen          : in  std_logic;
+      gt0_eyescandataerror : out std_logic;
+      gt0_txbufstatus      : out std_logic_vector(1 downto 0);
+      gt0_txresetdone      : out std_logic;
+      gt0_rxpmaresetdone   : out std_logic;
+      gt0_rxresetdone      : out std_logic;
+      gt0_rxbufstatus      : out std_logic_vector(2 downto 0);
+      gt0_rxprbserr        : out std_logic;
+      gt0_dmonitorout      : out std_logic_vector(14 downto 0);
       tx_disable           : out std_logic;
       mdc                  : in  std_logic;
       mdio_in              : in  std_logic;
@@ -179,7 +223,7 @@ architecture wrapper of top_ten_gig_eth_pcs_pma_0_0 is
   end component;
 
   ATTRIBUTE CORE_GENERATION_INFO : STRING;
-  ATTRIBUTE CORE_GENERATION_INFO OF wrapper : ARCHITECTURE IS "top_ten_gig_eth_pcs_pma_0_0,ten_gig_eth_pcs_pma_v6_0_33,{x_ipProduct=Vivado 2026.1,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=ten_gig_eth_pcs_pma,x_ipVersion=6.0,x_ipCoreRevision=33,x_ipLanguage=VHDL,x_ipSimLanguage=VHDL,c_family=virtex7,c_component_name=top_ten_gig_eth_pcs_pma_0_0,c_has_mdio=true,c_has_fec=false,c_has_an=false,c_is_kr=false,c_is_32bit=false,c_no_ebuff=false,c_gttype=1,c_1588=0,c_gtif_width=32,c_speed10_25=10,c_sub_core_name=top_ten_gig_eth_pcs_pma_0_0_gt,c_gt_loc=X0Y0,c_refclk=clk0,c_refclkrate=156,c_dclkrate=100.00,x_ipLicense=ten_gig_eth_pcs_pma_basekr@2015.04(design_linking)}";
+  ATTRIBUTE CORE_GENERATION_INFO OF wrapper : ARCHITECTURE IS "top_ten_gig_eth_pcs_pma_0_0,ten_gig_eth_pcs_pma_v6_0_33,{x_ipProduct=Vivado 2026.1,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=ten_gig_eth_pcs_pma,x_ipVersion=6.0,x_ipCoreRevision=33,x_ipLanguage=VHDL,x_ipSimLanguage=VHDL,c_family=virtex7,c_component_name=top_ten_gig_eth_pcs_pma_0_0,c_has_mdio=true,c_has_fec=false,c_has_an=false,c_is_kr=false,c_is_32bit=false,c_no_ebuff=false,c_gttype=1,c_1588=0,c_gtif_width=32,c_speed10_25=10,c_sub_core_name=top_ten_gig_eth_pcs_pma_0_0_gt,c_gt_loc=X0Y0,c_refclk=clk1,c_refclkrate=156,c_dclkrate=100.00,x_ipLicense=ten_gig_eth_pcs_pma_basekr@2015.04(hardware_evaluation)}";
   ATTRIBUTE X_CORE_INFO : STRING;
   ATTRIBUTE X_CORE_INFO OF wrapper: ARCHITECTURE IS "ten_gig_eth_pcs_pma_v6_0_33,Vivado 2026.1";
 begin
@@ -230,6 +274,28 @@ begin
       drp_di_i            => drp_di_i,
       drp_drdy_i          => drp_drdy_i,
       drp_drpdo_i         => drp_drpdo_i,
+     gt0_eyescanreset    => gt0_eyescanreset,
+     gt0_eyescantrigger  => gt0_eyescantrigger,
+     gt0_rxcdrhold       => gt0_rxcdrhold,
+     gt0_txprbsforceerr  => gt0_txprbsforceerr,
+     gt0_txpolarity      => gt0_txpolarity,
+     gt0_rxpolarity      => gt0_rxpolarity,
+     gt0_rxrate          => gt0_rxrate,
+     gt0_txpmareset      => gt0_txpmareset,
+     gt0_rxpmareset      => gt0_rxpmareset,
+     gt0_rxdfelpmreset   => gt0_rxdfelpmreset,
+     gt0_rxpmaresetdone  => gt0_rxpmaresetdone,
+     gt0_txresetdone     => gt0_txresetdone,
+     gt0_rxresetdone     => gt0_rxresetdone,
+     gt0_txprecursor     => gt0_txprecursor,
+     gt0_txpostcursor    => gt0_txpostcursor,
+     gt0_txdiffctrl      => gt0_txdiffctrl,
+     gt0_rxlpmen         => gt0_rxlpmen,
+     gt0_eyescandataerror=> gt0_eyescandataerror,
+     gt0_txbufstatus     => gt0_txbufstatus,
+     gt0_rxbufstatus     => gt0_rxbufstatus,
+     gt0_rxprbserr       => gt0_rxprbserr,
+     gt0_dmonitorout     => gt0_dmonitorout,
       tx_disable          => tx_disable,
       mdc                 => mdc,
       mdio_in             => mdio_in,

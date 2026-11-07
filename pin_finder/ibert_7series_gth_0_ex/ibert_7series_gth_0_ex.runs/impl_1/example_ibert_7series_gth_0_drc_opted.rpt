@@ -1,0 +1,41 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
+| Date         : Fri Nov  6 21:50:14 2026
+| Host         : DESKTOP-MB4FOM3 running 64-bit major release  (build 9200)
+| Command      : report_drc -file example_ibert_7series_gth_0_drc_opted.rpt -pb example_ibert_7series_gth_0_drc_opted.pb -rpx example_ibert_7series_gth_0_drc_opted.rpx
+| Design       : example_ibert_7series_gth_0
+| Device       : xc7vx690tffg1157-2
+| Speed File   : -2
+| Design State : Synthesized
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Report DRC
+
+Table of Contents
+-----------------
+1. REPORT SUMMARY
+2. REPORT DETAILS
+
+1. REPORT SUMMARY
+-----------------
+            Netlist: netlist
+          Floorplan: design_1
+      Design limits: <entire design considered>
+           Ruledeck: default
+             Max checks: <unlimited>
+             Checks found: 1
++-----------+----------+------------------------------+--------+
+| Rule      | Severity | Description                  | Checks |
++-----------+----------+------------------------------+--------+
+| PDCN-2721 | Warning  | IBUFDS_GT_loads_clock_region | 1      |
++-----------+----------+------------------------------+--------+
+
+2. REPORT DETAILS
+-----------------
+PDCN-2721#1 Warning
+IBUFDS_GT_loads_clock_region  
+IBUFDS_GTE2 u_buf_q18_clk1 drives MMCME2_ADV u_ibert_core/inst/SYSCLK_DIVIDER.U_GT_MMCM in a different clock region and must do so using local routing resources which may negatively affect clock performance. Use CLOCK_DEDICATED_ROUTE set to FALSE to indicate this is intended.
+Related violations: <none>
+
+

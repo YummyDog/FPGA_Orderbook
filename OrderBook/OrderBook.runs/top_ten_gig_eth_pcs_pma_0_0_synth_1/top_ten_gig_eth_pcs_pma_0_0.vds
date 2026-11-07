@@ -1,11 +1,11 @@
-INFO: [Common 17-3922] A valid Vivado Design Suite BASIC license has been detected. Your current license is active and will expire on 07-sep-2027.
+INFO: [Common 17-3922] A valid Vivado Design Suite ENTERPRISE license has been detected. Your current license is active and will expire on 03-jan-2027.
 #-----------------------------------------------------------
 # Vivado v2026.1 (64-bit)
 # SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
 # IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
 # SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
-# Start of session at: Wed Oct 14 23:06:14 2026
-# Process ID         : 21752
+# Start of session at: Fri Nov  6 22:35:01 2026
+# Process ID         : 14296
 # Current directory  : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/top_ten_gig_eth_pcs_pma_0_0_synth_1
 # Command line       : vivado.exe -log top_ten_gig_eth_pcs_pma_0_0.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source top_ten_gig_eth_pcs_pma_0_0.tcl
 # Log file           : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/top_ten_gig_eth_pcs_pma_0_0_synth_1/top_ten_gig_eth_pcs_pma_0_0.vds
@@ -18,29 +18,30 @@ INFO: [Common 17-3922] A valid Vivado Design Suite BASIC license has been detect
 # CPU Physical cores : 6
 # CPU Logical cores  : 6
 # Host memory        : 17119 MB
-# Swap memory        : 9656 MB
-# Total Virtual      : 26776 MB
-# Available Virtual  : 5322 MB
+# Swap memory        : 11945 MB
+# Total Virtual      : 29065 MB
+# Available Virtual  : 9319 MB
 #-----------------------------------------------------------
 source top_ten_gig_eth_pcs_pma_0_0.tcl -notrace
-create_project: Time (s): cpu = 00:00:11 ; elapsed = 00:00:09 . Memory (MB): peak = 584.559 ; gain = 270.312
+create_project: Time (s): cpu = 00:00:11 ; elapsed = 00:00:09 . Memory (MB): peak = 583.789 ; gain = 269.121
 Command: synth_design -top top_ten_gig_eth_pcs_pma_0_0 -part xc7vx690tffg1157-2 -incremental_mode off -mode out_of_context
 Starting synth_design
-Attempting to get a license for feature 'Vivado_Synthesis' and/or device 'xc7vx690t'
-INFO: [Common 17-349] Got license for feature 'Vivado_Synthesis' and/or device 'xc7vx690t'
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7vx690t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7vx690t'
+INFO: [Common 17-86] Your Synthesis license expires in 28 day(s)
 INFO: [Device 21-403] Loading part xc7vx690tffg1157-2
 INFO: [Designutils 20-5008] Incremental synthesis strategy off
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 7200
+INFO: [Synth 8-7075] Helper process launched with PID 1912
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 1713.270 ; gain = 577.895
+Starting RTL Elaboration : Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 1712.375 ; gain = 576.293
 ---------------------------------------------------------------------------------
-INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.vhd:120]
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_support' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_support.vhd:64' bound to instance 'U0' of component 'top_ten_gig_eth_pcs_pma_0_0_support' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.vhd:189]
-INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_support' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_support.vhd:118]
+INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.vhd:142]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_support' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_support.vhd:64' bound to instance 'U0' of component 'top_ten_gig_eth_pcs_pma_0_0_support' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.vhd:233]
+INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_support' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_support.vhd:140]
 	Parameter WRAPPER_SIM_GTRESET_SPEEDUP bound to: TRUE - type: string 
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_gt_common' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_gt_common.vhd:63' bound to instance 'ten_gig_eth_pcs_pma_gt_common_block' of component 'top_ten_gig_eth_pcs_pma_0_0_gt_common' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_support.vhd:256]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_gt_common' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_gt_common.vhd:63' bound to instance 'ten_gig_eth_pcs_pma_gt_common_block' of component 'top_ten_gig_eth_pcs_pma_0_0_gt_common' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_support.vhd:300]
 INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_gt_common' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_gt_common.vhd:78]
 	Parameter BIAS_CFG bound to: 64'b0000000000000000000001000000000000000000000000000001000001010000 
 	Parameter COMMON_CFG bound to: 32'b00000000000000000000000001011100 
@@ -68,7 +69,7 @@ INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_gt_common' 
 	Parameter SIM_VERSION bound to: 2.0 - type: string 
 INFO: [Synth 8-113] binding component instance 'gthe2_common_0_i' to cell 'GTHE2_COMMON' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_gt_common.vhd:161]
 INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_gt_common' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_gt_common.vhd:78]
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_shared_clock_and_reset' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_shared_clock_and_reset.vhd:63' bound to instance 'ten_gig_eth_pcs_pma_shared_clock_reset_block' of component 'top_ten_gig_eth_pcs_pma_0_0_shared_clock_and_reset' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_support.vhd:273]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_shared_clock_and_reset' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_shared_clock_and_reset.vhd:63' bound to instance 'ten_gig_eth_pcs_pma_shared_clock_reset_block' of component 'top_ten_gig_eth_pcs_pma_0_0_shared_clock_and_reset' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_support.vhd:317]
 INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_shared_clock_and_reset' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_shared_clock_and_reset.vhd:84]
 	Parameter IBUF_LOW_PWR bound to: 0 - type: bool 
 INFO: [Synth 8-113] binding component instance 'refclk_p_buf' to cell 'IBUF' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_shared_clock_and_reset.vhd:131]
@@ -91,9 +92,9 @@ INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_ff_syn
 	Parameter C_RVAL bound to: 1'b1 
 INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst.vhd:64' bound to instance 'gttxreset_txusrclk2_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_shared_clock_and_reset.vhd:210]
 INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_shared_clock_and_reset' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_shared_clock_and_reset.vhd:84]
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_block' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:67' bound to instance 'ten_gig_eth_pcs_pma_block_i' of component 'top_ten_gig_eth_pcs_pma_0_0_block' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_support.vhd:295]
-INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_block' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:129]
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_local_clock_and_reset' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_local_clock_and_reset.vhd:63' bound to instance 'top_ten_gig_eth_pcs_pma_0_0_local_clock_reset_block' of component 'top_ten_gig_eth_pcs_pma_0_0_local_clock_and_reset' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:570]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_block' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:67' bound to instance 'ten_gig_eth_pcs_pma_block_i' of component 'top_ten_gig_eth_pcs_pma_0_0_block' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_support.vhd:339]
+INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_block' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:151]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_local_clock_and_reset' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_local_clock_and_reset.vhd:63' bound to instance 'top_ten_gig_eth_pcs_pma_0_0_local_clock_reset_block' of component 'top_ten_gig_eth_pcs_pma_0_0_local_clock_and_reset' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:572]
 INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_local_clock_and_reset' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_local_clock_and_reset.vhd:94]
 	Parameter SYNTH_VALUE bound to: 24'b000100011010010010100110 
 	Parameter SIM_VALUE bound to: 24'b000000000000011000011011 
@@ -148,16 +149,16 @@ INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' de
 INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_local_clock_and_reset' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_local_clock_and_reset.vhd:94]
 	Parameter C_NUM_SYNC_REGS bound to: 5 - type: integer 
 	Parameter C_RVAL bound to: 1'b1 
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst.vhd:64' bound to instance 'gtrxreset_coreclk_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:602]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst.vhd:64' bound to instance 'gtrxreset_coreclk_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:606]
 	Parameter C_NUM_SYNC_REGS bound to: 5 - type: integer 
 	Parameter C_RVAL bound to: 1'b0 
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst.vhd:64' bound to instance 'qplllock_coreclk_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:614]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst.vhd:64' bound to instance 'qplllock_coreclk_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:618]
 	Parameter C_NUM_SYNC_REGS bound to: 5 - type: integer 
 	Parameter C_RVAL bound to: 1'b0 
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst.vhd:64' bound to instance 'qplllock_txusrclk2_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:626]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst.vhd:64' bound to instance 'qplllock_txusrclk2_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:630]
 	Parameter C_NUM_SYNC_REGS bound to: 5 - type: integer 
 	Parameter C_RVAL bound to: 1'b0 
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst.vhd:64' bound to instance 'qplllock_rxusrclk2_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:638]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst.vhd:64' bound to instance 'qplllock_rxusrclk2_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:642]
 	Parameter C_HAS_MDIO bound to: 1 - type: bool 
 	Parameter C_HAS_FEC bound to: 0 - type: bool 
 	Parameter C_HAS_AN bound to: 0 - type: bool 
@@ -170,16 +171,16 @@ INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' de
 	Parameter C_GTIF_WIDTH bound to: 32 - type: integer 
 	Parameter C_REFCLKRATE bound to: 156 - type: integer 
 	Parameter C_1588 bound to: 0 - type: integer 
-INFO: [Synth 8-3491] module 'ten_gig_eth_pcs_pma_v6_0_33' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ipshared/bd5b/hdl/ten_gig_eth_pcs_pma_v6_0_rfs.v:1268' bound to instance 'top_ten_gig_eth_pcs_pma_0_0_core' of component 'ten_gig_eth_pcs_pma_v6_0_33' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:668]
+INFO: [Synth 8-3491] module 'ten_gig_eth_pcs_pma_v6_0_33' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ipshared/702c/hdl/ten_gig_eth_pcs_pma_v6_0_rfs.v:1268' bound to instance 'top_ten_gig_eth_pcs_pma_0_0_core' of component 'ten_gig_eth_pcs_pma_v6_0_33' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:672]
 INFO: [Synth 8-6157] synthesizing module 'MUXCY_L' [D:/AMDDesignTools/2026.1/Vivado/scripts/rt/data/unisim_comp.v:104752]
 INFO: [Synth 8-6155] done synthesizing module 'MUXCY_L' (0#1) [D:/AMDDesignTools/2026.1/Vivado/scripts/rt/data/unisim_comp.v:104752]
 	Parameter C_NUM_SYNC_REGS bound to: 5 - type: integer 
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'gt0_txresetdone_i_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:765]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'gt0_txresetdone_i_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:769]
 	Parameter C_NUM_SYNC_REGS bound to: 5 - type: integer 
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'gt0_rxresetdone_i_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:774]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'gt0_rxresetdone_i_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:778]
 	Parameter C_NUM_SYNC_REGS bound to: 5 - type: integer 
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'gt0_rxresetdone_i_reg_rxusrclk2_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:867]
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_cable_pull_logic' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_cable_pull_logic.vhd:61' bound to instance 'cable_pull_logic_i' of component 'top_ten_gig_eth_pcs_pma_0_0_cable_pull_logic' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:879]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'gt0_rxresetdone_i_reg_rxusrclk2_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:872]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_cable_pull_logic' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_cable_pull_logic.vhd:61' bound to instance 'cable_pull_logic_i' of component 'top_ten_gig_eth_pcs_pma_0_0_cable_pull_logic' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:884]
 INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_cable_pull_logic' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_cable_pull_logic.vhd:81]
 	Parameter C_NUM_SYNC_REGS bound to: 5 - type: integer 
 INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'cable_pull_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_cable_pull_logic.vhd:209]
@@ -193,14 +194,14 @@ INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' de
 INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst.vhd:64' bound to instance 'cable_unpull_reset_rising_rxusrclk2_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer_rst' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_cable_pull_logic.vhd:307]
 INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_cable_pull_logic' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_cable_pull_logic.vhd:81]
 	Parameter C_NUM_SYNC_REGS bound to: 5 - type: integer 
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'signal_detect_rxusrclk2_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:895]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'signal_detect_rxusrclk2_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:900]
 	Parameter C_NUM_SYNC_REGS bound to: 5 - type: integer 
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'cable_pull_coreclk_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:927]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'cable_pull_coreclk_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:932]
 	Parameter C_NUM_SYNC_REGS bound to: 5 - type: integer 
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'signal_detect_coreclk_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:1004]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer.vhd:62' bound to instance 'signal_detect_coreclk_sync_i' of component 'top_ten_gig_eth_pcs_pma_0_0_ff_synchronizer' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:1009]
 	Parameter WRAPPER_SIM_GTRESET_SPEEDUP bound to: TRUE - type: string 
 	Parameter EXAMPLE_SIMULATION bound to: 0 - type: integer 
-INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_multi_GT' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_multi_gt.vhd:56' bound to instance 'gt0_gtwizard_10gbaser_multi_gt_i' of component 'top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_multi_GT' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:1076]
+INFO: [Synth 8-3491] module 'top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_multi_GT' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_multi_gt.vhd:56' bound to instance 'gt0_gtwizard_10gbaser_multi_gt_i' of component 'top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_multi_GT' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:1081]
 INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_multi_GT' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_multi_gt.vhd:180]
 	Parameter GT_SIM_GTRESET_SPEEDUP bound to: TRUE - type: string 
 	Parameter EXAMPLE_SIMULATION bound to: 0 - type: integer 
@@ -467,9 +468,9 @@ INFO: [Synth 8-638] synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_gtwizard_gt
 INFO: [Synth 8-113] binding component instance 'gthe2_i' to cell 'GTHE2_CHANNEL' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_gt.vhd:228]
 INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_GT' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_gt.vhd:176]
 INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_multi_GT' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_gtwizard_gth_10gbaser_multi_gt.vhd:180]
-INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_block' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:129]
-INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_support' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_support.vhd:118]
-INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.vhd:120]
+INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_block' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_block.vhd:151]
+INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0_support' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_support.vhd:140]
+INFO: [Synth 8-256] done synthesizing module 'top_ten_gig_eth_pcs_pma_0_0' (0#1) [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.vhd:142]
 INFO: [Synth 8-7129] Port reset in module ten_gig_eth_pcs_pma_v6_0_33_drp_ipif is either unconnected or has no load
 INFO: [Synth 8-7129] Port re in module ten_gig_eth_pcs_pma_v6_0_33_g_register__parameterized10 is either unconnected or has no load
 INFO: [Synth 8-7129] Port we in module ten_gig_eth_pcs_pma_v6_0_33_g_register__parameterized10 is either unconnected or has no load
@@ -572,18 +573,18 @@ INFO: [Synth 8-7129] Port pcs_test_pattern_seedA_config[39] in module ten_gig_et
 INFO: [Synth 8-7129] Port pcs_test_pattern_seedA_config[38] in module ten_gig_eth_pcs_pma_v6_0_33_common_ieee_registers is either unconnected or has no load
 INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:13 ; elapsed = 00:00:15 . Memory (MB): peak = 1896.574 ; gain = 761.199
+Finished RTL Elaboration : Time (s): cpu = 00:00:12 ; elapsed = 00:00:14 . Memory (MB): peak = 1897.566 ; gain = 761.484
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:13 ; elapsed = 00:00:15 . Memory (MB): peak = 1896.574 ; gain = 761.199
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:12 ; elapsed = 00:00:14 . Memory (MB): peak = 1897.566 ; gain = 761.484
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:13 ; elapsed = 00:00:15 . Memory (MB): peak = 1896.574 ; gain = 761.199
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:12 ; elapsed = 00:00:14 . Memory (MB): peak = 1897.566 ; gain = 761.484
 ---------------------------------------------------------------------------------
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.078 . Memory (MB): peak = 1896.574 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.079 . Memory (MB): peak = 1897.566 ; gain = 0.000
 INFO: [Netlist 29-17] Analyzing 44 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
@@ -604,28 +605,28 @@ Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/
 Finished Parsing XDC File [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_clocks.xdc] for cell 'U0'
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.005 . Memory (MB): peak = 1983.766 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.006 . Memory (MB): peak = 1999.672 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
   A total of 44 instances were transformed.
   MUXCY_L => MUXCY: 44 instances
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.246 . Memory (MB): peak = 1984.879 ; gain = 0.000
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.201 . Memory (MB): peak = 1999.891 ; gain = 0.000
 INFO: [Designutils 20-5008] Incremental synthesis strategy off
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:37 ; elapsed = 00:00:40 . Memory (MB): peak = 1984.879 ; gain = 849.504
+Finished Constraint Validation : Time (s): cpu = 00:00:37 ; elapsed = 00:00:40 . Memory (MB): peak = 1999.891 ; gain = 863.809
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7vx690tffg1157-2
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:37 ; elapsed = 00:00:40 . Memory (MB): peak = 1984.879 ; gain = 849.504
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:37 ; elapsed = 00:00:40 . Memory (MB): peak = 1999.891 ; gain = 863.809
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:38 ; elapsed = 00:00:41 . Memory (MB): peak = 1984.879 ; gain = 849.504
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:38 ; elapsed = 00:00:41 . Memory (MB): peak = 1999.891 ; gain = 863.809
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-802] inferred FSM for state register 'mcp1_state_reg' in module 'ten_gig_eth_pcs_pma_v6_0_33_idle_delete'
 INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'ten_gig_eth_pcs_pma_v6_0_33_tx_pcs_fsm'
@@ -709,7 +710,7 @@ INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 
 ---------------------------------------------------------------------------------------------------
 INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'ten_gig_eth_pcs_pma_v6_0_33_drp_ipif'
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:41 ; elapsed = 00:00:45 . Memory (MB): peak = 1984.879 ; gain = 849.504
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:41 ; elapsed = 00:00:45 . Memory (MB): peak = 1999.891 ; gain = 863.809
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start RTL Component Statistics 
@@ -730,26 +731,26 @@ Finished Part Resource Summary
 Start Cross Boundary and Area Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:07 ; elapsed = 00:01:11 . Memory (MB): peak = 2044.375 ; gain = 909.000
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:07 ; elapsed = 00:01:12 . Memory (MB): peak = 2053.203 ; gain = 917.121
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying XDC Timing Constraints
 ---------------------------------------------------------------------------------
 WARNING: [Synth 8-3321] set_false_path : Empty from list for constraint at line 76 of c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.xdc. [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.xdc:76]
 ---------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): cpu = 00:01:18 ; elapsed = 00:01:23 . Memory (MB): peak = 2125.957 ; gain = 990.582
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:01:19 ; elapsed = 00:01:24 . Memory (MB): peak = 2135.867 ; gain = 999.785
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:01:20 ; elapsed = 00:01:24 . Memory (MB): peak = 2136.797 ; gain = 1001.422
+Finished Timing Optimization : Time (s): cpu = 00:01:20 ; elapsed = 00:01:25 . Memory (MB): peak = 2147.270 ; gain = 1011.188
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Technology Mapping
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:01:22 ; elapsed = 00:01:27 . Memory (MB): peak = 2192.984 ; gain = 1057.609
+Finished Technology Mapping : Time (s): cpu = 00:01:23 ; elapsed = 00:01:28 . Memory (MB): peak = 2203.531 ; gain = 1067.449
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start IO Insertion
@@ -767,37 +768,37 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:01:29 ; elapsed = 00:01:34 . Memory (MB): peak = 2411.254 ; gain = 1275.879
+Finished IO Insertion : Time (s): cpu = 00:01:29 ; elapsed = 00:01:35 . Memory (MB): peak = 2421.746 ; gain = 1285.664
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:01:29 ; elapsed = 00:01:34 . Memory (MB): peak = 2411.254 ; gain = 1275.879
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:29 ; elapsed = 00:01:35 . Memory (MB): peak = 2421.746 ; gain = 1285.664
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:30 ; elapsed = 00:01:35 . Memory (MB): peak = 2411.254 ; gain = 1275.879
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:30 ; elapsed = 00:01:36 . Memory (MB): peak = 2421.746 ; gain = 1285.664
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:01:30 ; elapsed = 00:01:35 . Memory (MB): peak = 2411.254 ; gain = 1275.879
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:30 ; elapsed = 00:01:36 . Memory (MB): peak = 2421.746 ; gain = 1285.664
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:01:30 ; elapsed = 00:01:35 . Memory (MB): peak = 2411.254 ; gain = 1275.879
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:31 ; elapsed = 00:01:36 . Memory (MB): peak = 2421.746 ; gain = 1285.664
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:01:30 ; elapsed = 00:01:35 . Memory (MB): peak = 2411.254 ; gain = 1275.879
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:31 ; elapsed = 00:01:36 . Memory (MB): peak = 2421.746 ; gain = 1285.664
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -836,34 +837,34 @@ Report Cell Usage:
 |21    |IBUF          |     2|
 +------+--------------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:01:30 ; elapsed = 00:01:35 . Memory (MB): peak = 2411.254 ; gain = 1275.879
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:31 ; elapsed = 00:01:36 . Memory (MB): peak = 2421.746 ; gain = 1285.664
 ---------------------------------------------------------------------------------
 Synthesis finished with 0 errors, 0 critical warnings and 1 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:01:02 ; elapsed = 00:01:19 . Memory (MB): peak = 2411.254 ; gain = 1187.574
-Synthesis Optimization Complete : Time (s): cpu = 00:01:31 ; elapsed = 00:01:36 . Memory (MB): peak = 2411.254 ; gain = 1275.879
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:02 ; elapsed = 00:01:18 . Memory (MB): peak = 2421.746 ; gain = 1183.340
+Synthesis Optimization Complete : Time (s): cpu = 00:01:31 ; elapsed = 00:01:36 . Memory (MB): peak = 2421.746 ; gain = 1285.664
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.077 . Memory (MB): peak = 2416.469 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.048 . Memory (MB): peak = 2426.914 ; gain = 0.000
 INFO: [Netlist 29-17] Analyzing 135 Unisim elements for replacement
-INFO: [Netlist 29-28] Unisim Transformation completed in 1 CPU seconds
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.006 . Memory (MB): peak = 2436.070 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 2446.539 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
   A total of 41 instances were transformed.
   (MUXCY,XORCY) => CARRY4: 16 instances
   RAM32M => RAM32M (RAMD32(x6), RAMS32(x2)): 23 instances
   RAM32X1D => RAM32X1D (RAMD32(x2)): 2 instances
 
-Synth Design complete | Checksum: a6803bab
-INFO: [Common 17-83] Releasing license: Vivado_Synthesis
-214 Infos, 3 Warnings, 0 Critical Warnings and 0 Errors encountered.
+Synth Design complete | Checksum: 20017939
+INFO: [Common 17-83] Releasing license: Synthesis
+215 Infos, 3 Warnings, 0 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:01:45 ; elapsed = 00:01:57 . Memory (MB): peak = 2436.070 ; gain = 1836.840
-Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.008 . Memory (MB): peak = 2436.070 ; gain = 0.000
+synth_design: Time (s): cpu = 00:01:46 ; elapsed = 00:01:52 . Memory (MB): peak = 2446.551 ; gain = 1848.871
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.008 . Memory (MB): peak = 2446.551 ; gain = 0.000
 INFO: [Common 17-1381] The checkpoint 'C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/top_ten_gig_eth_pcs_pma_0_0_synth_1/top_ten_gig_eth_pcs_pma_0_0.dcp' has been generated.
-INFO: [Ipptcl 7-1612] Added synthesis output to IP cache for IP top_ten_gig_eth_pcs_pma_0_0, cache-ID = 7e149d4012a903d9
+INFO: [Ipptcl 7-1612] Added synthesis output to IP cache for IP top_ten_gig_eth_pcs_pma_0_0, cache-ID = 1942f93cd5ca593c
 INFO: [Coretcl 2-1174] Renamed 121 cell refs.
-Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.008 . Memory (MB): peak = 2436.070 ; gain = 0.000
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.109 . Memory (MB): peak = 2446.551 ; gain = 0.000
 INFO: [Common 17-1381] The checkpoint 'C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/top_ten_gig_eth_pcs_pma_0_0_synth_1/top_ten_gig_eth_pcs_pma_0_0.dcp' has been generated.
 INFO: [Vivado 12-24828] Executing command : report_utilization -file top_ten_gig_eth_pcs_pma_0_0_utilization_synth.rpt -pb top_ten_gig_eth_pcs_pma_0_0_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Wed Oct 14 23:08:34 2026...
+INFO: [Common 17-206] Exiting Vivado at Fri Nov  6 22:37:13 2026...

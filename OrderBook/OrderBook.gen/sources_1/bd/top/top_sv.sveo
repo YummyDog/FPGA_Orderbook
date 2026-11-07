@@ -73,7 +73,13 @@ top_sv your_instance_name (
   .sfp_txp(sfp_txp), // output wire sfp_txp
   .sfp_txn(sfp_txn), // output wire sfp_txn
   .clk25in(clk25in), // input wire clk25in
-  .fan(fan) // output wire fan
+  .fan(fan), // output wire fan
+  .sfp1_txp(sfp1_txp), // output wire sfp1_txp
+  .sfp1_txn(sfp1_txn), // output wire sfp1_txn
+  .sfp1_rxp(sfp1_rxp), // input wire sfp1_rxp
+  .sfp1_rxn(sfp1_rxn), // input wire sfp1_rxn
+  .QSFP_RESET(QSFP_RESET), // output wire [0:0] QSFP_RESET
+  .SFP_OR_OPT(SFP_OR_OPT) // output wire [0:0] SFP_OR_OPT
 );
 // INST_TAG_END ------  End cut for WRAPPER INSTANTIATION Template  ------
 

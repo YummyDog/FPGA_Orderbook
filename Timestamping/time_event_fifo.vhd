@@ -131,7 +131,7 @@ begin
     report "time_event_fifo: DEPTH must be a power of two and >= 8"
     severity failure;
 
-  -- Index = priority (0 highest).
+  -- Index = priority (0 highest).ee
   in_v     <= fifo_valid & input_valid & order_valid & price_valid;
   in_pl(0) <= "00" & price_op & price_data & price_side & timestamp;
   in_pl(1) <= "01" & order_op & order_data & order_side & timestamp;

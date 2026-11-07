@@ -1,0 +1,3 @@
+xpm_memory.sv,systemverilog,xpm,D:/AMDDesignTools/2026.1/Vivado/data/ip/xpm/xpm_memory/hdl/xpm_memory.sv,incdir="D:/AMDDesignTools/2026.1/Vivado/data/rsb/busdef"incdir="../../../../ibert.gen/sources_1/ip/ibert_7series_gth_0/hdl"
+xpm_VCOMP.vhd,vhdl,xpm,D:/AMDDesignTools/2026.1/Vivado/data/ip/xpm/xpm_VCOMP.vhd,incdir="D:/AMDDesignTools/2026.1/Vivado/data/rsb/busdef"incdir="../../../../ibert.gen/sources_1/ip/ibert_7series_gth_0/hdl"
+glbl.v,Verilog,xil_defaultlib,glbl.v

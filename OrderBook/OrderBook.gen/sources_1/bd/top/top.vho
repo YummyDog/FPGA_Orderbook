@@ -60,7 +60,13 @@ COMPONENT top
     sfp_txp : OUT STD_LOGIC;
     sfp_txn : OUT STD_LOGIC;
     clk25in : IN STD_LOGIC;
-    fan : OUT STD_LOGIC
+    fan : OUT STD_LOGIC;
+    sfp1_txp : OUT STD_LOGIC;
+    sfp1_txn : OUT STD_LOGIC;
+    sfp1_rxp : IN STD_LOGIC;
+    sfp1_rxn : IN STD_LOGIC;
+    QSFP_RESET : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    SFP_OR_OPT : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
   );
 END COMPONENT;
 -- COMP_TAG_END ------  End cut for COMPONENT Declaration  ------
@@ -78,7 +84,13 @@ your_instance_name : top
     sfp_txp => sfp_txp,
     sfp_txn => sfp_txn,
     clk25in => clk25in,
-    fan => fan
+    fan => fan,
+    sfp1_txp => sfp1_txp,
+    sfp1_txn => sfp1_txn,
+    sfp1_rxp => sfp1_rxp,
+    sfp1_rxn => sfp1_rxn,
+    QSFP_RESET => QSFP_RESET,
+    SFP_OR_OPT => SFP_OR_OPT
   );
 -- INST_TAG_END ------  End cut for INSTANTIATION Template  ------
 

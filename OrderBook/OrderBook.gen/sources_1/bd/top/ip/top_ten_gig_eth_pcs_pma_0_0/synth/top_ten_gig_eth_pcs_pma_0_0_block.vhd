@@ -114,6 +114,28 @@ entity top_ten_gig_eth_pcs_pma_0_0_block is
       drp_di_i         : in  std_logic_vector(15 downto 0);
       drp_drdy_i       : in  std_logic;
       drp_drpdo_i      : in  std_logic_vector(15 downto 0);
+      gt0_eyescanreset     : in  std_logic;
+      gt0_eyescantrigger   : in  std_logic;
+      gt0_rxcdrhold        : in  std_logic;
+      gt0_txprbsforceerr   : in  std_logic;
+      gt0_txpolarity       : in  std_logic;
+      gt0_rxpolarity       : in  std_logic;
+      gt0_rxrate           : in  std_logic_vector(2 downto 0);
+      gt0_txpmareset       : in  std_logic;
+      gt0_rxpmareset       : in  std_logic;
+      gt0_rxdfelpmreset    : in  std_logic;
+      gt0_txprecursor      : in  std_logic_vector(4 downto 0);
+      gt0_txpostcursor     : in  std_logic_vector(4 downto 0);
+      gt0_txdiffctrl       : in  std_logic_vector(3 downto 0);
+      gt0_rxlpmen          : in  std_logic;
+      gt0_eyescandataerror : out std_logic;
+      gt0_txbufstatus      : out std_logic_vector(1 downto 0);
+      gt0_txresetdone      : out std_logic;
+      gt0_rxpmaresetdone   : out std_logic;
+      gt0_rxresetdone      : out std_logic;
+      gt0_rxbufstatus      : out std_logic_vector(2 downto 0);
+      gt0_rxprbserr        : out std_logic;
+      gt0_dmonitorout      : out std_logic_vector(14 downto 0);
       pma_pmd_type     : in  std_logic_vector(2 downto 0);
       tx_disable       : out std_logic);
 end top_ten_gig_eth_pcs_pma_0_0_block;
@@ -492,26 +514,6 @@ end component;
   signal cable_unpull_reset_rising_reg  : std_logic;
 
   signal gt_latclk           : std_logic := '0';
-  signal gt0_eyescanreset     : std_logic := '0';
-  signal gt0_eyescantrigger   : std_logic := '0';
-  signal gt0_rxcdrhold        : std_logic := '0';
-  signal gt0_txprbsforceerr   : std_logic := '0';
-  signal gt0_txpolarity       : std_logic := '0';
-  signal gt0_rxpolarity       : std_logic := '0';
-  signal gt0_rxrate           : std_logic_vector(2 downto 0) := "000";
-  signal gt0_txprecursor      : std_logic_vector(4 downto 0) := "00000";
-  signal gt0_txpostcursor     : std_logic_vector(4 downto 0) := "00000";
-  signal gt0_txdiffctrl       : std_logic_vector(3 downto 0) := "1110";
-  signal gt0_eyescandataerror : std_logic;
-  signal gt0_txbufstatus      : std_logic_vector(1 downto 0);
-  signal gt0_rxbufstatus      : std_logic_vector(2 downto 0);
-  signal gt0_txpmareset       : std_logic := '0';
-  signal gt0_rxpmareset       : std_logic := '0';
-  signal gt0_rxpmaresetdone   : std_logic;
-  signal gt0_rxdfelpmreset    : std_logic := '0';
-  signal gt0_rxlpmen          : std_logic := '0';
-  signal gt0_rxprbserr        : std_logic;
-  signal gt0_dmonitorout      : std_logic_vector(14 downto 0);
 
   signal gt_progdiv_reset          : std_logic;
 
@@ -596,6 +598,8 @@ begin
   rx_resetdone <= rx_resetdone_int;
   tx_resetdone <= tx_resetdone_int;
 
+  gt0_txresetdone <= gt0_txresetdone_i;
+  gt0_rxresetdone <= gt0_rxresetdone_i;
 
   gt_progdiv_reset <= '0';
 
@@ -784,6 +788,7 @@ begin
   tx_resetdone_int <= gt0_txresetdone_i_reg;
   rx_resetdone_int <= gt0_rxresetdone_i_reg;
 
+  gt0_rxbufstatus <= gt0_rxbufstatus_i;
 
   gt0_txdata_i(0 ) <= gt_txd(31);
   gt0_txdata_i(1 ) <= gt_txd(30);
@@ -1112,7 +1117,7 @@ begin
         gt0_rxoutclk_out                    =>      rxoutclk,
         gt0_rxpcsreset_in                   =>      gt0_rxpcsreset_i,
         gt0_rxpmareset_in                   =>      gt0_rxpmareset,
-        gt0_rxpmaresetdone_out              =>      open,
+        gt0_rxpmaresetdone_out              =>      gt0_rxpmaresetdone,
         gt0_rxusrclk_in                     =>      rxusrclk,
         gt0_rxusrclk2_in                    =>      rxusrclk2,
         ------- Receive Ports - RX Driver,OOB signalling,Coupling and Eq.,CDR ------

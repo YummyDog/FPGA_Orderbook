@@ -3,6 +3,10 @@
 
 # XDC: new/orderbook.xdc
 
+# XDC: new/debug_valids.xdc
+
+# XDC: new/debug_ila.xdc
+
 # Block Designs: bd/top/top.bd
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top || ORIG_REF_NAME==top} -quiet] -quiet
 
@@ -17,5 +21,39 @@ set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_const_o
 
 # IP: bd/top/ip/top_fan_pwm_0_0/top_fan_pwm_0_0.xci
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_fan_pwm_0_0 || ORIG_REF_NAME==top_fan_pwm_0_0} -quiet] -quiet
+
+# IP: bd/top/ip/top_xlconstant_0_0/top_xlconstant_0_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_xlconstant_0_0 || ORIG_REF_NAME==top_xlconstant_0_0} -quiet] -quiet
+
+# IP: bd/top/ip/top_xlconstant_1_0/top_xlconstant_1_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_xlconstant_1_0 || ORIG_REF_NAME==top_xlconstant_1_0} -quiet] -quiet
+
+# IP: bd/top/ip/top_ten_gig_eth_pcs_pma_1_0/top_ten_gig_eth_pcs_pma_1_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_ten_gig_eth_pcs_pma_1_0 || ORIG_REF_NAME==top_ten_gig_eth_pcs_pma_1_0} -quiet] -quiet
+
+# IP: bd/top/ip/top_vio_link_0/top_vio_link_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_vio_link_0 || ORIG_REF_NAME==top_vio_link_0} -quiet] -quiet
+
+# IP: bd/top/ip/top_por_0_0/top_por_0_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_por_0_0 || ORIG_REF_NAME==top_por_0_0} -quiet] -quiet
+
+# XDC: c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_clocks.xdc
+set_property KEEP_HIERARCHY SOFT [get_cells [split [join [get_cells -hier -filter {REF_NAME==top_ten_gig_eth_pcs_pma_0_0 || ORIG_REF_NAME==top_ten_gig_eth_pcs_pma_0_0} -quiet] {/U0 } ]/U0 ] -quiet] -quiet
+
+# XDC: c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ooc.xdc
+
+# XDC: c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.xdc
+#dup# set_property KEEP_HIERARCHY SOFT [get_cells [split [join [get_cells -hier -filter {REF_NAME==top_ten_gig_eth_pcs_pma_0_0 || ORIG_REF_NAME==top_ten_gig_eth_pcs_pma_0_0} -quiet] {/U0 } ]/U0 ] -quiet] -quiet
+
+# XDC: c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_1_0/synth/top_ten_gig_eth_pcs_pma_1_0_clocks.xdc
+set_property KEEP_HIERARCHY SOFT [get_cells [split [join [get_cells -hier -filter {REF_NAME==top_ten_gig_eth_pcs_pma_1_0 || ORIG_REF_NAME==top_ten_gig_eth_pcs_pma_1_0} -quiet] {/U0 } ]/U0 ] -quiet] -quiet
+
+# XDC: c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_1_0/synth/top_ten_gig_eth_pcs_pma_1_0_ooc.xdc
+
+# XDC: c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_1_0/synth/top_ten_gig_eth_pcs_pma_1_0.xdc
+#dup# set_property KEEP_HIERARCHY SOFT [get_cells [split [join [get_cells -hier -filter {REF_NAME==top_ten_gig_eth_pcs_pma_1_0 || ORIG_REF_NAME==top_ten_gig_eth_pcs_pma_1_0} -quiet] {/U0 } ]/U0 ] -quiet] -quiet
+
+# XDC: c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_vio_link_0/top_vio_link_0.xdc
+#dup# set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_vio_link_0 || ORIG_REF_NAME==top_vio_link_0} -quiet] -quiet
 
 # XDC: c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/top_ooc.xdc

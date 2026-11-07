@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.hw/hw_1/wave/hw_ila_data_1/hw_ila_data_1.wdb" id="1">
+         <top_modules>
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0"></ZoomStartTime>
+      <ZoomEndTime time="4,097"></ZoomEndTime>
+      <Cursor1Time time="0"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="331"></NameColumnWidth>
+      <ValueColumnWidth column_width="61"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="60" />
+   <wave_markers>
+   </wave_markers>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_engine/fifo_ts_en" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_engine/fifo_ts_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_ts_en</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_engine/m_tvalid" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_engine/m_tvalid</obj_property>
+      <obj_property name="ObjectShortName">m_tvalid</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_engine/m_valid" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_engine/m_valid[1:0]</obj_property>
+      <obj_property name="ObjectShortName">m_valid[1:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_engine/ob_ts_en" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_engine/ob_ts_en</obj_property>
+      <obj_property name="ObjectShortName">ob_ts_en</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/s_axis_tvalid" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/s_axis_tvalid</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tvalid</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_eth/fields_valid_r" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_eth/fields_valid_r</obj_property>
+      <obj_property name="ObjectShortName">fields_valid_r</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_ipv4/fields_valid_r" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_ipv4/fields_valid_r</obj_property>
+      <obj_property name="ObjectShortName">fields_valid_r</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/active_r" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/active_r</obj_property>
+      <obj_property name="ObjectShortName">active_r</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/adv_c" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/adv_c</obj_property>
+      <obj_property name="ObjectShortName">adv_c</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/armed_r" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/armed_r</obj_property>
+      <obj_property name="ObjectShortName">armed_r</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/end_ok_c" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/end_ok_c</obj_property>
+      <obj_property name="ObjectShortName">end_ok_c</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/first_ok_c" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/first_ok_c</obj_property>
+      <obj_property name="ObjectShortName">first_ok_c</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/fl_lenok_r" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/fl_lenok_r</obj_property>
+      <obj_property name="ObjectShortName">fl_lenok_r</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/fl_scope_r" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/fl_scope_r</obj_property>
+      <obj_property name="ObjectShortName">fl_scope_r</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/fl_typ_r" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/fl_typ_r[0:0]</obj_property>
+      <obj_property name="ObjectShortName">fl_typ_r[0:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/fl_typ_r_reg_n_0_" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/fl_typ_r_reg_n_0_[7:1]</obj_property>
+      <obj_property name="ObjectShortName">fl_typ_r_reg_n_0_[7:1]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/flush_r" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/flush_r</obj_property>
+      <obj_property name="ObjectShortName">flush_r</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/fv_keep_reg_n_0_" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/fv_keep_reg_n_0_[6:0]</obj_property>
+      <obj_property name="ObjectShortName">fv_keep_reg_n_0_[6:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/fv_last" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/fv_last</obj_property>
+      <obj_property name="ObjectShortName">fv_last</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/k1_last" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/k1_last</obj_property>
+      <obj_property name="ObjectShortName">k1_last</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/lane_r" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/lane_r[2:0]</obj_property>
+      <obj_property name="ObjectShortName">lane_r[2:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/load_c" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/load_c</obj_property>
+      <obj_property name="ObjectShortName">load_c</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields[277:277]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields[277:277]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_1" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_1[95:32]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields_1[95:32]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_2" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_2[127:96]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields_2[127:96]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_3" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_3[135:128]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields_3[135:128]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_4" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_4[231:168]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields_4[231:168]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_5" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_5[263:232]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields_5[263:232]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_6" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_6[269:269]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields_6[269:269]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_[31:0]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields_r_reg_n_0_[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_[31:0]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields_r_reg_n_0_[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_[31:0]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields_r_reg_n_0_[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_[31:0]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields_r_reg_n_0_[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_[31:0]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields_r_reg_n_0_[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_fields_r_reg_n_0_[31:0]</obj_property>
+      <obj_property name="ObjectShortName">msg_fields_r_reg_n_0_[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_index_r_reg_n_0_" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_index_r_reg_n_0_[15:0]</obj_property>
+      <obj_property name="ObjectShortName">msg_index_r_reg_n_0_[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_len_r" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_len_r[15:0]</obj_property>
+      <obj_property name="ObjectShortName">msg_len_r[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_seq_r" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_seq_r[63:0]</obj_property>
+      <obj_property name="ObjectShortName">msg_seq_r[63:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_stat_r" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_stat_r[5:0]</obj_property>
+      <obj_property name="ObjectShortName">msg_stat_r[5:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_type" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/msg_type[7:0]</obj_property>
+      <obj_property name="ObjectShortName">msg_type[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/p_1_in23_in" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/p_1_in23_in</obj_property>
+      <obj_property name="ObjectShortName">p_1_in23_in</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/pay_arm_c" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/pay_arm_c</obj_property>
+      <obj_property name="ObjectShortName">pay_arm_c</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/pkt_count_r" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/pkt_count_r[0:0]</obj_property>
+      <obj_property name="ObjectShortName">pkt_count_r[0:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/pkt_count_r_reg_n_0_" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/pkt_count_r_reg_n_0_[15:1]</obj_property>
+      <obj_property name="ObjectShortName">pkt_count_r_reg_n_0_[15:1]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/rem_r" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/rem_r[6:0]</obj_property>
+      <obj_property name="ObjectShortName">rem_r[6:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/ret_norm_c" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/ret_norm_c</obj_property>
+      <obj_property name="ObjectShortName">ret_norm_c</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/ret_tail_c" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/ret_tail_c</obj_property>
+      <obj_property name="ObjectShortName">ret_tail_c</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/retire_c" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/retire_c</obj_property>
+      <obj_property name="ObjectShortName">retire_c</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/s_axis_tdata" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/s_axis_tdata[63:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tdata[63:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/s_axis_tkeep" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/s_axis_tkeep[7:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tkeep[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/s_axis_tlast" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/s_axis_tlast</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tlast</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/seconds_r" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/seconds_r[31:0]</obj_property>
+      <obj_property name="ObjectShortName">seconds_r[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/start_ok_c" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/start_ok_c</obj_property>
+      <obj_property name="ObjectShortName">start_ok_c</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/surv_ok_c" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/surv_ok_c</obj_property>
+      <obj_property name="ObjectShortName">surv_ok_c</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/t0_hit_r" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/t0_hit_r</obj_property>
+      <obj_property name="ObjectShortName">t0_hit_r</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/tb_ist" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/tb_ist[7:0]</obj_property>
+      <obj_property name="ObjectShortName">tb_ist[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/tb_lenok" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/tb_lenok[7:0]</obj_property>
+      <obj_property name="ObjectShortName">tb_lenok[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/tb_scope" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/tb_scope[7:0]</obj_property>
+      <obj_property name="ObjectShortName">tb_scope[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_itch/tb_two" type="array">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_itch/tb_two[7:0]</obj_property>
+      <obj_property name="ObjectShortName">tb_two[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="top_i/market_data_top_0/U0/u_fullparser/u_udp/fields_valid_r" type="logic">
+      <obj_property name="DisplayName">FullPathName</obj_property>
+      <obj_property name="ElementShortName">top_i/market_data_top_0/U0/u_fullparser/u_udp/fields_valid_r</obj_property>
+      <obj_property name="ObjectShortName">fields_valid_r</obj_property>
+      <obj_property name="LABELRADIX">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+</wave_config>

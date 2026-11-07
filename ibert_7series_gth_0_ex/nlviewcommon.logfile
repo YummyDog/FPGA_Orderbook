@@ -1,0 +1,197 @@
+# Copyright (C) 2022-2024, Altair Engineering Inc.
+# Copyright (C) 1994-2022, Concept Engineering GmbH.
+# All Rights Reserved.  Cmd=logfile.
+# Nlview 7.8.0 2024-04-26 e1825d835c VDI=44 GEI=38 GUI=JA:24.0
+# License cookie [G|T|S|B|*] for HR="Xilinx Inc."
+# -----------------------------------------------------------------------------
+# dbg -netnet 10
+# property -colorscheme lightblue
+# property attrfontsize 8
+# property autobundle 3
+# property boxcolor0 #575d6c
+# property boxcolor1 #ffffff
+# property boxcolor2 #575d6c
+# property boxcolor3 #000000
+# property boxcolor4 #1c1f28
+# property boxinstcolor #1c1f28
+# property boxpincolor #1c1f28
+# property closeenough 15
+# property decorate 19
+# property fillcolor2 #cde5ff
+# property fillcolor3 #cde5ff
+# property fillcolor4 #cde5ff
+# property fillcolor5 #e5c7ff
+# property gatecellname 2
+# property marksize 12
+# property maxfontsize 14
+# property maxzoom 5
+# property minchannelwidth 40
+# property netcolor #8bc34a
+# property nethidedetails 1
+# property nohiernegpins 0
+# property objecthighlight0 #fe00f6
+# property objecthighlight1 #ffea00
+# property objecthighlight2 #84e413
+# property objecthighlight3 #1661ff
+# property objecthighlight4 #d9b7ff
+# property objecthighlight5 #ffa358
+# property objecthighlight6 #ff2b2b
+# property objecthighlight7 #00e0ff
+# property objecthighlight8 #c0ca33
+# property objecthighlight9 #b16eff
+# property objecthighlight10 #46a466
+# property objecthighlight11 #caff78
+# property objecthighlight12 #ab47bc
+# property objecthighlight13 #b4602c
+# property objecthighlight14 #c20f8c
+# property objecthighlight15 #00ffaa
+# property objecthighlight16 #ff9fe4
+# property objecthighlight17 #ff8019
+# property objecthighlight18 #26b3ff
+# property objecthighlight19 #e5551c
+# property objecthighlight69 #c89900
+# property pbuscolor #000000
+# property pbusnamecolor #1c1f28
+# property pinattrmax 15
+# property pinpermute 0
+# property portcolor #000000
+# property portnamecolor #1c1f28
+# property reducejogs 100
+# property ripindexfontsize 3
+# property rubberbandcolor #1c1f28
+# property rubberbandfontsize 13
+# property selectattr 80
+# property selectionappearance 14
+# property selectioncolor #396cef
+# property sheetheight 44
+# property sheetwidth 68
+# property showlevels 128
+# property showmarks 1
+# property showripindex 1
+# property timelimit 1
+# -----------------------------------------------------------------------------
+#CMD bind stroke-1 -action {}
+#CMD bind stroke-nw-1 -action callback -echo_type line -echo_text {Zoom fit} -format (#1C1F28,#FFFFFF,1.0)
+module list
+#CMD bind stroke-ne-1 -action {}
+#CMD bind stroke-se-1 -action zoom_in -echo_type rectangle -autoscroll -echo_text {Zoom area} -format (#1C1F28,#FFFFFF,1.0)
+#CMD bind stroke-sw-1 -action zoom_in2 -echo_type line -echo_text {Zoom +%z} -format (#1C1F28,#FFFFFF,1.0)
+#CMD bind stroke-nw-1 -action zoom_fit -echo_type line -echo_text {Zoom fit} -format (#1C1F28,#FFFFFF,1.0)
+property rubberbandfontsize 13
+property rubberbandcolor #1c1f28
+module new first -nosplit
+#  * Current module is first 
+load symbol temporary_object v IGEN pin reset in pinlinewidth 3 pin clk_in1 in pinlinewidth 3 pin clk_out1 out pinlinewidth 3 pin locked out pinlinewidth 3 fillcolor 5 centered
+load inst clk_wiz_0 temporary_object v -attr @cell {Clocking Wizard}
+attribute {pin clk_wiz_0 reset.reset} -attr @name reset
+#ERR attribute: cannot find pin clk_wiz_0 reset.reset
+attribute {pin clk_wiz_0 clock_CLK_IN1.clk_in1} -attr @name clk_in1
+#ERR attribute: cannot find pin clk_wiz_0 clock_CLK_IN1.clk_in1
+attribute {pin clk_wiz_0 clock_CLK_OUT1.clk_out1} -attr @name clk_out1
+#ERR attribute: cannot find pin clk_wiz_0 clock_CLK_OUT1.clk_out1
+increment -const
+show
+# Starting Split Pages                                                   72.06
+# NoSplit 1 Comps, 0 Nets 0 NetBundles                                   72.06
+# End of Split Pages                                                     72.06
+# Generating  Page 1:    1 Comps,    0 Nets                              72.06
+# End of Generating  Page 1                                              72.06
+scrollpos 80 64
+#CMD bind click-1 -action {}
+property showcellname false
+property showinstname false
+#CMD bind stroke-1 -action {}
+#CMD bind stroke-nw-1 -action callback -echo_type line -echo_text {Zoom fit} -format (#1C1F28,#FFFFFF,1.0)
+module list
+#R {first {}}
+pagesize
+#R 144 90
+#CMD bind stroke-ne-1 -action zoom_out -echo_type line -echo_text {Zoom -%z} -format (#1C1F28,#FFFFFF,1.0)
+#CMD bind stroke-se-1 -action zoom_in -echo_type rectangle -autoscroll -echo_text {Zoom area} -format (#1C1F28,#FFFFFF,1.0)
+#CMD bind stroke-sw-1 -action zoom_in2 -echo_type line -echo_text {Zoom +%z} -format (#1C1F28,#FFFFFF,1.0)
+#CMD bind stroke-nw-1 -action zoom_fit -echo_type line -echo_text {Zoom fit} -format (#1C1F28,#FFFFFF,1.0)
+property rubberbandfontsize 13
+property rubberbandcolor #1c1f28
+module new first -nosplit
+#  * Current module is first 
+load symbol temporary_object v IGEN pin reset in pinlinewidth 3 pin clk_in1 in pinlinewidth 3 pin clk_out1 out pinlinewidth 3 pin locked out pinlinewidth 3 fillcolor 5 centered
+load inst clk_wiz_0 temporary_object v -attr @cell {Clocking Wizard}
+attribute {pin clk_wiz_0 reset.reset} -attr @name reset
+#ERR attribute: cannot find pin clk_wiz_0 reset.reset
+attribute {pin clk_wiz_0 clock_CLK_IN1.clk_in1} -attr @name clk_in1
+#ERR attribute: cannot find pin clk_wiz_0 clock_CLK_IN1.clk_in1
+attribute {pin clk_wiz_0 clock_CLK_OUT1.clk_out1} -attr @name clk_out1
+#ERR attribute: cannot find pin clk_wiz_0 clock_CLK_OUT1.clk_out1
+increment -const
+show
+# Starting Split Pages                                                   72.06
+# NoSplit 1 Comps, 0 Nets 0 NetBundles                                   72.06
+# End of Split Pages                                                     72.06
+# Generating  Page 1:    1 Comps,    0 Nets                              72.06
+# End of Generating  Page 1                                              72.06
+#CMD bind stroke-1 -action {}
+#CMD bind stroke-nw-1 -action callback -echo_type line -echo_text {Zoom fit} -format (#1C1F28,#FFFFFF,1.0)
+module list
+#R {first {}}
+pagesize
+#R 144 80
+#CMD bind stroke-ne-1 -action zoom_out -echo_type line -echo_text {Zoom -%z} -format (#1C1F28,#FFFFFF,1.0)
+#CMD bind stroke-se-1 -action zoom_in -echo_type rectangle -autoscroll -echo_text {Zoom area} -format (#1C1F28,#FFFFFF,1.0)
+#CMD bind stroke-sw-1 -action zoom_in2 -echo_type line -echo_text {Zoom +%z} -format (#1C1F28,#FFFFFF,1.0)
+#CMD bind stroke-nw-1 -action zoom_fit -echo_type line -echo_text {Zoom fit} -format (#1C1F28,#FFFFFF,1.0)
+property rubberbandfontsize 13
+property rubberbandcolor #1c1f28
+module new first -nosplit
+#  * Current module is first 
+load symbol temporary_object v IGEN pin reset in pinlinewidth 3 pin clk_in1 in pinlinewidth 3 pin clk_out1 out pinlinewidth 3 pin locked out pinlinewidth 3 fillcolor 5 centered
+load inst clk_wiz_0 temporary_object v -attr @cell {Clocking Wizard}
+attribute {pin clk_wiz_0 reset.reset} -attr @name reset
+#ERR attribute: cannot find pin clk_wiz_0 reset.reset
+attribute {pin clk_wiz_0 clock_CLK_IN1.clk_in1} -attr @name clk_in1
+#ERR attribute: cannot find pin clk_wiz_0 clock_CLK_IN1.clk_in1
+attribute {pin clk_wiz_0 clock_CLK_OUT1.clk_out1} -attr @name clk_out1
+#ERR attribute: cannot find pin clk_wiz_0 clock_CLK_OUT1.clk_out1
+increment -const
+show
+# Starting Split Pages                                                   72.06
+# NoSplit 1 Comps, 0 Nets 0 NetBundles                                   72.06
+# End of Split Pages                                                     72.06
+# Generating  Page 1:    1 Comps,    0 Nets                              72.06
+# End of Generating  Page 1                                              72.06
+scrollpos 80 64
+fullfit
+scrollpos 21 -225
+fullfit
+fullfit
+#CMD bind stroke-1 -action {}
+#CMD bind stroke-nw-1 -action callback -echo_type line -echo_text {Zoom fit} -format (#1C1F28,#FFFFFF,1.0)
+module list
+#R {first {}}
+pagesize
+#R 380 211
+#CMD bind stroke-ne-1 -action zoom_out -echo_type line -echo_text {Zoom -%z} -format (#1C1F28,#FFFFFF,1.0)
+#CMD bind stroke-se-1 -action zoom_in -echo_type rectangle -autoscroll -echo_text {Zoom area} -format (#1C1F28,#FFFFFF,1.0)
+#CMD bind stroke-sw-1 -action zoom_in2 -echo_type line -echo_text {Zoom +%z} -format (#1C1F28,#FFFFFF,1.0)
+#CMD bind stroke-nw-1 -action zoom_fit -echo_type line -echo_text {Zoom fit} -format (#1C1F28,#FFFFFF,1.0)
+property rubberbandfontsize 13
+property rubberbandcolor #1c1f28
+module new first -nosplit
+#  * Current module is first 
+load symbol temporary_object v IGEN pin reset in pinlinewidth 3 pin clk_in1 in pinlinewidth 3 pin clk_out1 out pinlinewidth 3 pin locked out pinlinewidth 3 fillcolor 5 centered
+load inst clk_wiz_0 temporary_object v -attr @cell {Clocking Wizard}
+attribute {pin clk_wiz_0 reset.reset} -attr @name reset
+#ERR attribute: cannot find pin clk_wiz_0 reset.reset
+attribute {pin clk_wiz_0 clock_CLK_IN1.clk_in1} -attr @name clk_in1
+#ERR attribute: cannot find pin clk_wiz_0 clock_CLK_IN1.clk_in1
+attribute {pin clk_wiz_0 clock_CLK_OUT1.clk_out1} -attr @name clk_out1
+#ERR attribute: cannot find pin clk_wiz_0 clock_CLK_OUT1.clk_out1
+increment -const
+show
+# Starting Split Pages                                                   80.63
+# NoSplit 1 Comps, 0 Nets 0 NetBundles                                   80.63
+# End of Split Pages                                                     80.63
+# Generating  Page 1:    1 Comps,    0 Nets                              80.63
+# End of Generating  Page 1                                              80.63
+scrollpos -118 -266
+fullfit
+scrollpos 24 -211

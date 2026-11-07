@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="impl_1" LaunchPart="xc7vx690tffg1157-2" LaunchTime="1792930909">
+<GenRun Id="impl_1" LaunchPart="xc7vx690tffg1157-2" LaunchTime="1794049089">
   <File Type="PA-TCL" Name="top_wrapper.tcl"/>
   <File Type="REPORTS-TCL" Name="top_wrapper_reports.tcl"/>
   <File Type="INIT-TIMING" Name="top_wrapper_timing_summary_init.rpt"/>
@@ -321,6 +321,13 @@
         <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
+    <File Path="$PSRCDIR/sources_1/new/por_reset.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
     <File Path="$PSRCDIR/sources_1/bd/top/top.bd">
       <FileInfo>
         <Attr Name="UsedIn" Val="synthesis"/>
@@ -354,6 +361,17 @@
         <Attr Name="UsedIn" Val="implementation"/>
       </FileInfo>
     </File>
+    <File Path="$PSRCDIR/constrs_1/new/debug_valids.xdc">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/constrs_1/new/debug_ila.xdc">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="implementation"/>
+      </FileInfo>
+    </File>
     <Config>
       <Option Name="TargetConstrsFile" Val="$PSRCDIR/constrs_1/new/orderbook.xdc"/>
       <Option Name="ConstrsType" Val="XDC"/>
@@ -377,7 +395,10 @@
     <Step Id="post_route_phys_opt_design"/>
     <Step Id="write_bitstream"/>
   </Strategy>
+  <BlockFileSet Type="BlockSrcs" Name="top_por_0_0"/>
   <BlockFileSet Type="BlockSrcs" Name="top_ten_gig_eth_pcs_pma_0_0"/>
   <BlockFileSet Type="BlockSrcs" Name="top_market_data_top_0_0"/>
   <BlockFileSet Type="BlockSrcs" Name="top_fan_pwm_0_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="top_ten_gig_eth_pcs_pma_1_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="top_vio_link_0"/>
 </GenRun>

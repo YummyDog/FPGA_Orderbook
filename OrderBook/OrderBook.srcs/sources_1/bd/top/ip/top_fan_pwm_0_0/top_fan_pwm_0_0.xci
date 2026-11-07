@@ -10,8 +10,8 @@
       "component_parameters": {
         "G_CLK_HZ": [ { "value": "25000000", "resolve_type": "user", "format": "long", "usage": "all" } ],
         "G_PWM_HZ": [ { "value": "25000", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "G_DUTY_PCT": [ { "value": "100", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "G_MIN_DUTY_PCT": [ { "value": "30", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "G_DUTY_PCT": [ { "value": "100", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "G_MIN_DUTY_PCT": [ { "value": "30", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
         "G_ACTIVE_HIGH": [ { "value": "true", "resolve_type": "user", "format": "bool", "usage": "all" } ],
         "Component_Name": [ { "value": "top_fan_pwm_0_0", "resolve_type": "user", "usage": "all" } ]
       },
@@ -43,7 +43,7 @@
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "../../ipshared" } ],
         "SWVERSION": [ { "value": "2026.1" } ],
-        "SYNTHESISFLOW": [ { "value": "OOC_HIERARCHICAL" } ]
+        "SYNTHESISFLOW": [ { "value": "GLOBAL" } ]
       }
     },
     "boundary": {
@@ -73,5 +73,5 @@
       }
     }
   },
-  "checksum": "73c78537"
+  "checksum": "bfa44c48"
 }

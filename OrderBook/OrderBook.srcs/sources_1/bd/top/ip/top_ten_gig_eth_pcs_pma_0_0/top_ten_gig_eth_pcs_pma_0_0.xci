@@ -21,10 +21,10 @@
         "Timer_Format": [ { "value": "Time_of_day", "resolve_type": "user", "usage": "all" } ],
         "SupportLevel": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
         "TransceiverInExample": [ { "value": "false", "resolve_type": "user", "format": "bool", "usage": "all" } ],
-        "TransceiverControl": [ { "value": "false", "resolve_type": "user", "format": "bool", "usage": "all" } ],
+        "TransceiverControl": [ { "value": "true", "value_src": "user", "resolve_type": "user", "format": "bool", "usage": "all" } ],
         "Locations": [ { "value": "X0Y0", "resolve_type": "user", "usage": "all" } ],
         "RefClkRate": [ { "value": "156.25", "resolve_type": "user", "format": "float", "usage": "all" } ],
-        "RefClk": [ { "value": "clk0", "resolve_type": "user", "usage": "all" } ],
+        "RefClk": [ { "value": "clk1", "value_src": "user", "resolve_type": "user", "usage": "all" } ],
         "DClkRate": [ { "value": "100.00", "resolve_type": "user", "format": "float", "usage": "all" } ]
       },
       "model_parameters": {
@@ -42,7 +42,7 @@
         "c_speed10_25": [ { "value": "10", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "c_sub_core_name": [ { "value": "top_ten_gig_eth_pcs_pma_0_0_gt", "resolve_type": "generated", "usage": "all" } ],
         "c_gt_loc": [ { "value": "X0Y0", "resolve_type": "generated", "usage": "all" } ],
-        "c_refclk": [ { "value": "clk0", "resolve_type": "generated", "usage": "all" } ],
+        "c_refclk": [ { "value": "clk1", "resolve_type": "generated", "usage": "all" } ],
         "c_refclkrate": [ { "value": "156", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "c_dclkrate": [ { "value": "100.00", "resolve_type": "generated", "format": "float", "usage": "all" } ]
       },
@@ -67,7 +67,7 @@
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "../../ipshared" } ],
         "SWVERSION": [ { "value": "2026.1" } ],
-        "SYNTHESISFLOW": [ { "value": "OUT_OF_CONTEXT" } ]
+        "SYNTHESISFLOW": [ { "value": "GLOBAL" } ]
       }
     },
     "boundary": {
@@ -121,9 +121,60 @@
         "drp_drdy_i": [ { "direction": "in", "driver_value": "0" } ],
         "drp_drpdo_i": [ { "direction": "in", "size_left": "15", "size_right": "0", "driver_value": "0" } ],
         "tx_disable": [ { "direction": "out" } ],
-        "pma_pmd_type": [ { "direction": "in", "size_left": "2", "size_right": "0", "driver_value": "0" } ]
+        "pma_pmd_type": [ { "direction": "in", "size_left": "2", "size_right": "0", "driver_value": "0" } ],
+        "gt0_eyescanreset": [ { "direction": "in", "driver_value": "0" } ],
+        "gt0_eyescandataerror": [ { "direction": "out" } ],
+        "gt0_txbufstatus": [ { "direction": "out", "size_left": "1", "size_right": "0" } ],
+        "gt0_rxbufstatus": [ { "direction": "out", "size_left": "2", "size_right": "0" } ],
+        "gt0_eyescantrigger": [ { "direction": "in", "driver_value": "0" } ],
+        "gt0_rxcdrhold": [ { "direction": "in", "driver_value": "0" } ],
+        "gt0_txprbsforceerr": [ { "direction": "in", "driver_value": "0" } ],
+        "gt0_txpolarity": [ { "direction": "in", "driver_value": "0" } ],
+        "gt0_rxpolarity": [ { "direction": "in", "driver_value": "0" } ],
+        "gt0_rxprbserr": [ { "direction": "out" } ],
+        "gt0_txpmareset": [ { "direction": "in", "driver_value": "0" } ],
+        "gt0_rxpmareset": [ { "direction": "in", "driver_value": "0" } ],
+        "gt0_txresetdone": [ { "direction": "out" } ],
+        "gt0_rxresetdone": [ { "direction": "out" } ],
+        "gt0_rxpmaresetdone": [ { "direction": "out" } ],
+        "gt0_rxdfelpmreset": [ { "direction": "in", "driver_value": "0" } ],
+        "gt0_rxlpmen": [ { "direction": "in", "driver_value": "0" } ],
+        "gt0_dmonitorout": [ { "direction": "out", "size_left": "14", "size_right": "0" } ],
+        "gt0_rxrate": [ { "direction": "in", "size_left": "2", "size_right": "0", "driver_value": "0" } ],
+        "gt0_txprecursor": [ { "direction": "in", "size_left": "4", "size_right": "0", "driver_value": "0" } ],
+        "gt0_txpostcursor": [ { "direction": "in", "size_left": "4", "size_right": "0", "driver_value": "0" } ],
+        "gt0_txdiffctrl": [ { "direction": "in", "size_left": "3", "size_right": "0", "driver_value": "14" } ]
       },
       "interfaces": {
+        "transceiver_debug": {
+          "vlnv": "xilinx.com:display_ten_gig_eth_pcs_pma:transceiver_debug:1.0",
+          "abstraction_type": "xilinx.com:display_ten_gig_eth_pcs_pma:transceiver_debug_rtl:1.0",
+          "mode": "slave",
+          "port_maps": {
+            "gt0_dmonitorout": [ { "physical_name": "gt0_dmonitorout" } ],
+            "gt0_eyescandataerror": [ { "physical_name": "gt0_eyescandataerror" } ],
+            "gt0_eyescanreset": [ { "physical_name": "gt0_eyescanreset" } ],
+            "gt0_eyescantrigger": [ { "physical_name": "gt0_eyescantrigger" } ],
+            "gt0_rxbufstatus": [ { "physical_name": "gt0_rxbufstatus" } ],
+            "gt0_rxcdrhold": [ { "physical_name": "gt0_rxcdrhold" } ],
+            "gt0_rxdfelpmreset": [ { "physical_name": "gt0_rxdfelpmreset" } ],
+            "gt0_rxlpmen": [ { "physical_name": "gt0_rxlpmen" } ],
+            "gt0_rxpmareset": [ { "physical_name": "gt0_rxpmareset" } ],
+            "gt0_rxpmaresetdone": [ { "physical_name": "gt0_rxpmaresetdone" } ],
+            "gt0_rxpolarity": [ { "physical_name": "gt0_rxpolarity" } ],
+            "gt0_rxprbserr": [ { "physical_name": "gt0_rxprbserr" } ],
+            "gt0_rxrate": [ { "physical_name": "gt0_rxrate" } ],
+            "gt0_rxresetdone": [ { "physical_name": "gt0_rxresetdone" } ],
+            "gt0_txbufstatus": [ { "physical_name": "gt0_txbufstatus" } ],
+            "gt0_txdiffctrl": [ { "physical_name": "gt0_txdiffctrl" } ],
+            "gt0_txpmareset": [ { "physical_name": "gt0_txpmareset" } ],
+            "gt0_txpolarity": [ { "physical_name": "gt0_txpolarity" } ],
+            "gt0_txpostcursor": [ { "physical_name": "gt0_txpostcursor" } ],
+            "gt0_txprbsforceerr": [ { "physical_name": "gt0_txprbsforceerr" } ],
+            "gt0_txprecursor": [ { "physical_name": "gt0_txprecursor" } ],
+            "gt0_txresetdone": [ { "physical_name": "gt0_txresetdone" } ]
+          }
+        },
         "mdio_interface": {
           "vlnv": "xilinx.com:interface:mdio:1.0",
           "abstraction_type": "xilinx.com:interface:mdio_rtl:1.0",
@@ -171,7 +222,7 @@
             "FREQ_HZ": [ { "value": "156250000", "value_src": "user_prop", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
             "FREQ_TOLERANCE_HZ": [ { "value": "0", "value_permission": "bd", "resolve_type": "generated", "format": "long", "is_ips_inferred": true, "is_static_object": false } ],
             "PHASE": [ { "value": "0.0", "value_permission": "bd", "resolve_type": "generated", "format": "float", "is_ips_inferred": true, "is_static_object": false } ],
-            "CLK_DOMAIN": [ { "value": "top_ten_gig_eth_pcs_pma_0_0_coreclk_out", "value_src": "default_prop", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
+            "CLK_DOMAIN": [ { "value": "top_ten_gig_eth_pcs_pma_0_0_coreclk_out", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
             "ASSOCIATED_PORT": [ { "value": "", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
             "ASSOCIATED_RESET": [ { "value": "", "value_permission": "bd", "resolve_type": "generated", "is_ips_inferred": true, "is_static_object": false } ],
             "INSERT_VIP": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "simulation.rtl", "is_ips_inferred": true, "is_static_object": false } ]
@@ -365,5 +416,5 @@
       }
     }
   },
-  "checksum": "12484c21"
+  "checksum": "acc57405"
 }

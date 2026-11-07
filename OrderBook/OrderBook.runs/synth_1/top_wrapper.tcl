@@ -56,8 +56,10 @@ if {$::dispatch::connected} {
 }
 
 OPTRACE "synth_1" START { ROLLUP_AUTO }
+set_param tcl.collectionResultDisplayLimit 0
 set_param general.usePosixSpawnForFork 1
 set_param chipscope.maxJobs 1
+set_param xicom.use_bs_reader 1
 OPTRACE "Creating in-memory project" START { }
 create_project -in_memory -part xc7vx690tffg1157-2
 
@@ -73,11 +75,54 @@ set_property ip_output_repo c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/Orde
 set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
-read_vhdl -library xil_defaultlib C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/hdl/top_wrapper.vhd
+read_verilog -library xil_defaultlib C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/sources_1/new/por_reset.v
+read_vhdl -vhdl2008 -library xil_defaultlib {
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/ram_pkg.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book_pkg.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/eth_parser_pkg.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/ipv4_parser_pkg.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/udp_parser_pkg.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/mold_parser_pkg.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/itch_parser_pkg.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/book_input_stage.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/eth_parser.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Input/fcs_msg_extend_sync.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/ipv4_parser.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/udp_parser.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/mold_parser.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/itch_parser.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/fullparser.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/hash65_pkg.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Input/xgmii64_to_axis.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Input/xgmii_crc32_rx64.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Input/input_top.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/level_pkg.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/ram_sdp.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/level_array.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_fifo.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/ram_array.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/price_storage.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Timestamping/time_counter.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Timestamping/time_event_fifo.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book_engine_top.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Output/order_tx_pkg.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Output/order_tx_xgmii.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/Output/tx_top.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/market_data_top.vhd
+}
+read_vhdl -library xil_defaultlib {
+  C:/Users/lskje/Desktop/FPGA_Orderbook/fan_pwm.vhd
+  C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/hdl/top_wrapper.vhd
+}
 add_files C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/sources_1/bd/top/top.bd
 set_property used_in_implementation false [get_files -all c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_clocks.xdc]
 set_property used_in_implementation false [get_files -all c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0_ooc.xdc]
 set_property used_in_implementation false [get_files -all c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_0_0/synth/top_ten_gig_eth_pcs_pma_0_0.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_1_0/synth/top_ten_gig_eth_pcs_pma_1_0_clocks.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_1_0/synth/top_ten_gig_eth_pcs_pma_1_0_ooc.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_ten_gig_eth_pcs_pma_1_0/synth/top_ten_gig_eth_pcs_pma_1_0.xdc]
+set_property used_in_implementation false [get_files -all c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_vio_link_0/top_vio_link_0.xdc]
 set_property used_in_implementation false [get_files -all c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/top_ooc.xdc]
 
 OPTRACE "Adding files" END { }
@@ -91,6 +136,9 @@ foreach dcp [get_files -quiet -all -filter file_type=="Design\ Checkpoint"] {
 }
 read_xdc C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/orderbook.xdc
 set_property used_in_implementation false [get_files C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/orderbook.xdc]
+
+read_xdc C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc
+set_property used_in_implementation false [get_files C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc]
 
 read_xdc dont_touch.xdc
 set_property used_in_implementation false [get_files dont_touch.xdc]

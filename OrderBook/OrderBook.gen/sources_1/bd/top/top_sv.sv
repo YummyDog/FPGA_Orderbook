@@ -68,7 +68,19 @@ module top_sv (
   (* X_INTERFACE_IGNORE = "true" *)
   input wire clk25in,
   (* X_INTERFACE_IGNORE = "true" *)
-  output wire fan
+  output wire fan,
+  (* X_INTERFACE_IGNORE = "true" *)
+  output wire sfp1_txp,
+  (* X_INTERFACE_IGNORE = "true" *)
+  output wire sfp1_txn,
+  (* X_INTERFACE_IGNORE = "true" *)
+  input wire sfp1_rxp,
+  (* X_INTERFACE_IGNORE = "true" *)
+  input wire sfp1_rxn,
+  (* X_INTERFACE_IGNORE = "true" *)
+  output wire [0:0] QSFP_RESET,
+  (* X_INTERFACE_IGNORE = "true" *)
+  output wire [0:0] SFP_OR_OPT
 );
 
   top inst (
@@ -79,7 +91,13 @@ module top_sv (
     .sfp_txp(sfp_txp),
     .sfp_txn(sfp_txn),
     .clk25in(clk25in),
-    .fan(fan)
+    .fan(fan),
+    .sfp1_txp(sfp1_txp),
+    .sfp1_txn(sfp1_txn),
+    .sfp1_rxp(sfp1_rxp),
+    .sfp1_rxn(sfp1_rxn),
+    .QSFP_RESET(QSFP_RESET),
+    .SFP_OR_OPT(SFP_OR_OPT)
   );
 
 endmodule

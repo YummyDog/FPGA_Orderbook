@@ -8,12 +8,6 @@ create_clock -period 6.400 -name gt_refclk [get_ports gt_refclk_clk_p]
 
 # Do NOT create clocks for TXOUTCLK/RXOUTCLK yourself; the PCS/PMA IP's own XDC does that.
 
-## ---- GT placement (board specific) ----
-# sfp_txp/txn/rxp/rxn pins follow from the channel LOC
-
-## ---- SFP sideband ----
-set_property IOSTANDARD LVCMOS18 [get_ports sfp_tx_disable]
-set_false_path -to [get_ports sfp_tx_disable]
 
 ## ---- Config bank (7-series DRC) ----
 set_property CFGBVS GND [current_design]
@@ -35,10 +29,36 @@ set_property DRIVE 4 [get_ports fan]
 # Static/slow output to a fan driver: no output timing requirement
 set_false_path -to [get_ports fan]
 
-## ---- GTH placement: Vivado's previous auto-placement, NOT verified against the board ----
-set_property PACKAGE_PIN T6  [get_ports gt_refclk_clk_p]   ;# MGTREFCLK0P_116
-set_property PACKAGE_PIN T5  [get_ports gt_refclk_clk_n]   ;# MGTREFCLK0N_116
-set_property PACKAGE_PIN AC4 [get_ports sfp_rxp]           ;# MGTHRXP3_115
-set_property PACKAGE_PIN AC3 [get_ports sfp_rxn]           ;# MGTHRXN3_115
-set_property PACKAGE_PIN AB2 [get_ports sfp_txp]           ;# MGTHTXP3_115
-set_property PACKAGE_PIN AB1 [get_ports sfp_txn]           ;# MGTHTXN3_115
+## ---- GTH: quad 116, refclk MGTREFCLK1 (found with IBERT + reference rugmac.xdc) ----
+set_property PACKAGE_PIN V6  [get_ports gt_refclk_clk_p]   ;# MGTREFCLK1P_116
+set_property PACKAGE_PIN V5  [get_ports gt_refclk_clk_n]   ;# MGTREFCLK1N_116
+
+## Core A (ten_gig_eth_pcs_pma_0) = X1Y24 / ch0: TX -> QSFP lane 1 (TX polarity inverted)
+## (its RX receives QSFP lane 3 - unused)
+set_property PACKAGE_PIN Y2  [get_ports sfp_txp]           ;# MGTHTXP0_116
+set_property PACKAGE_PIN Y1  [get_ports sfp_txn]           ;# MGTHTXN0_116
+set_property PACKAGE_PIN AA4 [get_ports sfp_rxp]           ;# MGTHRXP0_116
+set_property PACKAGE_PIN AA3 [get_ports sfp_rxn]           ;# MGTHRXN0_116
+
+## Core B (ten_gig_eth_pcs_pma_1) = X1Y26 / ch2: RX <- QSFP lane 1 (RX polarity inverted)
+## (its TX drives QSFP lane 3 - unused)
+set_property PACKAGE_PIN T2  [get_ports sfp1_txp]          ;# MGTHTXP2_116
+set_property PACKAGE_PIN T1  [get_ports sfp1_txn]          ;# MGTHTXN2_116
+set_property PACKAGE_PIN U4  [get_ports sfp1_rxp]          ;# MGTHRXP2_116
+set_property PACKAGE_PIN U3  [get_ports sfp1_rxn]          ;# MGTHRXN2_116
+
+## ---- QSFP module control (pins from reference rugmac.xdc) ----
+## QSFP_RESET = 1 releases the module from reset; SFP_OR_OPT = 0
+set_property PACKAGE_PIN AH13 [get_ports QSFP_RESET]
+set_property IOSTANDARD LVCMOS18 [get_ports QSFP_RESET]
+set_property PACKAGE_PIN AC12 [get_ports SFP_OR_OPT]
+set_property IOSTANDARD LVCMOS18 [get_ports SFP_OR_OPT]
+set_false_path -to [get_ports {QSFP_RESET SFP_OR_OPT}]
+
+## ---- Debug VIO (vio_link): quasi-static control/status, not timed ----
+## probe_out* -> GT TX/RX polarity pins, probe_in* <- GT/core status bits
+set_false_path -through [get_pins -quiet {top_i/vio_link/probe_out*}]
+set_false_path -through [get_pins -quiet {top_i/vio_link/probe_in*}]
+
+## ---- Power-on reset (por_0, 25 MHz domain) into the 10G cores' async resets ----
+set_false_path -through [get_pins -quiet {top_i/por_0/rst_out}]

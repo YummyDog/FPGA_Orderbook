@@ -58,6 +58,7 @@ if {$::dispatch::connected} {
 OPTRACE "top_fan_pwm_0_0_synth_1" START { ROLLUP_AUTO }
 set_param general.usePosixSpawnForFork 1
 set_param chipscope.maxJobs 1
+set_param xicom.use_bs_reader 1
 set_param project.vivado.isBlockSynthRun true
 OPTRACE "Creating in-memory project" START { }
 set_param ips.modRefOverrideMrefDirPath c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/mref
@@ -77,7 +78,7 @@ set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
 read_vhdl -library xil_defaultlib C:/Users/lskje/Desktop/FPGA_Orderbook/fan_pwm.vhd
-read_ip -quiet c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/sources_1/bd/top/ip/top_fan_pwm_0_0/top_fan_pwm_0_0.xci
+read_ip -quiet C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/sources_1/bd/top/ip/top_fan_pwm_0_0/top_fan_pwm_0_0.xci
 
 OPTRACE "Adding files" END { }
 # Mark all dcp files as not used in implementation to prevent them from being
