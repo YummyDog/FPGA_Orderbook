@@ -4,8 +4,8 @@ INFO: [Common 17-3922] A valid Vivado Design Suite ENTERPRISE license has been d
 # SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
 # IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
 # SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
-# Start of session at: Sat Nov  7 21:49:33 2026
-# Process ID         : 10736
+# Start of session at: Mon Nov  9 18:59:32 2026
+# Process ID         : 16752
 # Current directory  : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1
 # Command line       : vivado.exe -log top_wrapper.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source top_wrapper.tcl
 # Log file           : C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/top_wrapper.vds
@@ -18,12 +18,12 @@ INFO: [Common 17-3922] A valid Vivado Design Suite ENTERPRISE license has been d
 # CPU Physical cores : 6
 # CPU Logical cores  : 6
 # Host memory        : 17119 MB
-# Swap memory        : 11944 MB
-# Total Virtual      : 29064 MB
-# Available Virtual  : 13620 MB
+# Swap memory        : 12587 MB
+# Total Virtual      : 29707 MB
+# Available Virtual  : 7742 MB
 #-----------------------------------------------------------
 source top_wrapper.tcl -notrace
-create_project: Time (s): cpu = 00:00:12 ; elapsed = 00:00:08 . Memory (MB): peak = 583.770 ; gain = 266.980
+create_project: Time (s): cpu = 00:00:11 ; elapsed = 00:00:09 . Memory (MB): peak = 585.559 ; gain = 267.117
 INFO: [IP_Flow 19-234] Refreshing IP repositories
 INFO: [IP_Flow 19-1704] No user IP repositories specified
 INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'D:/AMDDesignTools/2026.1/Vivado/data/ip'.
@@ -38,14 +38,14 @@ Command: synth_design -top top_wrapper -part xc7vx690tffg1157-2
 Starting synth_design
 Attempting to get a license for feature 'Synthesis' and/or device 'xc7vx690t'
 INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7vx690t'
-INFO: [Common 17-86] Your Synthesis license expires in 27 day(s)
+INFO: [Common 17-86] Your Synthesis license expires in 25 day(s)
 INFO: [Device 21-403] Loading part xc7vx690tffg1157-2
 INFO: [Designutils 20-5008] Incremental synthesis strategy default
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 1784
+INFO: [Synth 8-7075] Helper process launched with PID 2088
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:08 ; elapsed = 00:00:10 . Memory (MB): peak = 1723.445 ; gain = 577.805
+Starting RTL Elaboration : Time (s): cpu = 00:00:08 ; elapsed = 00:00:10 . Memory (MB): peak = 1727.340 ; gain = 574.906
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-638] synthesizing module 'top_wrapper' [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/hdl/top_wrapper.vhd:34]
 INFO: [Synth 8-3491] module 'top' declared at 'c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/synth/top.vhd:15' bound to instance 'top_i' of component 'top' [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/hdl/top_wrapper.vhd:54]
@@ -77,8 +77,8 @@ INFO: [Synth 8-638] synthesizing module 'top_market_data_top_0_0' [c:/Users/lskj
 INFO: [Synth 8-3491] module 'market_data_top' declared at 'C:/Users/lskje/Desktop/FPGA_Orderbook/market_data_top.vhd:33' bound to instance 'U0' of component 'market_data_top' [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_market_data_top_0_0/synth/top_market_data_top_0_0.vhd:176]
 INFO: [Synth 8-638] synthesizing module 'market_data_top' [C:/Users/lskje/Desktop/FPGA_Orderbook/market_data_top.vhd:113]
 INFO: [Synth 8-638] synthesizing module 'input_top' [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/input_top.vhd:74]
-INFO: [Synth 8-638] synthesizing module 'xgmii64_to_axis' [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/xgmii64_to_axis.vhd:40]
-INFO: [Synth 8-256] done synthesizing module 'xgmii64_to_axis' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/xgmii64_to_axis.vhd:40]
+INFO: [Synth 8-638] synthesizing module 'xgmii64_to_axis' [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/xgmii64_to_axis.vhd:57]
+INFO: [Synth 8-256] done synthesizing module 'xgmii64_to_axis' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/xgmii64_to_axis.vhd:57]
 INFO: [Synth 8-638] synthesizing module 'xgmii_crc32_rx64' [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/xgmii_crc32_rx64.vhd:36]
 INFO: [Synth 8-256] done synthesizing module 'xgmii_crc32_rx64' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/xgmii_crc32_rx64.vhd:36]
 INFO: [Synth 8-638] synthesizing module 'fcs_msg_extend_sync' [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/fcs_msg_extend_sync.vhd:41]
@@ -93,8 +93,8 @@ INFO: [Synth 8-638] synthesizing module 'udp_parser' [C:/Users/lskje/Desktop/FPG
 INFO: [Synth 8-256] done synthesizing module 'udp_parser' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/udp_parser.vhd:78]
 INFO: [Synth 8-638] synthesizing module 'mold_parser' [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/mold_parser.vhd:87]
 INFO: [Synth 8-256] done synthesizing module 'mold_parser' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/mold_parser.vhd:87]
-INFO: [Synth 8-638] synthesizing module 'itch_parser' [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/itch_parser.vhd:129]
-INFO: [Synth 8-256] done synthesizing module 'itch_parser' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/itch_parser.vhd:129]
+INFO: [Synth 8-638] synthesizing module 'itch_parser' [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/itch_parser.vhd:133]
+INFO: [Synth 8-256] done synthesizing module 'itch_parser' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/itch_parser.vhd:133]
 INFO: [Synth 8-256] done synthesizing module 'fullparser' (0#1) [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/fullparser.vhd:86]
 INFO: [Synth 8-638] synthesizing module 'order_book_engine_top' [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book_engine_top.vhd:127]
 INFO: [Synth 8-638] synthesizing module 'book_input_stage' [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/book_input_stage.vhd:104]
@@ -1864,18 +1864,18 @@ WARNING: [Synth 8-7129] Port probe_in66[0] in module vio_v3_0_28_vio is either u
 WARNING: [Synth 8-7129] Port probe_in67[0] in module vio_v3_0_28_vio is either unconnected or has no load
 INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:22 ; elapsed = 00:00:24 . Memory (MB): peak = 2121.812 ; gain = 976.172
+Finished RTL Elaboration : Time (s): cpu = 00:00:22 ; elapsed = 00:00:26 . Memory (MB): peak = 2127.207 ; gain = 974.773
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:23 ; elapsed = 00:00:25 . Memory (MB): peak = 2121.812 ; gain = 976.172
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:23 ; elapsed = 00:00:27 . Memory (MB): peak = 2127.207 ; gain = 974.773
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:23 ; elapsed = 00:00:25 . Memory (MB): peak = 2121.812 ; gain = 976.172
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:23 ; elapsed = 00:00:27 . Memory (MB): peak = 2127.207 ; gain = 974.773
 ---------------------------------------------------------------------------------
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.470 . Memory (MB): peak = 2121.812 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.508 . Memory (MB): peak = 2127.207 ; gain = 0.000
 INFO: [Netlist 29-17] Analyzing 88 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
@@ -1906,38 +1906,6 @@ Resolution: Review the constraint files and remove the redundant clock definitio
 Finished Parsing XDC File [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/orderbook.xdc]
 INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/orderbook.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/top_wrapper_propImpl.xdc].
 Resolution: To avoid this warning, move constraints listed in [.Xil/top_wrapper_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
-Parsing XDC File [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc]
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:4]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:6]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:15]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:18]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:23]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:40]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:46]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:65]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:67]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:69]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:71]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:73]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:81]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:89]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc:92]
-Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
-Finished Parsing XDC File [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.srcs/constrs_1/new/debug_valids.xdc]
 Parsing XDC File [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/dont_touch.xdc]
 Finished Parsing XDC File [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/dont_touch.xdc]
 INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/dont_touch.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/top_wrapper_propImpl.xdc].
@@ -1950,47 +1918,29 @@ INFO: [Project 1-236] Implementation specific constraints were found while readi
 Resolution: To avoid this warning, move constraints listed in [.Xil/top_wrapper_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.027 . Memory (MB): peak = 2243.207 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.027 . Memory (MB): peak = 2239.434 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
   A total of 88 instances were transformed.
   MUXCY_L => MUXCY: 88 instances
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:02 ; elapsed = 00:00:01 . Memory (MB): peak = 2243.266 ; gain = 0.000
+Constraint Validation Runtime : Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.598 . Memory (MB): peak = 2239.508 ; gain = 0.000
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:01:09 ; elapsed = 00:01:12 . Memory (MB): peak = 2243.266 ; gain = 1097.625
+Finished Constraint Validation : Time (s): cpu = 00:01:08 ; elapsed = 00:01:12 . Memory (MB): peak = 2239.508 ; gain = 1087.074
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7vx690tffg1157-2
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:01:09 ; elapsed = 00:01:12 . Memory (MB): peak = 2243.266 ; gain = 1097.625
+Finished Loading Part and Timing Information : Time (s): cpu = 00:01:08 ; elapsed = 00:01:12 . Memory (MB): peak = 2239.508 ; gain = 1087.074
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:01:12 ; elapsed = 00:01:15 . Memory (MB): peak = 2243.266 ; gain = 1097.625
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:01:10 ; elapsed = 00:01:15 . Memory (MB): peak = 2239.508 ; gain = 1087.074
 ---------------------------------------------------------------------------------
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_crc'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/input_top.vhd:113]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_extend'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Input/input_top.vhd:132]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_itch'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/fullparser.vhd:231]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_fullparser'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/market_data_top.vhd:201]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_eth'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/fullparser.vhd:129]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_ipv4'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/fullparser.vhd:154]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_udp'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/fullparser.vhd:179]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_mold'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Parser/fullparser.vhd:204]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_order_fifo'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book_engine_top.vhd:295]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_order_book'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book_engine_top.vhd:345]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_book_input_stage'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book_engine_top.vhd:262]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_time_event_fifo'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book_engine_top.vhd:496]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_price_storage'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book_engine_top.vhd:404]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_level_array'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/Engine/order_book_engine_top.vhd:446]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_engine'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/market_data_top.vhd:242]
 INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'order_tx_xgmii'
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_input'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/market_data_top.vhd:160]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'U0'. This will prevent further optimization [c:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.gen/sources_1/bd/top/ip/top_market_data_top_0_0/synth/top_market_data_top_0_0.vhd:176]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'u_tx'. This will prevent further optimization [C:/Users/lskje/Desktop/FPGA_Orderbook/market_data_top.vhd:287]
 INFO: [Synth 8-802] inferred FSM for state register 'mcp1_state_reg' in module 'ten_gig_eth_pcs_pma_v6_0_33_idle_delete'
 INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'ten_gig_eth_pcs_pma_v6_0_33_tx_pcs_fsm'
 INFO: [Synth 8-802] inferred FSM for state register 'mcp1_state_reg' in module 'ten_gig_eth_pcs_pma_v6_0_33_rx_block_lock_fsm'
@@ -2082,7 +2032,7 @@ INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 
 ---------------------------------------------------------------------------------------------------
 INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'ten_gig_eth_pcs_pma_v6_0_33_drp_ipif'
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:01:22 ; elapsed = 00:01:25 . Memory (MB): peak = 2243.266 ; gain = 1097.625
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:01:20 ; elapsed = 00:01:25 . Memory (MB): peak = 2239.508 ; gain = 1087.074
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start RTL Component Statistics 
@@ -2102,74 +2052,74 @@ Finished Part Resource Summary
 ---------------------------------------------------------------------------------
 Start Cross Boundary and Area Optimization
 ---------------------------------------------------------------------------------
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_0 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_0 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_1 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_1 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_2 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_2 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_3 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_3 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_4 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_4 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_5 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_5 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_6 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_6 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_7 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_7 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_8 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_8 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_9 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_9 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_10 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_10 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_11 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_11 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_12 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_12 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_13 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_13 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_14 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_14 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_15 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_15 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_32 , of type : RAMB18E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_0/\g_sides[0].u_ram/ram_reg_32 , of type : RAMB18E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_0 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_0 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_1 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_1 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_2 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_2 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_3 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_3 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_4 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_4 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_5 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_5 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_6 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_6 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_7 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_7 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_8 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_8 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_9 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_9 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_10 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_10 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_11 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_11 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_12 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_12 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_13 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_13 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_14 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_14 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_15 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_15 , of type : RAMB36E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_32 , of type : RAMB18E1 in constant propagation
-WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/U0/u_engine/i_1/u_level_array/i_1/\g_sides[1].u_ram/ram_reg_32 , of type : RAMB18E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_0 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_0 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_1 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_1 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_2 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_2 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_3 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_3 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_4 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_4 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_5 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_5 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_6 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_6 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_7 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_7 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_8 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_8 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_9 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_9 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_10 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_10 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_11 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_11 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_12 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_12 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_13 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_13 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_14 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_14 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_15 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_15 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_32 , of type : RAMB18E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_4/\u_level_array/g_sides[0].u_ram/ram_reg_32 , of type : RAMB18E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_0 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_0 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_1 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_1 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_2 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_2 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_3 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_3 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_4 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_4 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_5 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_5 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_6 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_6 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_7 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_7 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_8 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_8 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_9 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_9 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_10 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_10 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_11 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_11 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_12 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_12 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_13 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_13 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_14 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_14 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_15 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_15 , of type : RAMB36E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_32 , of type : RAMB18E1 in constant propagation
+WARNING: [Synth 8-13373] Removed Macro Instance : top_i/market_data_top_0/u_enginei_4/u_level_arrayi_5/\u_level_array/g_sides[1].u_ram/ram_reg_32 , of type : RAMB18E1 in constant propagation
 WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_0/U0/ten_gig_eth_pcs_pma_block_ii_2/\top_ten_gig_eth_pcs_pma_0_0_local_clock_reset_block/sim_speedup_controller_inst/load_sim_speedup_value_reg  is always disabled
 WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_0/U0/ten_gig_eth_pcs_pma_block_ii_2/\top_ten_gig_eth_pcs_pma_0_0_local_clock_reset_block/sim_speedup_controller_inst/load_sim_speedup_value_reg  is always disabled
 WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_1/U0/i_0/\top_ten_gig_eth_pcs_pma_1_0_local_clock_reset_block/sim_speedup_controller_inst/load_sim_speedup_value_reg  is always disabled
@@ -2179,7 +2129,7 @@ WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_0/U0/ten_gig_et
 WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_1/U0/i_0/\top_ten_gig_eth_pcs_pma_1_0_local_clock_reset_block/sim_speedup_controller_inst/load_sim_speedup_value_reg  is always disabled
 WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_1/U0/i_0/\top_ten_gig_eth_pcs_pma_1_0_local_clock_reset_block/sim_speedup_controller_inst/load_sim_speedup_value_reg  is always disabled
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:04:23 ; elapsed = 00:04:29 . Memory (MB): peak = 2802.930 ; gain = 1657.289
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:04:16 ; elapsed = 00:04:26 . Memory (MB): peak = 2843.801 ; gain = 1691.367
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying XDC Timing Constraints
@@ -2193,13 +2143,13 @@ INFO: [Synth 8-5578] Moved timing constraint from pin 'vio_link/probe_in2[0]' to
 INFO: [Synth 8-5578] Moved timing constraint from pin 'por_0/rst_out' to pin 'por_0/U0/rst_out_reg/Q'
 INFO: [Synth 8-5819] Moved 5 constraints on hierarchical pins to their respective driving/loading pins
 ---------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): cpu = 00:04:38 ; elapsed = 00:04:46 . Memory (MB): peak = 2802.930 ; gain = 1657.289
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:04:32 ; elapsed = 00:04:43 . Memory (MB): peak = 2843.801 ; gain = 1691.367
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:05:33 ; elapsed = 00:05:41 . Memory (MB): peak = 2906.754 ; gain = 1761.113
+Finished Timing Optimization : Time (s): cpu = 00:05:29 ; elapsed = 00:05:41 . Memory (MB): peak = 2928.500 ; gain = 1776.066
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Technology Mapping
@@ -2208,6 +2158,18 @@ WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_0/U0/\ten_gig_e
 WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_0/U0/\ten_gig_eth_pcs_pma_block_i/top_ten_gig_eth_pcs_pma_0_0_local_clock_reset_block/sim_speedup_controller_inst/load_sim_speedup_value_reg  is always disabled
 WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_1/U0/\top_ten_gig_eth_pcs_pma_1_0_local_clock_reset_block/sim_speedup_controller_inst/load_sim_speedup_value_reg  is always disabled
 WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_1/U0/\top_ten_gig_eth_pcs_pma_1_0_local_clock_reset_block/sim_speedup_controller_inst/load_sim_speedup_value_reg  is always disabled
+WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_0/U0/\ten_gig_eth_pcs_pma_block_i/top_ten_gig_eth_pcs_pma_0_0_local_clock_reset_block/sim_speedup_controller_inst/load_sim_speedup_value_reg  is always disabled
+WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_0/U0/\ten_gig_eth_pcs_pma_block_i/top_ten_gig_eth_pcs_pma_0_0_local_clock_reset_block/sim_speedup_controller_inst/load_sim_speedup_value_reg  is always disabled
+WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_1/U0/\top_ten_gig_eth_pcs_pma_1_0_local_clock_reset_block/sim_speedup_controller_inst/load_sim_speedup_value_reg  is always disabled
+WARNING: [Synth 8-264] enable of latch top_i/ten_gig_eth_pcs_pma_1/U0/\top_ten_gig_eth_pcs_pma_1_0_local_clock_reset_block/sim_speedup_controller_inst/load_sim_speedup_value_reg  is always disabled
+INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[0].u_ram/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[0].u_ram/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[1].u_ram/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[1].u_ram/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[2].u_ram/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[2].u_ram/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[3].u_ram/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[3].u_ram/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_16 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_17 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_level_array/g_sides[0].u_ram/ram_reg_18 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
@@ -2240,16 +2202,8 @@ INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_en
 INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_29 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_30 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_level_array/g_sides[1].u_ram/ram_reg_31 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[0].u_ram/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[0].u_ram/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[1].u_ram/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[1].u_ram/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[2].u_ram/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[2].u_ram/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[3].u_ram/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance top_i/market_data_top_0/U0/u_engine/u_ram_array/g_tables[3].u_ram/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:05:48 ; elapsed = 00:05:56 . Memory (MB): peak = 2906.754 ; gain = 1761.113
+Finished Technology Mapping : Time (s): cpu = 00:05:44 ; elapsed = 00:05:58 . Memory (MB): peak = 2928.500 ; gain = 1776.066
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start IO Insertion
@@ -2267,37 +2221,37 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:05:55 ; elapsed = 00:06:04 . Memory (MB): peak = 2906.754 ; gain = 1761.113
+Finished IO Insertion : Time (s): cpu = 00:05:52 ; elapsed = 00:06:05 . Memory (MB): peak = 2928.500 ; gain = 1776.066
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:05:55 ; elapsed = 00:06:04 . Memory (MB): peak = 2906.754 ; gain = 1761.113
+Finished Renaming Generated Instances : Time (s): cpu = 00:05:52 ; elapsed = 00:06:05 . Memory (MB): peak = 2928.500 ; gain = 1776.066
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:05:59 ; elapsed = 00:06:07 . Memory (MB): peak = 2906.754 ; gain = 1761.113
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:05:56 ; elapsed = 00:06:10 . Memory (MB): peak = 2928.500 ; gain = 1776.066
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:05:59 ; elapsed = 00:06:07 . Memory (MB): peak = 2906.754 ; gain = 1761.113
+Finished Renaming Generated Ports : Time (s): cpu = 00:05:56 ; elapsed = 00:06:10 . Memory (MB): peak = 2928.500 ; gain = 1776.066
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:06:00 ; elapsed = 00:06:09 . Memory (MB): peak = 2906.754 ; gain = 1761.113
+Finished Handling Custom Attributes : Time (s): cpu = 00:05:59 ; elapsed = 00:06:12 . Memory (MB): peak = 2928.500 ; gain = 1776.066
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:06:00 ; elapsed = 00:06:09 . Memory (MB): peak = 2906.754 ; gain = 1761.113
+Finished Renaming Generated Nets : Time (s): cpu = 00:05:59 ; elapsed = 00:06:13 . Memory (MB): peak = 2928.500 ; gain = 1776.066
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -2315,58 +2269,60 @@ Report Cell Usage:
 +------+--------------+------+
 |1     |BUFG          |     3|
 |2     |BUFH          |     2|
-|3     |CARRY4        |   264|
+|3     |CARRY4        |   208|
 |4     |GTHE2_CHANNEL |     2|
 |5     |GTHE2_COMMON  |     1|
 |6     |IBUFDS_GTE2   |     1|
-|7     |LUT1          |   291|
-|8     |LUT2          |  1176|
-|9     |LUT3          |  3842|
-|10    |LUT4          |  1681|
-|11    |LUT5          |  2236|
-|12    |LUT6          |  7332|
+|7     |LUT1          |   267|
+|8     |LUT2          |  1089|
+|9     |LUT3          |  1493|
+|10    |LUT4          |  1274|
+|11    |LUT5          |  2407|
+|12    |LUT6          | 10111|
 |13    |MUXCY_L       |    88|
-|14    |MUXF7         |   641|
-|15    |RAM32M        |    46|
-|16    |RAM32X1D      |     4|
-|17    |RAMB36E1      |    40|
-|19    |FDCE          |    36|
-|20    |FDPE          |   144|
-|21    |FDRE          | 16206|
-|22    |FDSE          |   493|
-|23    |LDCE          |     2|
-|24    |IBUF          |     3|
-|25    |OBUF          |     3|
+|14    |MUXF7         |   443|
+|15    |MUXF8         |     4|
+|16    |RAM32M        |    46|
+|17    |RAM32X1D      |     4|
+|18    |RAMB36E1      |    40|
+|20    |SRL16E        |    72|
+|21    |FDCE          |    36|
+|22    |FDPE          |   144|
+|23    |FDRE          | 14725|
+|24    |FDSE          |   497|
+|25    |LDCE          |     2|
+|26    |IBUF          |     3|
+|27    |OBUF          |     3|
 +------+--------------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:06:00 ; elapsed = 00:06:09 . Memory (MB): peak = 2906.754 ; gain = 1761.113
+Finished Writing Synthesis Report : Time (s): cpu = 00:05:59 ; elapsed = 00:06:13 . Memory (MB): peak = 2928.500 ; gain = 1776.066
 ---------------------------------------------------------------------------------
-Synthesis finished with 0 errors, 0 critical warnings and 102 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:05:01 ; elapsed = 00:05:33 . Memory (MB): peak = 2906.754 ; gain = 1639.660
-Synthesis Optimization Complete : Time (s): cpu = 00:06:01 ; elapsed = 00:06:10 . Memory (MB): peak = 2906.754 ; gain = 1761.113
+Synthesis finished with 0 errors, 0 critical warnings and 106 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:05:00 ; elapsed = 00:06:05 . Memory (MB): peak = 2928.500 ; gain = 1663.766
+Synthesis Optimization Complete : Time (s): cpu = 00:05:59 ; elapsed = 00:06:40 . Memory (MB): peak = 2928.500 ; gain = 1776.066
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.271 . Memory (MB): peak = 2906.754 ; gain = 0.000
-INFO: [Netlist 29-17] Analyzing 1083 Unisim elements for replacement
-INFO: [Netlist 29-28] Unisim Transformation completed in 1 CPU seconds
+Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.245 . Memory (MB): peak = 2928.500 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 833 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-140] Inserted 4 IBUFs to IO ports without IO buffers.
 INFO: [Opt 31-141] Inserted 4 OBUFs to IO ports without IO buffers.
 INFO: [Chipscope 16-324] Core: top_i/vio_link UUID: 1765fbfa-5450-5011-940e-e2cf9f17680f 
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.019 . Memory (MB): peak = 2906.754 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.017 . Memory (MB): peak = 2939.578 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
   A total of 82 instances were transformed.
   (MUXCY,XORCY) => CARRY4: 32 instances
   RAM32M => RAM32M (RAMD32(x6), RAMS32(x2)): 46 instances
   RAM32X1D => RAM32X1D (RAMD32(x2)): 4 instances
 
-Synth Design complete | Checksum: abe37554
+Synth Design complete | Checksum: a2c8d3c3
 INFO: [Common 17-83] Releasing license: Synthesis
-344 Infos, 195 Warnings, 16 Critical Warnings and 0 Errors encountered.
+326 Infos, 199 Warnings, 1 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:06:23 ; elapsed = 00:06:41 . Memory (MB): peak = 2906.754 ; gain = 2304.180
+synth_design: Time (s): cpu = 00:06:21 ; elapsed = 00:07:19 . Memory (MB): peak = 2939.621 ; gain = 2331.988
 INFO: [runtcl-6] Synthesis results are not added to the cache due to CRITICAL_WARNING
-Write ShapeDB Complete: Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.045 . Memory (MB): peak = 2906.754 ; gain = 0.000
+Write ShapeDB Complete: Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.573 . Memory (MB): peak = 2939.621 ; gain = 0.000
 INFO: [Common 17-1381] The checkpoint 'C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/OrderBook.runs/synth_1/top_wrapper.dcp' has been generated.
 INFO: [Vivado 12-24828] Executing command : report_utilization -file top_wrapper_utilization_synth.rpt -pb top_wrapper_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Sat Nov  7 21:56:35 2026...
+INFO: [Common 17-206] Exiting Vivado at Mon Nov  9 19:07:22 2026...

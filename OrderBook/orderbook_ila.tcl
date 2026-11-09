@@ -1,5 +1,5 @@
-# orderbook_ila.tcl - ILA on market_data_top: every valid signal + the whole
-#                     itch_parser interface (NO RTL changes)
+# orderbook_ila.tcl - ILA on the main pipeline valids (input, parser, engine)
+#                     and the transmit path into 10G core A     (NO RTL changes)
 #
 # Run in the Vivado Tcl Console with the OrderBook project open:
 #   source C:/Users/lskje/Desktop/FPGA_Orderbook/OrderBook/orderbook_ila.tcl
@@ -11,8 +11,8 @@
 #   2. sets top.bd to global synthesis (synth_checkpoint_mode None)
 #   3. runs synth_1, opens it and finds each signal. A signal can be given as
 #      several names (a|b|c): the first one synthesis kept is used, by
-#        net name -> register output (<name>_reg Q) -> hierarchical port pin
-#   4. creates ILA "u_ila_valids" (depth 4096) and saves it to
+#        register output (<name>_reg Q) -> net name -> hierarchical port pin
+#   4. creates ILA "u_ila_tx" (depth 4096) and saves it to
 #      constrs_1/new/debug_ila.xdc (implementation only)
 #   5. writes OrderBook/ila_probe_map.txt (probe number -> signal)
 #   6. launches impl_1 to write_bitstream
@@ -20,128 +20,54 @@
 # Safe to re-run: debug_ila.xdc is emptied first, so you always get one fresh ILA.
 #
 # Signal entry formats (paths relative to market_data_top):
-#   {path}                  1 bit
-#   {path lo hi}            bits lo..hi
-#   {path lo hi label}      bits lo..hi, shown with <label> in the probe map
+#   {path}                      1 bit
+#   {path lo hi}                bits lo..hi
+#   {path lo hi label}          bits lo..hi, shown with <label> in the probe map
+#   {path lo hi label idx}      element idx of an array of vectors: path(idx)(lo..hi)
 # Entries starting with "--" are section headings.
 
 set M top_i/market_data_top_0/*
 
-set I u_fullparser/u_itch
+set T u_tx/u_order_tx_xgmii
 
 set sigs [list \
-  {-- Input stage} \
-  {u_input/u_axis/h_v} \
-  {p_tvalid|u_fullparser/s_axis_tvalid|u_input/u_axis/o_v} \
-  {u_input/crc_done} \
-  {u_input/u_extend/res_v} \
-  {u_input/u_extend/cnt_v} \
-  {mold_cnt_v} \
-  {fcs_complete_i} \
-  {fcs_true_i} \
-  {fcs_false_i} \
+  {-- Pipeline valids: input -> parser -> engine} \
+  "p_tvalid|u_fullparser/s_axis_tvalid" \
+  "fcs_true_i" \
+  "fcs_false_i" \
+  "u_fullparser/e_tvalid" \
+  "u_fullparser/i_tvalid" \
+  "u_fullparser/u_tvalid" \
+  "u_fullparser/d_tvalid" \
+  "eng_valid|u_engine/s_valid" \
+  "u_engine/in_tvalid|u_engine/input_ev_valid" \
+  "u_engine/cmd_tvalid" \
+  "u_engine/cmd_tready" \
+  "u_engine/mut_tvalid" \
+  "u_engine/lvl_we|u_engine/price_ev_valid" \
+  "u_engine/fifo_full|fifo_full" \
   \
-  {-- Parser stages: master tvalid + m_fields_valid} \
-  {u_fullparser/e_tvalid} \
-  {u_fullparser/e_fvalid|u_fullparser/u_eth/fields_valid_r} \
-  {u_fullparser/i_tvalid} \
-  {u_fullparser/i_fvalid|u_fullparser/u_ipv4/fields_valid_r} \
-  {u_fullparser/u_ipv4/ihl_invalid_r} \
-  {u_fullparser/u_ipv4/ver_invalid_r} \
-  {u_fullparser/u_tvalid} \
-  {u_fullparser/u_fvalid|u_fullparser/u_udp/fields_valid_r} \
-  {u_fullparser/u_udp/len_invalid_r} \
-  {u_fullparser/d_tvalid} \
-  {eng_valid} \
+  {-- TX slave (from the engine's event FIFO)} \
+  "u_tx/s_valid|ev_valid_i|$T/s_axis_tvalid" \
+  "u_tx/s_ready|ev_ready_i|$T/ready_r|$T/s_axis_tready" \
+  "u_tx/s_payload|ev_payload_i|$T/s_axis_tdata 0 86 s_payload" \
   \
-  {-- ITCH slave AXI-Stream (s_axis_tready is tied '1' in the RTL - nothing to probe)} \
-  "$I/s_axis_tvalid|u_fullparser/d_tvalid" \
-  "$I/s_axis_tlast|u_fullparser/d_tlast" \
-  "$I/s_axis_tkeep|u_fullparser/d_tkeep 0 7" \
-  "$I/s_axis_tdata|u_fullparser/d_tdata 0 63" \
+  {-- TX framer state (order_tx_xgmii)} \
+  "$T/FSM_onehot_state|$T/FSM_sequential_state|$T/state 0 3 tx_state" \
+  "$T/idx 0 2 tx_idx" \
+  "$T/gap_cnt 0 1 tx_gap_cnt" \
+  "$T/payload_r 0 86 tx_payload_r" \
+  "$T/crc 0 31 tx_crc" \
   \
-  {-- ITCH internal: window / framing valids} \
-  "$I/adv_c" \
-  "$I/flush_r" \
-  "$I/fv_valid" \
-  "$I/k1_last" \
-  "$I/fv_last" \
-  "$I/fv_keep 0 7" \
-  "$I/active_r" \
-  "$I/armed_r" \
-  "$I/pay_arm_c" \
-  "$I/rem_r 0 6" \
-  "$I/lane_r 0 2" \
-  "$I/fl_typ_r 0 7" \
-  "$I/fl_scope_r" \
-  "$I/fl_lenok_r" \
-  "$I/t0_hit_r" \
-  "$I/tb_scope 0 7" \
-  "$I/tb_ist 0 7" \
-  "$I/tb_lenok 0 7" \
-  "$I/tb_two 0 7" \
-  \
-  {-- ITCH internal: retire decisions (combinational - see note on timing)} \
-  "$I/start_ok_c" \
-  "$I/end_ok_c" \
-  "$I/surv_ok_c" \
-  "$I/first_ok_c" \
-  "$I/load_c" \
-  "$I/ret_norm_c" \
-  "$I/ret_tail_c" \
-  "$I/retire_c" \
-  \
-  {-- ITCH master: message bus (the itch parser has no AXI master)} \
-  "$I/msg_valid|$I/msg_valid_r" \
-  "$I/msg_type|$I/msg_type_r 0 7" \
-  "$I/msg_fields|$I/msg_fields_r 0 31 msg_fields.ts_ns" \
-  "$I/msg_fields|$I/msg_fields_r 32 95 msg_fields.order_id" \
-  "$I/msg_fields|$I/msg_fields_r 96 127 msg_fields.book_id" \
-  "$I/msg_fields|$I/msg_fields_r 128 135 msg_fields.side" \
-  "$I/msg_fields|$I/msg_fields_r 136 167 msg_fields.position" \
-  "$I/msg_fields|$I/msg_fields_r 168 231 msg_fields.qty" \
-  "$I/msg_fields|$I/msg_fields_r 232 263 msg_fields.price" \
-  "$I/msg_fields|$I/msg_fields_r 264 279 msg_fields.extype" \
-  "$I/msg_fields|$I/msg_fields_r 280 287 msg_fields.lot" \
-  "$I/msg_index|$I/msg_index_r 0 15" \
-  "$I/msg_seqnum|$I/msg_seq_r 0 63" \
-  "$I/msg_length|$I/msg_len_r 0 15" \
-  "$I/msg_status|$I/msg_stat_r 0 5" \
-  "$I/exchange_seconds|$I/seconds_r 0 31" \
-  "$I/pkt_done|$I/pkt_done_r" \
-  "$I/pkt_msg_count|$I/pkt_count_r 0 15" \
-  \
-  {-- Engine} \
-  {u_engine/in_tvalid} \
-  {u_engine/in_px_valid} \
-  {u_engine/u_book_input_stage/r_tvalid} \
-  {u_engine/cmd_tvalid} \
-  {u_engine/cmd_px_valid} \
-  {u_engine/mut_tvalid} \
-  {u_engine/price_ev_valid} \
-  {u_engine/order_ev_valid|u_engine/ob_ts_en|u_engine/u_order_book/ts_en} \
-  {u_engine/fifo_ev_valid|u_engine/fifo_ts_en|u_engine/u_order_fifo/ts_en} \
-  {u_engine/u_time_event_fifo/any_v} \
-  {u_engine/u_time_event_fifo/out_v} \
-  {m_tvalid|u_engine/m_tvalid} \
-  {m_valid|u_engine/m_valid 0 1} \
-  {ev_valid_i} \
-  {ev_ready_i} \
+  {-- XGMII master (into 10G core A)} \
+  "$T/txc_r|u_tx/xgmii_txc|xgmii_txc 0 7 xgmii_txc" \
+  "$T/txd_r|u_tx/xgmii_txd|xgmii_txd 0 63 xgmii_txd" \
 ]
 
-# Registers whose outputs the RTL leaves unconnected ("=> open"): without
-# DONT_TOUCH synthesis deletes them and there is nothing to probe.
-set keep_cells {
-  u_fullparser/u_eth/fields_valid_r_reg
-  u_fullparser/u_ipv4/fields_valid_r_reg
-  u_fullparser/u_udp/fields_valid_r_reg
-  u_fullparser/u_itch/msg_index_r_reg*
-  u_fullparser/u_itch/msg_seq_r_reg*
-  u_fullparser/u_itch/msg_len_r_reg*
-  u_fullparser/u_itch/seconds_r_reg*
-}
+# no DONT_TOUCH needed: everything above drives the 10G core
+set keep_cells {}
 
-set ila      u_ila_valids
+set ila      u_ila_tx
 set depth    4096
 set pdir     [get_property DIRECTORY [current_project]]
 set cdir     $pdir/OrderBook.srcs/constrs_1/new
@@ -151,15 +77,17 @@ set map_txt  $pdir/ila_probe_map.txt
 
 # ---------------------------------------------------------------- helpers
 proc _parse {e} {
-  # -> {alts lo hi label}; lo = "" for a 1-bit signal
+  # -> {alts lo hi label idx}; lo = "" for a 1-bit signal, idx = "" unless an array element
   set alts [split [lindex $e 0] |]
+  set idx ""
   if {[llength $e] >= 3} {
     set lo [lindex $e 1]; set hi [lindex $e 2]
     set label [expr {[llength $e] >= 4 ? [lindex $e 3] : "[lindex $alts 0]\[$hi:$lo\]"}]
+    if {[llength $e] >= 5} { set idx [lindex $e 4] }
   } else {
     set lo ""; set hi ""; set label [lindex $alts 0]
   }
-  return [list $alts $lo $hi $label]
+  return [list $alts $lo $hi $label $idx]
 }
 
 proc _is_const {n} {
@@ -173,64 +101,102 @@ proc _is_const {n} {
 # one bit of one candidate name -> net (or "")
 proc _bit {U path b} {
   set s [expr {$b eq "" ? "" : "\[$b\]"}]
-  set n [get_nets -quiet "$U/$path$s"]
-  if {[llength $n]} { set n [lindex $n 0]; if {![_is_const $n]} { return $n }; return "" }
+
+  # 1. register output by the flop's Q pin. Synthesis often puts the HDL
+  #    name on the next-state or enable net and renames the real Q net
+  #    <name>_reg_n_0_, so a net-name match can probe the wrong wire.
   set c [get_cells -quiet "$U/${path}_reg$s"]
   if {[llength $c]} {
     set q [get_pins -quiet -of_objects [lindex $c 0] -filter {REF_PIN_NAME == Q}]
-    if {[llength $q]} { set n [get_nets -quiet -of_objects $q]
-      if {[llength $n] && ![_is_const $n]} { return [lindex $n 0] } }
+    if {[llength $q]} {
+      set n [get_nets -quiet -of_objects $q]
+      if {[llength $n] && ![_is_const [lindex $n 0]]} { return [lindex $n 0] }
+    }
+    return ""
   }
+
+  # 2. other bits of this register exist but this flop was optimised away:
+  #    the bit is constant. Don't substitute a same-named net.
+  if {[llength [get_cells -quiet "$U/${path}_reg*"]]} { return "" }
+
+  # 3. wire or port, by net name
+  set n [get_nets -quiet "$U/$path$s"]
+  if {[llength $n]} { set n [lindex $n 0]; if {![_is_const $n]} { return $n }; return "" }
+
+  # 4. hierarchical port pin
   set p [get_pins -quiet "$U/$path$s"]
   if {[llength $p]} { set n [get_nets -quiet -of_objects $p]
     if {[llength $n] && ![_is_const [lindex $n 0]]} { return [lindex $n 0] } }
   return ""
 }
 
+# Re-use the existing synthesis (skip steps 1-3) with:
+#   set skip_synth 1; source .../orderbook_ila.tcl
+# Only valid if the signal list has not changed since synth_1 ran.
+set _skip [expr {[info exists ::skip_synth] && $::skip_synth}]
+catch {unset ::skip_synth}
+
 # ---------------------------------------------------------------- 1. constraints
 file mkdir $cdir
-set fh [open $mark_xdc w]
-puts $fh "## generated by orderbook_ila.tcl - keep debug signals through synthesis"
-puts $fh "## (edit the lists in orderbook_ila.tcl, not this file)"
-set seen [dict create]
-foreach e $sigs {
-  if {[string match --* $e]} continue
-  lassign [_parse $e] alts lo hi label
-  foreach a $alts {
-    set pat [expr {$lo eq "" ? "$M/$a" : "$M/$a\[*\]"}]
-    if {[dict exists $seen $pat]} continue
-    dict set seen $pat 1
-    puts $fh "set_property MARK_DEBUG true \[get_nets -quiet {$pat}\]"
+if {!$_skip} {
+  set fh [open $mark_xdc w]
+  puts $fh "## generated by orderbook_ila.tcl - keep debug signals through synthesis"
+  puts $fh "## (edit the lists in orderbook_ila.tcl, not this file)"
+  set seen [dict create]
+  foreach e $sigs {
+    if {[string match --* $e]} continue
+    lassign [_parse $e] alts lo hi label idx
+    foreach a $alts {
+      set pat [expr {$lo eq "" ? "$M/$a" : "$M/$a\[*\]"}]
+      if {[dict exists $seen $pat]} continue
+      dict set seen $pat 1
+      puts $fh "set_property MARK_DEBUG true \[get_nets -quiet {$pat}\]"
+    }
   }
+  foreach c $keep_cells {
+    puts $fh "set_property DONT_TOUCH true \[get_cells -quiet {$M/$c}\]"
+  }
+  close $fh
 }
-foreach c $keep_cells {
-  puts $fh "set_property DONT_TOUCH true \[get_cells -quiet {$M/$c}\]"
-}
-close $fh
-close [open $ila_xdc w]      ;# start with no ILA
+close [open $ila_xdc w]      ;# start with no ILA (implementation-only file)
 
 foreach f [list $mark_xdc $ila_xdc] {
   if {![llength [get_files -quiet $f]]} { add_files -fileset constrs_1 -norecurse $f }
 }
-set_property used_in_synthesis      true  [get_files $mark_xdc]
-set_property used_in_implementation true  [get_files $mark_xdc]
+if {!$_skip} {
+  set_property used_in_synthesis      true  [get_files $mark_xdc]
+  set_property used_in_implementation true  [get_files $mark_xdc]
+}
 set_property used_in_synthesis      false [get_files $ila_xdc]
 set_property used_in_implementation true  [get_files $ila_xdc]
 
-# ---------------------------------------------------------------- 2. block design
-set bd [get_files top.bd]
-if {[get_property synth_checkpoint_mode $bd] ne "None"} {
-  puts "=== top.bd: synth_checkpoint_mode [get_property synth_checkpoint_mode $bd] -> None"
-  set_property synth_checkpoint_mode None $bd
-  generate_target all $bd
-}
+if {!$_skip} {
+  # ---------------------------------------------------------------- 2. block design
+  set bd [get_files top.bd]
+  if {[get_property synth_checkpoint_mode $bd] ne "None"} {
+    puts "=== top.bd: synth_checkpoint_mode [get_property synth_checkpoint_mode $bd] -> None"
+    set_property synth_checkpoint_mode None $bd
+    generate_target all $bd
+  }
 
-# ---------------------------------------------------------------- 3. synthesis
-reset_run synth_1
-launch_runs synth_1 -jobs 4
-wait_on_run synth_1
+  # ---------------------------------------------------------------- 3. synthesis
+  reset_run synth_1
+  launch_runs synth_1 -jobs 4
+  # wait_on_run can return an error for unrelated reasons (e.g. Hardware
+  # Manager losing its target while waiting); judge synthesis by its own result.
+  if {[catch {wait_on_run synth_1} werr]} {
+    puts "=== wait_on_run reported: $werr  - checking synth_1 itself"
+    while {[get_property STATUS [get_runs synth_1]] ni {"synth_design Complete!" "synth_design ERROR"}
+           && ![string match "*ERROR*" [get_property STATUS [get_runs synth_1]]]
+           && [get_property PROGRESS [get_runs synth_1]] ne "100%"} {
+      after 10000
+    }
+  }
+} else {
+  puts "=== skip_synth: re-using the existing synth_1 result"
+}
 if {[get_property PROGRESS [get_runs synth_1]] ne "100%"} {
-  error "synth_1 failed - see the Messages tab"
+  error "synth_1 is not complete ([get_property STATUS [get_runs synth_1]]) - see the Messages tab"
 }
 open_run synth_1 -name synth_1
 
@@ -253,9 +219,16 @@ set used    [dict create]     ;# flat net -> label, for 1-bit duplicates
 set section ""
 foreach e $sigs {
   if {[string match --* $e]} { set section [string trim [string range $e 2 end]]; continue }
-  lassign [_parse $e] alts lo hi label
+  lassign [_parse $e] alts lo hi label idx
   set bits {}
-  if {$lo eq ""} { set bits [list ""] } else { for {set b $lo} {$b <= $hi} {incr b} { lappend bits $b } }
+  if {$lo eq ""} {
+    set bits [list ""]
+  } elseif {$idx eq ""} {
+    for {set b $lo} {$b <= $hi} {incr b} { lappend bits $b }
+  } else {
+    # array element: name[idx][bit]
+    for {set b $lo} {$b <= $hi} {incr b} { lappend bits "$idx\]\[$b" }
+  }
 
   # take the candidate name that resolves the most bits
   set best {}; set best_alt ""
@@ -326,7 +299,7 @@ foreach pr $probes {
 }
 
 if {[llength [get_debug_cores -quiet dbg_hub]]} {
-  set_property C_CLK_INPUT_FREQ_HZ   300000000 [get_debug_cores dbg_hub]
+  set_property C_CLK_INPUT_FREQ_HZ   156250000 [get_debug_cores dbg_hub]
   set_property C_ENABLE_CLK_DIVIDER  false     [get_debug_cores dbg_hub]
   set_property C_USER_SCAN_CHAIN     1         [get_debug_cores dbg_hub]
   connect_debug_port dbg_hub/clk $clk_net
@@ -351,7 +324,10 @@ foreach pr $probes {
   if {$section ne $last} { lappend out ""; lappend out "== $section"; set last $section }
   set w [llength $nets]
   set nm [lindex $nets 0]
-  if {$w > 1} { regsub {\[[0-9]+\]$} $nm "" nm; set nm "$nm\[[expr {$w-1}]:0\]" }
+  if {$w > 1 && [regexp {^(.*)\[([0-9]+)\]$} $nm -> base lo_i]
+             && [regexp {\[([0-9]+)\]$} [lindex $nets end] -> hi_i]} {
+    set nm "$base\[$hi_i:$lo_i\]"
+  }
   lappend out [format "  probe%-3d %-34s %3d  %s" $i $label $w $nm]
   incr i
 }
@@ -374,5 +350,6 @@ puts "=== probe map saved to $map_txt"
 close_design
 
 # ---------------------------------------------------------------- 6. implementation
+reset_run impl_1
 launch_runs impl_1 -to_step write_bitstream -jobs 4
 puts "=== impl_1 launched. Program with impl_1/top_wrapper.bit + top_wrapper.ltx ==="

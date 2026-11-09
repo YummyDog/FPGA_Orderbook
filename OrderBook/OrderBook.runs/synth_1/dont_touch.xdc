@@ -3,10 +3,6 @@
 
 # XDC: new/orderbook.xdc
 
-# XDC: new/debug_valids.xdc
-
-# XDC: new/debug_ila.xdc
-
 # Block Designs: bd/top/top.bd
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top || ORIG_REF_NAME==top} -quiet] -quiet
 

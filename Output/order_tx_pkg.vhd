@@ -39,12 +39,12 @@ package order_tx_pkg is
   ------------------------------------------------------------------------------
 
   -- Ethernet, byte 0 first on the wire
-  constant C_MAC_DST   : t_bytes(0 to 5) := (x"00", x"0A", x"35", x"01", x"02", x"03");
+  constant C_MAC_DST   : t_bytes(0 to 5) := (x"FF", x"FF", x"FF", x"FF", x"FF", x"FF");  -- broadcast
   constant C_MAC_SRC   : t_bytes(0 to 5) := (x"00", x"0A", x"35", x"AA", x"BB", x"CC");
 
   -- IPv4, byte 0 first on the wire: 192.168.10.20 -> 192.168.10.1
   constant C_IP_SRC    : t_bytes(0 to 3) := (x"A9", x"FE", x"F2", x"5C");
-  constant C_IP_DST    : t_bytes(0 to 3) := (x"C0", x"A8", x"00", x"50");
+  constant C_IP_DST    : t_bytes(0 to 3) := (x"FF", x"FF", x"FF", x"FF");  -- 255.255.255.255
 
   constant C_IP_TTL    : std_logic_vector(7 downto 0)  := x"40";
   constant C_IP_DSCP   : std_logic_vector(7 downto 0)  := x"00";

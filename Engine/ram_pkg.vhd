@@ -299,7 +299,7 @@ package body ram_pkg is
       std_logic_vector(
       unsigned(prev(QTY_RANGE)) - unsigned(modify(QTY_RANGE))
       ) &
-      modify(NOTQTY_RANGE);
+      std_logic_vector(prev(NOTQTY_RANGE));
 
     elsif op = OP_REPLACE then
       return '1' & lookup & modify;

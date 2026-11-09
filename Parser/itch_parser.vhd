@@ -78,6 +78,10 @@
 -- Payload starts at byte 62 untagged (beat 7, lane 6) or byte 66 tagged
 -- (beat 8, lane 2).
 --
+-- The Mold sequence number is read from the raw window at payload start,
+-- not from the field bus: the bus is sampled one beat before the sequence
+-- number is complete. See the payload-start block in p_frame.
+--
 -- VHDL-2008
 --------------------------------------------------------------------------------
 
@@ -657,6 +661,7 @@ begin
   p_frame : process (clk)
     variable v_l   : integer range 0 to 7;
     variable v_idx : unsigned(15 downto 0);
+    variable v_seq : std_logic_vector(63 downto 0);
   begin
     if rising_edge(clk) then
       if resetn = '0' then
@@ -757,7 +762,37 @@ begin
             rem_r    <= (others => '0');
             lane_r   <= first_lane_c;
             index_r  <= (others => '0');
-            seq_r    <= unsigned(mold_sequence_num(fv_fields));
+
+            -- Mold sequence number, taken from the WINDOW, not the field bus.
+            --
+            -- fv_fields is a replica of s_fields as it stood while this beat
+            -- was at the input, and the Mold stage has not finished the
+            -- sequence number by then: its last byte arrives one beat later.
+            -- The window already holds both beats it needs, because win_r(1)
+            -- is the beat being framed and win_r(0) is the one after it.
+            --
+            --   untagged  bytes 52..59 = framing beat 6 lanes 4..7
+            --                          & framing beat 7 lanes 0..3
+            --             pay_arm is on beat 6: win_r(1) = 6, win_r(0) = 7
+            --
+            --   tagged    bytes 56..63 = framing beat 7 lanes 0..7
+            --             pay_arm is on beat 7: win_r(1) = 7
+            --
+            -- Big-endian: lane order is wire order, so the earliest byte
+            -- goes to the most significant position.
+            if vlan_c = '1' then
+              for k in 0 to 7 loop
+                v_seq(63 - 8*k downto 56 - 8*k) := bsel(win_r(1), k);
+              end loop;
+            else
+              for k in 0 to 3 loop
+                v_seq(63 - 8*k downto 56 - 8*k) := bsel(win_r(1), 4 + k);
+              end loop;
+              for k in 4 to 7 loop
+                v_seq(63 - 8*k downto 56 - 8*k) := bsel(win_r(0), k - 4);
+              end loop;
+            end if;
+            seq_r <= unsigned(v_seq);
           end if;
 
           --------------------------------------------------------------------

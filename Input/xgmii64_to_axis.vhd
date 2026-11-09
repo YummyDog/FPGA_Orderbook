@@ -1,6 +1,22 @@
 --------------------------------------------------------------------------------
 -- 64-bit XGMII to AXI4-Stream. Strips the first beat (preamble + SFD) and
--- presents the rest of the frame, FCS included, as a packet.
+-- presents the rest of the frame as a packet.
+--
+-- G_STRIP_FCS = false : the 4 FCS bytes are kept on the end of the packet.
+-- G_STRIP_FCS = true  : the 4 FCS bytes are removed; tlast and tkeep mark the
+--                       last byte BEFORE the FCS. Any downstream CRC checker
+--                       that needs those bytes will then see none.
+--
+-- How the strip works. /T/ in lane t means the current word carries t data
+-- bytes. Together with the held beat (always 8 bytes) the frame tail is
+-- 8 + t bytes, and the FCS is its last 4:
+--
+--   t = 5..7   current word keeps t - 4 bytes; held beat goes out whole
+--   t = 0..4   current word is all FCS and is dropped; the held beat
+--              becomes the last beat with 4 + t bytes (t = 4 -> all 8)
+--
+-- No extra latency and no extra pipeline stage: the held beat already
+-- exists to place tlast, and the trim only changes its tkeep.
 --
 -- Assumes /S/ is always in lane 0, so preamble and SFD occupy exactly the
 -- first beat and the payload is 8-byte aligned.
@@ -20,7 +36,8 @@ use ieee.numeric_std.all;
 
 entity xgmii64_to_axis is
   generic (
-    G_CHECK_PREAMBLE : boolean := true
+    G_CHECK_PREAMBLE : boolean := true;
+    G_STRIP_FCS      : boolean := true
   );
   port (
     clk           : in  std_logic;
@@ -49,6 +66,19 @@ architecture rtl of xgmii64_to_axis is
   begin
     for i in 0 to 7 loop
       if i < to_integer(n) then
+        k(i) := '1';
+      end if;
+    end loop;
+    return k;
+  end function;
+
+  -- tkeep for a held beat closed by /T/ in lane t when the FCS is stripped:
+  -- 4 + t bytes, t = 0..4. t = 4 is a full beat, which keep_of cannot express.
+  function keep_trim(t : unsigned(2 downto 0)) return std_logic_vector is
+    variable k : std_logic_vector(7 downto 0) := (others => '0');
+  begin
+    for i in 0 to 7 loop
+      if i < 4 + to_integer(t) then
         k(i) := '1';
       end if;
     end loop;
@@ -132,6 +162,8 @@ begin
     variable push, force_last, err_now : std_logic;
     variable n_keep : std_logic_vector(7 downto 0);
     variable n_last : std_logic;
+    variable trim   : std_logic;                     -- close held beat short
+    variable t_keep : std_logic_vector(7 downto 0);  -- its tkeep when trimmed
   begin
     if rising_edge(clk) then
       push       := '0';
@@ -139,6 +171,8 @@ begin
       n_keep     := x"FF";
       n_last     := '0';
       err_now    := frm_err;
+      trim       := '0';
+      t_keep     := x"FF";
 
       if s0_start = '1' then
         if in_frame = '1' then
@@ -152,7 +186,20 @@ begin
         if s0_term = '1' then
           err_now  := frm_err or s0_terr;
           in_frame <= '0';
-          if s0_tsel = 0 then
+          if G_STRIP_FCS then
+            if s0_tsel >= 5 then
+              -- FCS is the last 4 of this word's t bytes; keep the rest
+              push   := '1';
+              n_last := '1';
+              n_keep := keep_of(s0_tsel - 4);
+            else
+              -- This word is FCS only (with up to 4 FCS bytes in the held
+              -- beat too): drop it and close the held beat short
+              force_last := '1';
+              trim       := '1';
+              t_keep     := keep_trim(s0_tsel);
+            end if;
+          elsif s0_tsel = 0 then
             force_last := '1';      -- last data beat was the held one
           else
             push   := '1';
@@ -173,7 +220,11 @@ begin
       if h_v = '1' and (push or h_last or force_last) = '1' then
         o_v    <= '1';
         o_d    <= h_d;
-        o_keep <= h_keep;
+        if trim = '1' then
+          o_keep <= t_keep;
+        else
+          o_keep <= h_keep;
+        end if;
         o_last <= h_last or force_last;
         o_err  <= h_err or (force_last and err_now);
         h_v    <= '0';
